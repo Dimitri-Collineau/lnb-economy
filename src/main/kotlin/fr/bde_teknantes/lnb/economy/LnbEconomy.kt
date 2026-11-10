@@ -2,6 +2,8 @@ package fr.bde_teknantes.lnb.economy
 
 import com.mojang.logging.LogUtils
 import fr.bde_teknantes.lnb.economy.account.PlayerAccounts
+import fr.bde_teknantes.lnb.economy.command.EconomyCommands
+import fr.bde_teknantes.lnb.economy.command.Payments
 import fr.bde_teknantes.lnb.economy.ledger.TransferJournal
 import fr.bde_teknantes.lnb.economy.network.EconomyNetwork
 import net.minecraft.resources.ResourceLocation
@@ -24,6 +26,9 @@ class LnbEconomy(modBus: IEventBus, container: ModContainer) {
         container.registerConfig(ModConfig.Type.COMMON, EconomyConfig.SPEC, "$ID-server.toml")
 
         modBus.addListener(EconomyNetwork::register)
+
+        Payments.register()
+        NeoForge.EVENT_BUS.addListener(EconomyCommands::register)
 
         NeoForge.EVENT_BUS.addListener(TransferJournal::onServerStarted)
         NeoForge.EVENT_BUS.addListener(TransferJournal::onServerStopped)
