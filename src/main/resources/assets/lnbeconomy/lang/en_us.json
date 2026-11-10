@@ -1,1 +1,18 @@
-{}
+{
+  "economy.lnbeconomy.account.personal": "your personal account",
+  "economy.lnbeconomy.amount.many": "%s LNBits",
+  "economy.lnbeconomy.amount.one": "%s LNBit",
+  "economy.lnbeconomy.default.cant_spend": "You can’t spend from that account, so it can’t pay by default.",
+  "economy.lnbeconomy.default.set": "Paying by default: %s.",
+  "economy.lnbeconomy.problem.closed": "That account is closed.",
+  "economy.lnbeconomy.problem.disabled": "The economy is switched off for now.",
+  "economy.lnbeconomy.problem.frozen": "That account is frozen: no money goes in or out.",
+  "economy.lnbeconomy.problem.insufficientFunds": "There isn’t enough money on that account.",
+  "economy.lnbeconomy.problem.notAllowed": "You can’t spend from that account.",
+  "economy.lnbeconomy.problem.notEligible": "Your LNB account doesn’t have access to the economy.",
+  "economy.lnbeconomy.problem.notFound": "No such account.",
+  "economy.lnbeconomy.problem.notLinked": "Link your LNB account to use the economy.",
+  "economy.lnbeconomy.problem.other": "LNB’s site refused (%s).",
+  "economy.lnbeconomy.problem.sameAccount": "The money would stay on the same account.",
+  "economy.lnbeconomy.problem.unavailable": "The economy is unavailable for now. Try again in a moment."
+}

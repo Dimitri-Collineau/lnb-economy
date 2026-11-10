@@ -1,1 +1,18 @@
-{}
+{
+  "economy.lnbeconomy.account.personal": "ton compte perso",
+  "economy.lnbeconomy.amount.many": "%s LNBits",
+  "economy.lnbeconomy.amount.one": "%s LNBit",
+  "economy.lnbeconomy.default.cant_spend": "Tu ne peux pas dépenser depuis ce compte, il ne peut donc pas payer par défaut.",
+  "economy.lnbeconomy.default.set": "Compte qui paie par défaut : %s.",
+  "economy.lnbeconomy.problem.closed": "Ce compte est fermé.",
+  "economy.lnbeconomy.problem.disabled": "L’économie est désactivée pour le moment.",
+  "economy.lnbeconomy.problem.frozen": "Ce compte est gelé : aucun argent n’y entre ni n’en sort.",
+  "economy.lnbeconomy.problem.insufficientFunds": "Il n’y a pas assez d’argent sur ce compte.",
+  "economy.lnbeconomy.problem.notAllowed": "Tu ne peux pas dépenser depuis ce compte.",
+  "economy.lnbeconomy.problem.notEligible": "Ton compte LNB n’a pas accès à l’économie.",
+  "economy.lnbeconomy.problem.notFound": "Ce compte n’existe pas.",
+  "economy.lnbeconomy.problem.notLinked": "Lie ton compte LNB pour utiliser l’économie.",
+  "economy.lnbeconomy.problem.other": "Le site LNB a refusé (%s).",
+  "economy.lnbeconomy.problem.sameAccount": "L’argent resterait sur le même compte.",
+  "economy.lnbeconomy.problem.unavailable": "L’économie est momentanément indisponible. Réessaie dans un instant."
+}
