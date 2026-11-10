@@ -92,7 +92,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    "integrationTestImplementation"(kotlin("test"))
+    "integrationTestImplementation"(kotlin("test-junit5"))
     "integrationTestImplementation"(platform("org.junit:junit-bom:5.11.4"))
     "integrationTestImplementation"("org.junit.jupiter:junit-jupiter")
     "integrationTestRuntimeOnly"("org.junit.platform:junit-platform-launcher")

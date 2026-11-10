@@ -17,3 +17,20 @@ and skips the build when they are not set.
 ## License
 
 AGPL-3.0-or-later, like LNB Warden and the site.
+
+## Tests
+
+`./gradlew test` runs the unit tests, which need neither Minecraft nor the site.
+
+`./gradlew integrationTest` calls a running site. Start it from `lnb-website` (`docker compose up -d`, then
+`pnpm dev`) with `WARDEN_SERVER_SECRET` set in its `.env` and the `economy`, `economy.serverApi` and
+`economy.transfers` flags on, then set:
+
+| Variable          | Value                                                                       |
+| ----------------- | --------------------------------------------------------------------------- |
+| `LNB_API_URL`     | `http://localhost:3000`                                                     |
+| `LNB_API_TOKEN`   | the site's `WARDEN_SERVER_SECRET`                                           |
+| `LNB_TEST_PLAYER` | UUID of a linked Minecraft account (offline mode: `OfflinePlayer:<name>`)    |
+| `LNB_TEST_CASINO` | handle of a shared account that player owns or is a member of              |
+
+The tests move 1 LNBit to that account and back. Without these variables, they are skipped.
