@@ -42,9 +42,12 @@ object CasinoHooks {
 
     // Which items are bets
 
-    /** Any chip with a casino, for menus and settings that don't know their machine. */
+    /**
+     * Any chip, for the lists and settings screens that don't know their machine: they test plain item stacks, so a
+     * chip without its casino must pass. Actual bets always go through [accepts] or [acceptsInMenu].
+     */
     @JvmStatic
-    fun isBettable(stack: ItemStack): Boolean = Chips.casinoOf(stack) != null
+    fun isBettable(stack: ItemStack): Boolean = Chips.isChip(stack)
 
     /** Only chips of the machine's casino. On the client, where links aren't known, any chip. */
     @JvmStatic
