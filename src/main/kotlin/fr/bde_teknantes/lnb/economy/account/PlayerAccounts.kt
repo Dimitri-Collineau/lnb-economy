@@ -7,6 +7,7 @@ import fr.bde_teknantes.lnb.economy.api.EconomyApi
 import fr.bde_teknantes.lnb.economy.api.Problems
 import fr.bde_teknantes.lnb.economy.api.ServerPlayer as SitePlayer
 import fr.bde_teknantes.lnb.economy.api.TransferResult
+import fr.bde_teknantes.lnb.economy.casino.Casinos
 import fr.bde_teknantes.lnb.economy.network.AccountEntry
 import fr.bde_teknantes.lnb.economy.network.AccountsSnapshotPayload
 import fr.bde_teknantes.lnb.economy.network.EconomyStatus
@@ -88,6 +89,7 @@ object PlayerAccounts {
 
     /** A transfer gives the balance of both accounts right after it: update everyone who holds one of them. */
     fun applyTransfer(server: MinecraftServer, result: TransferResult) {
+        Casinos.onTransfer(result)
         val balances = mapOf(result.from.accountId to result.from.balance, result.to.accountId to result.to.balance)
         for ((uuid, entry) in entries.toMap()) {
             val player = entry.player ?: continue

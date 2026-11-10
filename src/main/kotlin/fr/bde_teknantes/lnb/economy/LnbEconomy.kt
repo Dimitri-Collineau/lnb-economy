@@ -2,6 +2,7 @@ package fr.bde_teknantes.lnb.economy
 
 import com.mojang.logging.LogUtils
 import fr.bde_teknantes.lnb.economy.account.PlayerAccounts
+import fr.bde_teknantes.lnb.economy.casino.Casinos
 import fr.bde_teknantes.lnb.economy.chip.LostChips
 import fr.bde_teknantes.lnb.economy.command.EconomyCommands
 import fr.bde_teknantes.lnb.economy.command.Payments
@@ -40,6 +41,9 @@ class LnbEconomy(modBus: IEventBus, container: ModContainer) {
         NeoForge.EVENT_BUS.addListener(PlayerAccounts::onPlayerLoggedIn)
         NeoForge.EVENT_BUS.addListener(PlayerAccounts::onPlayerLoggedOut)
         NeoForge.EVENT_BUS.addListener(PlayerAccounts::onServerStopped)
+        NeoForge.EVENT_BUS.addListener(Casinos::onServerStarted)
+        NeoForge.EVENT_BUS.addListener(Casinos::onServerStopped)
+        NeoForge.EVENT_BUS.addListener(Casinos::onServerTick)
         NeoForge.EVENT_BUS.addListener<ItemExpireEvent>(EventPriority.LOWEST, LostChips::onExpire)
         NeoForge.EVENT_BUS.addListener(LostChips::onLeaveLevel)
     }
