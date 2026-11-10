@@ -64,5 +64,14 @@
   "gui.lnbeconomy.accounts.viewer": "You can only read this account.",
   "gui.lnbeconomy.inventory.accounts": "My accounts",
   "gui.lnbeconomy.inventory.accounts.hint": "See your accounts and choose the one that pays by default",
-  "gui.lnbeconomy.inventory.default": "Paying by default: %s"
+  "gui.lnbeconomy.inventory.default": "Paying by default: %s",
+  "item.lnbeconomy.chip.blank": "No casino: worth nothing",
+  "item.lnbeconomy.chip.casino": "Casino %s",
+  "item.lnbeconomy.chip.stack": "This stack: %s LNBits",
+  "item.lnbeconomy.chip_1": "1 LNBit Chip",
+  "item.lnbeconomy.chip_100": "100 LNBit Chip",
+  "item.lnbeconomy.chip_1000": "1,000 LNBit Chip",
+  "item.lnbeconomy.chip_25": "25 LNBit Chip",
+  "item.lnbeconomy.chip_5": "5 LNBit Chip",
+  "item.lnbeconomy.chip_500": "500 LNBit Chip"
 }

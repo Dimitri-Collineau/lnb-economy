@@ -64,5 +64,14 @@
   "gui.lnbeconomy.accounts.viewer": "Tu peux seulement consulter ce compte.",
   "gui.lnbeconomy.inventory.accounts": "Mes comptes",
   "gui.lnbeconomy.inventory.accounts.hint": "Voir tes comptes et choisir celui qui paie par défaut",
-  "gui.lnbeconomy.inventory.default": "Paie par défaut : %s"
+  "gui.lnbeconomy.inventory.default": "Paie par défaut : %s",
+  "item.lnbeconomy.chip.blank": "Aucun casino : ne vaut rien",
+  "item.lnbeconomy.chip.casino": "Casino %s",
+  "item.lnbeconomy.chip.stack": "Cette pile : %s LNBits",
+  "item.lnbeconomy.chip_1": "Jeton de 1 LNBit",
+  "item.lnbeconomy.chip_100": "Jeton de 100 LNBits",
+  "item.lnbeconomy.chip_1000": "Jeton de 1 000 LNBits",
+  "item.lnbeconomy.chip_25": "Jeton de 25 LNBits",
+  "item.lnbeconomy.chip_5": "Jeton de 5 LNBits",
+  "item.lnbeconomy.chip_500": "Jeton de 500 LNBits"
 }
