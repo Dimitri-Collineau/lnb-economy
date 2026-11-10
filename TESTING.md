@@ -9,10 +9,26 @@ What the unit and integration tests can't cover: the game itself, with a client.
 1. In `lnb-website` (branch `feat/economy`): `docker compose up -d`, then `pnpm dev`.
 2. In `.env`, set `WARDEN_SERVER_SECRET` to any long random string.
 3. In the admin, turn on the `economy`, `economy.serverApi`, `economy.transfers` and `economy.sharedAccounts` flags.
-4. Make two LNB accounts, A and B, each with a linked Minecraft account (offline mode: the UUID is
-   `UUID.nameUUIDFromBytes("OfflinePlayer:<name>")`). Give each a few thousand LNBits with an admin adjustment.
-5. With A, open a shared account `#test-casino` on `/minecraft/bank` and give it 10,000 LNBits (pay it from the site
-   admin with an adjustment). Invite B as a **viewer**.
+4. Without Microsoft sign-in, `MICROSOFT_CLIENT_ID` and `MICROSOFT_CLIENT_SECRET` can hold any placeholder: the server
+   routes don't use them, but the site refuses to start when they are empty.
+5. Make two LNB accounts, A and B, each with a linked Minecraft account, a starting balance, and a shared account
+   `#test-casino` owned by A with B as a **viewer**. Without Microsoft sign-in, straight in the database (replace the
+   UUIDs with the offline-mode ones, `UUID.nameUUIDFromBytes("OfflinePlayer:<name>")`; the tenant is Epitech's):
+
+   ```sql
+   insert into economy_settings (id, starting_balance) values (1, 5000)
+     on conflict (id) do update set starting_balance = 5000;
+   insert into "user" (id, name, email, email_verified, tenant_id) values
+     ('dev-a', 'Player A', 'dev-a@example.invalid', true, '901cb4ca-b862-4029-9306-e5cd0f6d9f86'),
+     ('dev-b', 'Player B', 'dev-b@example.invalid', true, '901cb4ca-b862-4029-9306-e5cd0f6d9f86');
+   insert into minecraft_account (uuid, user_id, username) values ('<uuid A>', 'dev-a', '<name A>'), ('<uuid B>', 'dev-b', '<name B>');
+   with acc as (insert into economy_account (kind, handle, name) values ('shared', 'test-casino', 'Test Casino') returning id)
+   insert into economy_member (account_id, user_id, role)
+     select id, 'dev-a', 'owner' from acc union all select id, 'dev-b', 'viewer' from acc;
+   ```
+
+   The starting balance is minted when the server first looks a player up. Then fund the casino with a real transfer,
+   for instance `/pay #test-casino 3000` as A.
 
 ### The Minecraft server
 
@@ -20,11 +36,15 @@ What the unit and integration tests can't cover: the game itself, with a client.
 
 ```toml
 [api]
-	url = "http://localhost:3000"
+	url = "http://[::1]:3000"
 	token = "<WARDEN_SERVER_SECRET>"
 [auth]
-	mode = "OPTIONAL"
+	mode = "OFF"
 ```
+
+`pnpm dev` only listens on `[::1]`, and Java tries `127.0.0.1` for `localhost`, so write the IPv6 address (the same
+goes for `LNB_API_URL` in the integration tests). `OFF` turns off LNB Warden's authentication only: LNB Economy still
+calls the site with this URL and token, and players don't need to link through Warden to join.
 
 `run/server.properties` needs `online-mode=false`. Restart after editing.
 

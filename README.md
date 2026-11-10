@@ -53,7 +53,7 @@ AGPL-3.0-or-later, like LNB Warden and the site.
 
 | Variable          | Value                                                                       |
 | ----------------- | --------------------------------------------------------------------------- |
-| `LNB_API_URL`     | `http://localhost:3000`                                                     |
+| `LNB_API_URL`     | `http://[::1]:3000` (`pnpm dev` only listens on IPv6)                       |
 | `LNB_API_TOKEN`   | the site's `WARDEN_SERVER_SECRET`                                           |
 | `LNB_TEST_PLAYER` | UUID of a linked Minecraft account (offline mode: `OfflinePlayer:<name>`)    |
 | `LNB_TEST_CASINO` | handle of a shared account that player owns or is a member of              |
