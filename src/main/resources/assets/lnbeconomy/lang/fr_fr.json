@@ -95,6 +95,7 @@
   "gui.lnbeconomy.counter.change": "Échanger",
   "gui.lnbeconomy.counter.change.title": "Faire la monnaie",
   "gui.lnbeconomy.counter.largest": "Plus gros jeton",
+  "gui.lnbeconomy.counter.no_account": "Aucun compte depuis lequel payer",
   "gui.lnbeconomy.counter.pay_from": "Payer depuis",
   "gui.lnbeconomy.counter.title": "Guichet : %s",
   "gui.lnbeconomy.game.blackjack": "blackjack",

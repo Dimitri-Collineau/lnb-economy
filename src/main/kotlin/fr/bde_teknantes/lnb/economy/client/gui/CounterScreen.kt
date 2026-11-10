@@ -26,7 +26,7 @@ class CounterScreen(private val counter: OpenCounterPayload) :
         const val WIDTH = 240
     }
 
-    private lateinit var account: CycleButton<AccountEntry>
+    private var account: CycleButton<AccountEntry>? = null
     private lateinit var amount: EditBox
     private lateinit var buy: Button
     private lateinit var cash: Button
@@ -41,15 +41,22 @@ class CounterScreen(private val counter: OpenCounterPayload) :
         val top = height / 2 - 80
         val previous = if (::amount.isInitialized) amount.value else ""
 
-        // Buying
+        // Buying. Without an account to pay from (no economy, or not loaded yet), a disabled placeholder.
         val spendable = ClientEconomy.snapshot.accounts.filter { it.canSpend && it.handle != counter.handle }
         val default = ClientEconomy.snapshot.defaultAccount?.takeIf { it in spendable } ?: spendable.firstOrNull()
-        account = CycleButton.builder<AccountEntry> { accountLabel(it) }
-            .withValues(spendable.ifEmpty { listOfNotNull(default) })
-            .apply { if (default != null) withInitialValue(default) }
-            .create(left, top + 20, WIDTH, 20, Component.translatable("gui.lnbeconomy.counter.pay_from"))
-        account.active = spendable.isNotEmpty()
-        addRenderableWidget(account)
+        account = if (default == null) {
+            null.also {
+                addRenderableWidget(Button.builder(Component.translatable("gui.lnbeconomy.counter.no_account")) {}
+                    .bounds(left, top + 20, WIDTH, 20).build()).active = false
+            }
+        } else {
+            addRenderableWidget(
+                CycleButton.builder<AccountEntry> { accountLabel(it) }
+                    .withValues(spendable)
+                    .withInitialValue(default)
+                    .create(left, top + 20, WIDTH, 20, Component.translatable("gui.lnbeconomy.counter.pay_from")),
+            )
+        }
 
         amount = EditBox(font, left, top + 44, WIDTH - 84, 20, Component.translatable("gui.lnbeconomy.counter.amount"))
         amount.setFilter { text -> text.isEmpty() || (text.length <= 13 && text.all(Char::isDigit)) }
@@ -87,14 +94,14 @@ class CounterScreen(private val counter: OpenCounterPayload) :
 
     private fun updateButtons() {
         val value = amount.value.toLongOrNull()
-        buy.active = account.active && value != null && value > 0
+        buy.active = account != null && value != null && value > 0
         cash.active = chipsValue() > 0
     }
 
     private fun buy() {
         val value = amount.value.toLongOrNull() ?: return
-        val chosen = account.value
-        val accountId = chosen?.id?.takeIf { it != ClientEconomy.snapshot.defaultAccountId }
+        val chosen = account?.value ?: return
+        val accountId = chosen.id.takeIf { it != ClientEconomy.snapshot.defaultAccountId }
         PacketDistributor.sendToServer(CounterBuyPayload(counter.pos, accountId, value))
         amount.value = ""
     }

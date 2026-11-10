@@ -95,6 +95,7 @@
   "gui.lnbeconomy.counter.change": "Change",
   "gui.lnbeconomy.counter.change.title": "Change",
   "gui.lnbeconomy.counter.largest": "Largest chip",
+  "gui.lnbeconomy.counter.no_account": "No account you can pay from",
   "gui.lnbeconomy.counter.pay_from": "Pay from",
   "gui.lnbeconomy.counter.title": "Counter: %s",
   "gui.lnbeconomy.game.blackjack": "blackjack",
