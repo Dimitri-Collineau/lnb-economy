@@ -33,7 +33,7 @@ object ClientEconomy {
     fun requestRefresh(always: Boolean) {
         if (Minecraft.getInstance().connection == null) return
         if (!always && System.currentTimeMillis() - receivedAt < REFRESH_MS) return
-        PacketDistributor.sendToServer(RefreshAccountsPayload())
+        PacketDistributor.sendToServer(RefreshAccountsPayload)
     }
 
     fun onLoggingOut(event: ClientPlayerNetworkEvent.LoggingOut) {

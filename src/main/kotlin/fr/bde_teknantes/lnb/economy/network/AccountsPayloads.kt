@@ -88,14 +88,15 @@ data class AccountsSnapshotPayload(
     }
 }
 
-/** Client -> server: send me my accounts, read again from the site. Rate-limited on the server. */
-class RefreshAccountsPayload : CustomPacketPayload {
+/**
+ * Client -> server: send me my accounts, read again from the site. Rate-limited on the server.
+ * A single instance: [StreamCodec.unit] only encodes the very instance it was given.
+ */
+object RefreshAccountsPayload : CustomPacketPayload {
     override fun type() = TYPE
 
-    companion object {
-        val TYPE = CustomPacketPayload.Type<RefreshAccountsPayload>(LnbEconomy.id("refresh_accounts"))
-        val STREAM_CODEC: StreamCodec<FriendlyByteBuf, RefreshAccountsPayload> = StreamCodec.unit(RefreshAccountsPayload())
-    }
+    val TYPE = CustomPacketPayload.Type<RefreshAccountsPayload>(LnbEconomy.id("refresh_accounts"))
+    val STREAM_CODEC: StreamCodec<FriendlyByteBuf, RefreshAccountsPayload> = StreamCodec.unit(RefreshAccountsPayload)
 }
 
 /** Client -> server: make this account the one that pays by default. */
