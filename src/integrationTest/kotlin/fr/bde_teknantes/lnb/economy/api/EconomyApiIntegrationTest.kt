@@ -61,6 +61,8 @@ class EconomyApiIntegrationTest {
         val before = EconomyApi.player(player).get().ok()
         val shared = EconomyApi.setDefaultAccount(player, casino).get().ok()
         assertEquals(EconomyApi.account(casino).get().ok().id, shared.defaultAccountId)
+        val personal = EconomyApi.setDefaultAccount(player, before.accounts.first().id).get().ok()
+        assertEquals(before.accounts.first().id, personal.defaultAccountId)
         val restored = EconomyApi.setDefaultAccount(player, before.defaultAccountId).get().ok()
         assertEquals(before.defaultAccountId, restored.defaultAccountId)
     }

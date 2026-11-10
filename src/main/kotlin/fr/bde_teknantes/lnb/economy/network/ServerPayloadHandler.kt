@@ -24,9 +24,7 @@ object ServerPayloadHandler {
             player.sendSystemMessage(Component.translatable("economy.lnbeconomy.default.cant_spend").withStyle(ChatFormatting.RED))
             return
         }
-        // The personal account is the site's fallback: store it as "no choice", so the player follows any later change.
-        val ref = if (account.isPersonal) null else account.id
-        EconomyApi.setDefaultAccount(player.uuid, ref).thenAccept { result ->
+        EconomyApi.setDefaultAccount(player.uuid, account.id).thenAccept { result ->
             server.execute {
                 when (result) {
                     is ApiResult.Ok -> {

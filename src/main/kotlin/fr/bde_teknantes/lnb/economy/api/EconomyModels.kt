@@ -50,8 +50,8 @@ data class ServerAccount(
     val frozen: Boolean,
 )
 
-/** `PUT /players/:uuid/default-account`. A null account pays with the personal account. */
-data class DefaultAccountBody(val account: String?)
+/** `PUT /players/:uuid/default-account`. */
+data class DefaultAccountBody(val account: String)
 
 /** One side of a transfer: a player (with or without an account), or an account alone. */
 data class Party(val player: String? = null, val account: String? = null)

@@ -27,8 +27,11 @@ object EconomyApi {
     fun player(uuid: UUID): CompletableFuture<ApiResult<ServerPlayer>> =
         call("economy player lookup", "GET", "$BASE/players/$uuid")
 
-    /** [account] is an account ID or a handle; null pays with the personal account. */
-    fun setDefaultAccount(uuid: UUID, account: String?): CompletableFuture<ApiResult<ServerPlayer>> =
+    /**
+     * [account] is an account ID or a handle. The site also takes `null` for the personal account, but Gson leaves null
+     * fields out and the site refuses a body without `account`: pass the personal account's ID instead.
+     */
+    fun setDefaultAccount(uuid: UUID, account: String): CompletableFuture<ApiResult<ServerPlayer>> =
         call("economy default account", "PUT", "$BASE/players/$uuid/default-account", DefaultAccountBody(account))
 
     /** [handle] with or without its `#`. */
