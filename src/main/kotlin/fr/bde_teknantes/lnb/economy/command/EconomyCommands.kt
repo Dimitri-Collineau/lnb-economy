@@ -2,14 +2,18 @@ package fr.bde_teknantes.lnb.economy.command
 
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.StringArgumentType
-import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.Suggestions
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import fr.bde_teknantes.lnb.economy.account.KnownHandles
+import fr.bde_teknantes.lnb.economy.LnbEconomy
 import fr.bde_teknantes.lnb.economy.account.PlayerAccounts
 import fr.bde_teknantes.lnb.economy.api.EconomyApi
 import fr.bde_teknantes.lnb.economy.api.Handles
+import fr.bde_teknantes.lnb.economy.casino.CasinoBook
+import fr.bde_teknantes.lnb.economy.casino.CasinoLinks
+import fr.bde_teknantes.lnb.economy.casino.Casinos
+import fr.bde_teknantes.lnb.economy.chip.ChipLedger
 import fr.bde_teknantes.lnb.economy.ledger.TransferJournal
 import fr.bde_teknantes.lnb.economy.money.Texts
 import fr.bde_teknantes.lnb.economy.network.EconomyStatus
@@ -27,9 +31,6 @@ import java.util.concurrent.CompletableFuture
 /** `/balance`, `/pay`, `/payfrom`, `/payconfirm` for everyone, and `/economy` for operators. */
 object EconomyCommands {
     private const val OPERATOR = 2
-
-    /** Extra `/economy` branches, added by the casino integration when MineVegas is installed. */
-    val adminBranches = mutableListOf<(LiteralArgumentBuilder<CommandSourceStack>) -> Unit>()
 
     fun register(event: RegisterCommandsEvent) {
         val dispatcher = event.dispatcher
@@ -85,7 +86,16 @@ object EconomyCommands {
                     },
                 ),
             )
-        adminBranches.forEach { it(economy) }
+            .then(
+                Commands.literal("casino").then(
+                    Commands.argument("casino", StringArgumentType.greedyString())
+                        .suggests { _, builder ->
+                            KnownHandles.extra().map(Handles::display).filter { it.startsWith(builder.remaining) }.forEach(builder::suggest)
+                            builder.buildFuture()
+                        }
+                        .executes(::casino),
+                ),
+            )
         dispatcher.register(economy)
     }
 
@@ -171,6 +181,55 @@ object EconomyCommands {
         val ready = players.count { PlayerAccounts.get(it.uuid)?.status == EconomyStatus.READY }
         source.sendSuccess({ Component.translatable("commands.lnbeconomy.status.players", ready, players.size) }, false)
         source.sendSuccess({ Component.translatable("commands.lnbeconomy.status.pending", TransferJournal.pending.size) }, false)
+        return 1
+    }
+
+    /**
+     * `/economy casino #handle`: the casino's balance, free balance, chips in circulation and links.
+     * `/economy casino #handle outstanding <n>`: sets its chips in circulation, after chips were lost unseen.
+     */
+    private fun casino(context: CommandContext<CommandSourceStack>): Int {
+        val source = context.source
+        val parts = StringArgumentType.getString(context, "casino").trim().split(Regex("\\s+"))
+        if (!Handles.isHandle(parts[0])) {
+            source.sendFailure(Component.translatable("economy.lnbeconomy.pay.bad_handle"))
+            return 0
+        }
+        val handle = Handles.bare(parts[0])
+        val ledger = ChipLedger.get(source.server)
+        if (parts.size == 3 && parts[1] == "outstanding") {
+            val value = parts[2].toLongOrNull()?.takeIf { it >= 0 } ?: run {
+                source.sendFailure(Component.translatable("economy.lnbeconomy.pay.bad_amount"))
+                return 0
+            }
+            val before = ledger.outstanding(handle)
+            ledger.set(handle, value)
+            LnbEconomy.LOGGER.info("{} set the chips in circulation of #{} from {} to {}", source.textName, handle, before, value)
+            source.sendSuccess({ Component.translatable("commands.lnbeconomy.casino.outstanding.set", Handles.display(handle), before, value) }, true)
+            return 1
+        }
+        if (parts.size != 1) {
+            source.sendFailure(Component.translatable("commands.lnbeconomy.casino.usage"))
+            return 0
+        }
+        Casinos.refresh(source.server, handle).thenAccept { status ->
+            val account = Casinos.book.account(handle)
+            val free = when (status) {
+                is CasinoBook.Status.Open -> status.free.toString()
+                else -> status.javaClass.simpleName
+            }
+            source.sendSuccess({
+                Component.translatable(
+                    "commands.lnbeconomy.casino.info",
+                    Handles.display(handle),
+                    account?.balance?.toString() ?: "?",
+                    ledger.outstanding(handle),
+                    Casinos.book.reserved(handle),
+                    free,
+                    CasinoLinks.get(source.server).linkedTo(handle).size,
+                )
+            }, false)
+        }
         return 1
     }
 
