@@ -1,6 +1,8 @@
 package fr.bde_teknantes.lnb.economy.network
 
+import fr.bde_teknantes.lnb.economy.casino.Links
 import fr.bde_teknantes.lnb.economy.client.ClientPayloadHandler
+import fr.bde_teknantes.lnb.economy.counter.Counters
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent
 
 /**
@@ -18,6 +20,19 @@ object EconomyNetwork {
         registrar.playToClient(AccountsSnapshotPayload.TYPE, AccountsSnapshotPayload.STREAM_CODEC) { payload, context ->
             ClientPayloadHandler.handleAccounts(payload, context)
         }
+        registrar.playToClient(OpenCounterPayload.TYPE, OpenCounterPayload.STREAM_CODEC) { payload, context ->
+            ClientPayloadHandler.handleOpenCounter(payload, context)
+        }
+        registrar.playToClient(OpenLinkPayload.TYPE, OpenLinkPayload.STREAM_CODEC) { payload, context ->
+            ClientPayloadHandler.handleOpenLink(payload, context)
+        }
+        registrar.playToClient(MenuCasinoPayload.TYPE, MenuCasinoPayload.STREAM_CODEC) { payload, context ->
+            ClientPayloadHandler.handleMenuCasino(payload, context)
+        }
+        registrar.playToServer(CounterBuyPayload.TYPE, CounterBuyPayload.STREAM_CODEC, Counters::handleBuy)
+        registrar.playToServer(CounterCashPayload.TYPE, CounterCashPayload.STREAM_CODEC, Counters::handleCash)
+        registrar.playToServer(CounterChangePayload.TYPE, CounterChangePayload.STREAM_CODEC, Counters::handleChange)
+        registrar.playToServer(LinkPayload.TYPE, LinkPayload.STREAM_CODEC, Links::handleLink)
         registrar.playToServer(RefreshAccountsPayload.TYPE, RefreshAccountsPayload.STREAM_CODEC, ServerPayloadHandler::handleRefresh)
         registrar.playToServer(SetDefaultAccountPayload.TYPE, SetDefaultAccountPayload.STREAM_CODEC, ServerPayloadHandler::handleSetDefault)
     }

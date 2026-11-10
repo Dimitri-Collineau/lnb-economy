@@ -2,10 +2,14 @@ package fr.bde_teknantes.lnb.economy
 
 import com.mojang.logging.LogUtils
 import fr.bde_teknantes.lnb.economy.account.PlayerAccounts
+import fr.bde_teknantes.lnb.economy.casino.CasinoLinks
 import fr.bde_teknantes.lnb.economy.casino.Casinos
+import fr.bde_teknantes.lnb.economy.casino.Links
+import fr.bde_teknantes.lnb.economy.chip.ChipMailbox
 import fr.bde_teknantes.lnb.economy.chip.LostChips
 import fr.bde_teknantes.lnb.economy.command.EconomyCommands
 import fr.bde_teknantes.lnb.economy.command.Payments
+import fr.bde_teknantes.lnb.economy.counter.Counters
 import fr.bde_teknantes.lnb.economy.ledger.TransferJournal
 import fr.bde_teknantes.lnb.economy.network.EconomyNetwork
 import net.minecraft.resources.ResourceLocation
@@ -16,6 +20,7 @@ import net.neoforged.fml.config.ModConfig
 import net.neoforged.bus.api.EventPriority
 import net.neoforged.neoforge.common.NeoForge
 import net.neoforged.neoforge.event.entity.item.ItemExpireEvent
+import net.neoforged.neoforge.event.level.BlockEvent
 import org.slf4j.Logger
 
 /**
@@ -33,6 +38,8 @@ class LnbEconomy(modBus: IEventBus, container: ModContainer) {
         modBus.addListener(EconomyNetwork::register)
 
         Payments.register()
+        Counters.register()
+        Casinos.linked = { server -> CasinoLinks.get(server).handles }
         NeoForge.EVENT_BUS.addListener(EconomyCommands::register)
 
         NeoForge.EVENT_BUS.addListener(TransferJournal::onServerStarted)
@@ -44,6 +51,8 @@ class LnbEconomy(modBus: IEventBus, container: ModContainer) {
         NeoForge.EVENT_BUS.addListener(Casinos::onServerStarted)
         NeoForge.EVENT_BUS.addListener(Casinos::onServerStopped)
         NeoForge.EVENT_BUS.addListener(Casinos::onServerTick)
+        NeoForge.EVENT_BUS.addListener(ChipMailbox::onPlayerLoggedIn)
+        NeoForge.EVENT_BUS.addListener<BlockEvent.BreakEvent>(EventPriority.LOWEST) { if (!it.isCanceled) Links.onBlockBroken(it) }
         NeoForge.EVENT_BUS.addListener<ItemExpireEvent>(EventPriority.LOWEST, LostChips::onExpire)
         NeoForge.EVENT_BUS.addListener(LostChips::onLeaveLevel)
     }

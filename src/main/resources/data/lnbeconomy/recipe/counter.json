@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GGG",
+    "WCW",
+    "WWW"
+  ],
+  "key": {
+    "G": { "item": "minecraft:gold_ingot" },
+    "C": { "item": "minecraft:chest" },
+    "W": { "item": "minecraft:dark_oak_planks" }
+  },
+  "result": { "id": "lnbeconomy:counter", "count": 1 }
+}

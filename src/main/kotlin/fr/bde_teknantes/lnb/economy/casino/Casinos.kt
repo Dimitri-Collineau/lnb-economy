@@ -25,6 +25,10 @@ object Casinos {
     private var server: MinecraftServer? = null
     private var ticks = 0
     private val loading = HashMap<String, CompletableFuture<CasinoBook.Status>>()
+    private val names = HashMap<String, String>()
+
+    /** The casino's name on the site, or its handle until the site has answered. */
+    fun name(handle: String): String = names[handle] ?: "#$handle"
 
     /** Every casino linked to something in the world. */
     @Volatile
@@ -46,7 +50,10 @@ object Casinos {
             server.execute {
                 loading.remove(handle)
                 when {
-                    result is ApiResult.Ok -> book.update(handle, result.body.balance, result.body.frozen)
+                    result is ApiResult.Ok -> {
+                        book.update(handle, result.body.balance, result.body.frozen)
+                        names[handle] = result.body.name
+                    }
                     result is ApiResult.Http && result.problem == Problems.NOT_FOUND -> book.markMissing(handle)
                     else -> LnbEconomy.LOGGER.debug("Couldn't read casino #{}: {}", handle, result.describe())
                 }
