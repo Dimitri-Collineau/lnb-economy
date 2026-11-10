@@ -11,9 +11,6 @@ displayURL="https://lnb.bde-teknantes.fr/minecraft/bank"
 authors="${mod_authors}"
 description='''${mod_description}'''
 
-[[mixins]]
-config="${mod_id}.mixins.json"
-
 # Only applied when MineVegas Casino is installed (see CasinoMixinPlugin).
 [[mixins]]
 config="${mod_id}.casino.mixins.json"

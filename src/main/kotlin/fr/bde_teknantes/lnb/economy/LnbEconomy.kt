@@ -5,6 +5,8 @@ import fr.bde_teknantes.lnb.economy.account.PlayerAccounts
 import fr.bde_teknantes.lnb.economy.casino.CasinoLinks
 import fr.bde_teknantes.lnb.economy.casino.Casinos
 import fr.bde_teknantes.lnb.economy.casino.Links
+import fr.bde_teknantes.lnb.economy.casino.Machines
+import fr.bde_teknantes.lnb.economy.casino.minevegas.MineVegasEvents
 import fr.bde_teknantes.lnb.economy.chip.ChipMailbox
 import fr.bde_teknantes.lnb.economy.chip.LostChips
 import fr.bde_teknantes.lnb.economy.command.EconomyCommands
@@ -16,6 +18,7 @@ import net.minecraft.resources.ResourceLocation
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.fml.ModContainer
 import net.neoforged.fml.common.Mod
+import net.neoforged.fml.ModList
 import net.neoforged.fml.config.ModConfig
 import net.neoforged.bus.api.EventPriority
 import net.neoforged.neoforge.common.NeoForge
@@ -53,6 +56,12 @@ class LnbEconomy(modBus: IEventBus, container: ModContainer) {
         NeoForge.EVENT_BUS.addListener(Casinos::onServerTick)
         NeoForge.EVENT_BUS.addListener(ChipMailbox::onPlayerLoggedIn)
         NeoForge.EVENT_BUS.addListener<BlockEvent.BreakEvent>(EventPriority.LOWEST) { if (!it.isCanceled) Links.onBlockBroken(it) }
+        if (ModList.get().isLoaded(Machines.MINEVEGAS)) {
+            // MineVegas classes are only touched when it is installed.
+            modBus.addListener(MineVegasEvents::onCommonSetup)
+            NeoForge.EVENT_BUS.addListener(MineVegasEvents::onServerStarted)
+            NeoForge.EVENT_BUS.addListener(MineVegasEvents::onContainerOpen)
+        }
         NeoForge.EVENT_BUS.addListener<ItemExpireEvent>(EventPriority.LOWEST, LostChips::onExpire)
         NeoForge.EVENT_BUS.addListener(LostChips::onLeaveLevel)
     }

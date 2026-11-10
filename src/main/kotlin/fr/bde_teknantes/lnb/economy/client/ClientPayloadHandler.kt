@@ -1,5 +1,6 @@
 package fr.bde_teknantes.lnb.economy.client
 
+import fr.bde_teknantes.lnb.economy.casino.MenuCasinos
 import fr.bde_teknantes.lnb.economy.client.gui.CounterScreen
 import fr.bde_teknantes.lnb.economy.client.gui.LinkScreen
 import fr.bde_teknantes.lnb.economy.network.AccountsSnapshotPayload
@@ -24,6 +25,6 @@ object ClientPayloadHandler {
     }
 
     fun handleMenuCasino(payload: MenuCasinoPayload, context: IPayloadContext) {
-        ClientCasinoMenus.set(payload.containerId, payload.handle)
+        MenuCasinos.set(payload.containerId, payload.handle)
     }
 }

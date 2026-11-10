@@ -2,9 +2,24 @@
   "required": true,
   "minVersion": "0.8",
   "package": "fr.bde_teknantes.lnb.economy.mixin.casino",
+  "plugin": "fr.bde_teknantes.lnb.economy.casino.minevegas.CasinoMixinPlugin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [],
-  "client": [],
+  "mixins": [
+    "BetMenusMixin",
+    "BlackjackEventsMixin",
+    "BlackjackTableBlockEntityMixin",
+    "CasinoBetsMixin",
+    "CasinoSettingsMixin",
+    "DuckDerbyBlockEntityMixin",
+    "DuckDerbyParticipantAccessor",
+    "FortuneWheelBlockEntityMixin",
+    "PlinkoBlockEntityMixin",
+    "PokerEventsMixin",
+    "PokerTableBlockEntityMixin",
+    "RouletteBlockEntityMixin",
+    "SlotMachineBlockEntityMixin",
+    "TableWagerAccessor"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

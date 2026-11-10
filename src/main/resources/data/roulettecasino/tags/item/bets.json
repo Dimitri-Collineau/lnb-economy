@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    { "id": "lnbeconomy:chip_1", "required": false },
+    { "id": "lnbeconomy:chip_5", "required": false },
+    { "id": "lnbeconomy:chip_25", "required": false },
+    { "id": "lnbeconomy:chip_100", "required": false },
+    { "id": "lnbeconomy:chip_500", "required": false },
+    { "id": "lnbeconomy:chip_1000", "required": false }
+  ]
+}
