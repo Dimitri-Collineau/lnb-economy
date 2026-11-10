@@ -49,5 +49,20 @@
   "economy.lnbeconomy.problem.notLinked": "Lie ton compte LNB pour utiliser l’économie.",
   "economy.lnbeconomy.problem.other": "Le site LNB a refusé (%s).",
   "economy.lnbeconomy.problem.sameAccount": "L’argent resterait sur le même compte.",
-  "economy.lnbeconomy.problem.unavailable": "L’économie est momentanément indisponible. Réessaie dans un instant."
+  "economy.lnbeconomy.problem.unavailable": "L’économie est momentanément indisponible. Réessaie dans un instant.",
+  "gui.lnbeconomy.accounts.frozen": "Gelé : aucun argent n’y entre ni n’en sort.",
+  "gui.lnbeconomy.accounts.hint": "★ paie par défaut. Clique sur un autre compte pour le choisir.",
+  "gui.lnbeconomy.accounts.is_default": "Paie par défaut.",
+  "gui.lnbeconomy.accounts.loading": "Chargement de tes comptes…",
+  "gui.lnbeconomy.accounts.make_default": "Clique pour qu’il paie par défaut.",
+  "gui.lnbeconomy.accounts.personal": "Perso",
+  "gui.lnbeconomy.accounts.role.member": "Membre",
+  "gui.lnbeconomy.accounts.role.owner": "Propriétaire",
+  "gui.lnbeconomy.accounts.role.viewer": "Lecteur",
+  "gui.lnbeconomy.accounts.site": "Historique sur le site",
+  "gui.lnbeconomy.accounts.title": "Mes comptes",
+  "gui.lnbeconomy.accounts.viewer": "Tu peux seulement consulter ce compte.",
+  "gui.lnbeconomy.inventory.accounts": "Mes comptes",
+  "gui.lnbeconomy.inventory.accounts.hint": "Voir tes comptes et choisir celui qui paie par défaut",
+  "gui.lnbeconomy.inventory.default": "Paie par défaut : %s"
 }
