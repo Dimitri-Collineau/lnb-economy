@@ -1,0 +1,55 @@
+modLoader="kotlinforforge"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
+issueTrackerURL="https://github.com/Dimitri-Collineau/lnb-economy/issues"
+
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+displayURL="https://lnb.bde-teknantes.fr/minecraft/bank"
+authors="${mod_authors}"
+description='''${mod_description}'''
+
+[[mixins]]
+config="${mod_id}.mixins.json"
+
+# Only applied when MineVegas Casino is installed (see CasinoMixinPlugin).
+[[mixins]]
+config="${mod_id}.casino.mixins.json"
+
+[[dependencies.${mod_id}]]
+    modId="neoforge"
+    type="required"
+    versionRange="${neo_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="kotlinforforge"
+    type="required"
+    versionRange="[${kff_version},)"
+    ordering="NONE"
+    side="BOTH"
+
+# Player identity and the connection to LNB's API (api.url and api.token in lnbwarden-server.toml).
+[[dependencies.${mod_id}]]
+    modId="lnbwarden"
+    type="required"
+    versionRange="${lnbwarden_version_range}"
+    ordering="AFTER"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="roulettecasino"
+    type="optional"
+    versionRange="${minevegas_version_range}"
+    ordering="AFTER"
+    side="BOTH"
