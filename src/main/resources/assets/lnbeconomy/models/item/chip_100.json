@@ -1,6 +1,14 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "lnbeconomy:item/chip_100"
+  "loader": "neoforge:separate_transforms",
+  "base": {
+    "parent": "lnbeconomy:item/chip_100_3d"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "minecraft:item/generated",
+      "textures": {
+        "layer0": "lnbeconomy:item/chip_100"
+      }
+    }
   }
 }
