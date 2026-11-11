@@ -127,7 +127,34 @@ and without a call):
 | 5.3 | Drop a chip, pick it up | Unchanged |
 | 5.4 | `/economy casino #test-casino outstanding 0` as an operator | Set, and logged |
 
-## 6. Without MineVegas
+## 6. Shops
+
+A is an owner of `#test-casino`, B a player with LNBits. Give A 64 diamonds and B 32.
+
+| # | Do | Expect |
+|---|----|--------|
+| 6.1 | Craft a shop (glass panes, an emerald, a chest, planks) and place it as A | It crafts and places |
+| 6.2 | B: right click it | "This shop isn't set up yet." |
+| 6.3 | B: break it | Refused: only its owners and members break it |
+| 6.4 | A: right click, click the empty slot with a diamond | The diamond stays in A's hand; the slot shows one diamond |
+| 6.5 | Lots of 16, price 40, buy back 50, Save | Refused: the buy-back price can't be above the price |
+| 6.6 | Buy back 25, account `#test-casino`, Save | "Shop saved."; status Open. The shop is in the site admin's Shops (once the page is built) |
+| 6.7 | Put 48 diamonds and 1 dirt in the stock | The dirt doesn't go in |
+| 6.8 | Put a hopper with diamonds on top, and one under the shop | The top hopper fills the stock; the bottom one takes nothing |
+| 6.9 | B: right click, 2 lots from the personal account, Buy | 32 diamonds for B, 80 to `#test-casino`; A gets "B bought 32 × Diamond at your shop for 80". The screen shows the new stock |
+| 6.10 | B: sell 1 lot back | 16 diamonds back in the stock, 25 to B |
+| 6.11 | B: sell when A's stock is at the buy-back limit | "The shop has no room for that many." |
+| 6.12 | A: change the price to 45 while B's screen is open, then B buys | "The price changed…"; nothing moves |
+| 6.13 | Stop the site, B buys | The diamonds leave the stock; "LNB's site is slow to answer…". Start the site: B gets them, once |
+| 6.14 | Same, but the site refuses (B's account frozen in the admin) | The diamonds go back to the stock |
+| 6.15 | B: fill the inventory, then buy | What doesn't fit waits; "… wait in your mailbox"; `/mailbox` after making room gives it |
+| 6.16 | Turn the shop off in the site admin, B opens it | "This shop is closed." A saving it again: refused |
+| 6.17 | A: `/economy notify off`, B buys | No message for A |
+| 6.18 | A: break the shop | The stock drops; the shop is off on the site |
+| 6.19 | Push it with a piston, move it with a Create contraption | It doesn't move |
+| 6.20 | Turn `features.shops` off in `lnbeconomy-server.toml`, restart | Right click: "Shops are switched off on this server." |
+
+## 7. Without MineVegas
 
 Remove MineVegas from the server and the client: the game starts, payments and counters work, the log has no mixin
 error.

@@ -13,6 +13,8 @@ the mod on a player's computer only talks to the server. The contract is `docs/e
   - `/pay <player|#account> <amount> [message]`: pays from your default account. Above `pay.confirmAbove`, asks to
     confirm with a click.
   - `/payfrom <#account> <player|#account> <amount> [message]`: pays from a shared account you own or are a member of.
+  - `/mailbox` (`/courrier`): collects items that didn't fit in your inventory.
+  - `/economy notify on|off`: messages when someone buys from or sells to your shops.
   - `/economy status|pending|retry <key>|casino <#account> [outstanding <value>]`: operators.
 - **Casinos.** A casino is a shared account. Its counters sell chips (the player pays the casino's account) and cash
   them (the account pays the player). Chips carry their casino and only its machines and counters take them. While
@@ -20,7 +22,13 @@ the mod on a player's computer only talks to the server. The contract is `docs/e
   and a machine only starts a game the casino's **free balance** (balance − chips in circulation − rounds in
   progress) can cover. Machines and counters are linked to a casino with the casino link wand, by an owner or member
   of its account. With MineVegas Casino installed, its machines take only chips of their casino.
-- **Reliability.** Every transfer is written to `<world>/data/lnbeconomy_journal.json` before it is sent, and sent
+- **Shops.** A shop block sells one item, in lots, for an account its owner or a member chooses, and may buy it back
+  at a lower or equal price. Its owners and members fill it (hoppers can fill it too, never empty it), set it up and
+  break it; everyone else buys. The site registers each shop and prices every order from its saved prices. While
+  the site decides, the items are held aside in the journal entry, so a refusal or a crash gives them back.
+- **Mailbox.** Items owed to a player (bought chips or items, items handed back) go straight to the inventory; what
+  doesn't fit waits for `/mailbox`. Nothing is dropped on the ground.
+- **Reliability.** Every money move is written to `<world>/data/lnbeconomy_journal.json` before it is sent, and sent
   again with the same idempotency key until the site answers, after a restart too.
 
 ## Configuration

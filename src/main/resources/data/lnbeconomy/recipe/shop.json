@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PEP",
+    "#C#",
+    "###"
+  ],
+  "key": {
+    "P": { "item": "minecraft:glass_pane" },
+    "E": { "item": "minecraft:emerald" },
+    "C": { "item": "minecraft:chest" },
+    "#": { "tag": "minecraft:planks" }
+  },
+  "result": { "id": "lnbeconomy:shop", "count": 1 }
+}

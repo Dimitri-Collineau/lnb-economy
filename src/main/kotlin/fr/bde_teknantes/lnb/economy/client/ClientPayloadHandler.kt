@@ -3,10 +3,12 @@ package fr.bde_teknantes.lnb.economy.client
 import fr.bde_teknantes.lnb.economy.casino.MenuCasinos
 import fr.bde_teknantes.lnb.economy.client.gui.CounterScreen
 import fr.bde_teknantes.lnb.economy.client.gui.LinkScreen
+import fr.bde_teknantes.lnb.economy.client.gui.ShopScreen
 import fr.bde_teknantes.lnb.economy.network.AccountsSnapshotPayload
 import fr.bde_teknantes.lnb.economy.network.MenuCasinoPayload
 import fr.bde_teknantes.lnb.economy.network.OpenCounterPayload
 import fr.bde_teknantes.lnb.economy.network.OpenLinkPayload
+import fr.bde_teknantes.lnb.economy.network.OpenShopPayload
 import net.minecraft.client.Minecraft
 import net.neoforged.neoforge.network.handling.IPayloadContext
 
@@ -18,6 +20,16 @@ object ClientPayloadHandler {
 
     fun handleOpenCounter(payload: OpenCounterPayload, context: IPayloadContext) {
         Minecraft.getInstance().setScreen(CounterScreen(payload))
+    }
+
+    /** Opens a shop, or updates the one on screen; a refresh for a shop that isn't on screen is dropped. */
+    fun handleOpenShop(payload: OpenShopPayload, context: IPayloadContext) {
+        val minecraft = Minecraft.getInstance()
+        val current = minecraft.screen as? ShopScreen
+        when {
+            current != null && current.pos == payload.pos -> current.update(payload)
+            !payload.refresh -> minecraft.setScreen(ShopScreen(payload))
+        }
     }
 
     fun handleOpenLink(payload: OpenLinkPayload, context: IPayloadContext) {

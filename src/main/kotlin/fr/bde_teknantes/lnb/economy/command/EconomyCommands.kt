@@ -17,6 +17,7 @@ import fr.bde_teknantes.lnb.economy.chip.ChipLedger
 import fr.bde_teknantes.lnb.economy.ledger.TransferJournal
 import fr.bde_teknantes.lnb.economy.money.Texts
 import fr.bde_teknantes.lnb.economy.network.EconomyStatus
+import fr.bde_teknantes.lnb.economy.shop.ShopNotices
 import fr.bde_teknantes.lnb.warden.server.api.ApiHealth
 import net.minecraft.ChatFormatting
 import net.minecraft.commands.CommandSourceStack
@@ -69,11 +70,13 @@ object EconomyCommands {
             ),
         )
 
-        val economy = Commands.literal("economy").requires { it.hasPermission(OPERATOR) }
-            .then(Commands.literal("status").executes(::status))
-            .then(Commands.literal("pending").executes(::pending))
+        // Everything under /economy is for operators, except `notify`, which every player has.
+        val operator = { source: CommandSourceStack -> source.hasPermission(OPERATOR) }
+        val economy = Commands.literal("economy")
+            .then(Commands.literal("status").requires(operator).executes(::status))
+            .then(Commands.literal("pending").requires(operator).executes(::pending))
             .then(
-                Commands.literal("retry").then(
+                Commands.literal("retry").requires(operator).then(
                     Commands.argument("key", StringArgumentType.word()).executes { context ->
                         val key = StringArgumentType.getString(context, "key")
                         if (TransferJournal.retryNow(key)) {
@@ -87,7 +90,7 @@ object EconomyCommands {
                 ),
             )
             .then(
-                Commands.literal("casino").then(
+                Commands.literal("casino").requires(operator).then(
                     Commands.argument("casino", StringArgumentType.greedyString())
                         .suggests { _, builder ->
                             KnownHandles.extra().map(Handles::display).filter { it.startsWith(builder.remaining) }.forEach(builder::suggest)
@@ -95,6 +98,11 @@ object EconomyCommands {
                         }
                         .executes(::casino),
                 ),
+            )
+            .then(
+                Commands.literal("notify")
+                    .then(Commands.literal("on").executes { context -> notify(context, true) })
+                    .then(Commands.literal("off").executes { context -> notify(context, false) }),
             )
         dispatcher.register(economy)
     }
@@ -230,6 +238,13 @@ object EconomyCommands {
                 )
             }, false)
         }
+        return 1
+    }
+
+    private fun notify(context: CommandContext<CommandSourceStack>, on: Boolean): Int {
+        val player = context.source.playerOrException
+        ShopNotices.get(player.server).set(player.uuid, on)
+        context.source.sendSuccess({ Component.translatable(if (on) "commands.lnbeconomy.notify.on" else "commands.lnbeconomy.notify.off") }, false)
         return 1
     }
 

@@ -1,11 +1,21 @@
 package fr.bde_teknantes.lnb.economy.network
 
+import fr.bde_teknantes.lnb.economy.shop.ShopSettings
+import fr.bde_teknantes.lnb.economy.shop.ShopSetup
 import io.netty.buffer.Unpooled
 import net.minecraft.core.BlockPos
+import net.minecraft.core.RegistryAccess
+import net.minecraft.core.component.DataComponents
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.FriendlyByteBuf
+import net.minecraft.network.RegistryFriendlyByteBuf
+import net.minecraft.network.chat.Component
 import net.minecraft.network.codec.StreamCodec
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /** Every payload must survive an encode and a decode: a codec that throws drops the player's connection. */
 class PayloadCodecTest {
@@ -15,6 +25,28 @@ class PayloadCodecTest {
         val decoded = codec.decode(buf)
         assertEquals(0, buf.readableBytes(), "every byte is read back")
         return decoded
+    }
+
+    private fun registryBuf() = RegistryFriendlyByteBuf(Unpooled.buffer(), RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY))
+
+    @Test
+    fun `shop screens`() {
+        val pos = BlockPos(10, 64, -3)
+        val item = ItemStack(Items.DIAMOND_SWORD).apply { set(DataComponents.CUSTOM_NAME, Component.literal("Lame")) }
+        val shop = OpenShopPayload(pos, item, 1, 400, 0, 3, 0, "#forge", refresh = true)
+        val buf = registryBuf()
+        OpenShopPayload.STREAM_CODEC.encode(buf, shop)
+        val decoded = OpenShopPayload.STREAM_CODEC.decode(buf)
+        assertEquals(0, buf.readableBytes(), "every byte is read back")
+        assertTrue(ItemStack.matches(item, decoded.item))
+        assertEquals(shop.copy(item = ItemStack.EMPTY), decoded.copy(item = ItemStack.EMPTY))
+
+        for (setup in listOf(ShopSetup(pos, ShopSettings(16, 40, 25, 1728), "a", true, false), ShopSetup(pos, ShopSettings(1, 5, null, 0), null, false, true), ShopSetup(pos, null, null, false, false))) {
+            val setupBuf = registryBuf()
+            setup.write(setupBuf)
+            assertEquals(setup, ShopSetup.read(setupBuf))
+            assertEquals(0, setupBuf.readableBytes())
+        }
     }
 
     @Test
@@ -49,6 +81,11 @@ class PayloadCodecTest {
         assertEquals(CounterChangePayload(pos, 25), roundTrip(CounterChangePayload.STREAM_CODEC, CounterChangePayload(pos, 25)))
         assertEquals(LinkPayload(pos, "casino", 100), roundTrip(LinkPayload.STREAM_CODEC, LinkPayload(pos, "casino", 100)))
         assertEquals(LinkPayload(pos, null, null), roundTrip(LinkPayload.STREAM_CODEC, LinkPayload(pos, null, null)))
+        listOf(ShopOrderPayload(pos, true, 3, null, 40), ShopOrderPayload(pos, false, 1, "a", 25)).forEach {
+            assertEquals(it, roundTrip(ShopOrderPayload.STREAM_CODEC, it))
+        }
+        val save = ShopSavePayload(pos, 16, 40, 0, 1728, "a")
+        assertEquals(save, roundTrip(ShopSavePayload.STREAM_CODEC, save))
     }
 
     @Test
