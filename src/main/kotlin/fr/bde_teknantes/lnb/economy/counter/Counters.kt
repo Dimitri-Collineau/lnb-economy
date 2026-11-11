@@ -112,9 +112,7 @@ object Counters {
             error(player, Component.translatable("economy.lnbeconomy.counter.no_chips", Handles.display(handle)))
             return
         }
-        for (stack in Chips.make(handle, value, payload.largest)) {
-            if (!player.inventory.add(stack)) player.drop(stack, false)
-        }
+        ItemMailbox.deliver(player.server, player.uuid, Chips.make(handle, value, payload.largest))
         player.sendSystemMessage(Component.translatable("economy.lnbeconomy.counter.changed", Texts.amount(value, player)))
     }
 
