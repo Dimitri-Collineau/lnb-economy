@@ -9,6 +9,7 @@ import fr.bde_teknantes.lnb.economy.network.MenuCasinoPayload
 import fr.bde_teknantes.lnb.economy.network.OpenCounterPayload
 import fr.bde_teknantes.lnb.economy.network.OpenLinkPayload
 import fr.bde_teknantes.lnb.economy.network.OpenShopPayload
+import fr.bde_teknantes.lnb.economy.network.TradeStatePayload
 import net.minecraft.client.Minecraft
 import net.neoforged.neoforge.network.handling.IPayloadContext
 
@@ -30,6 +31,10 @@ object ClientPayloadHandler {
             current != null && current.pos == payload.pos -> current.update(payload)
             !payload.refresh -> minecraft.setScreen(ShopScreen(payload))
         }
+    }
+
+    fun handleTradeState(payload: TradeStatePayload, context: IPayloadContext) {
+        ClientTrade.update(payload)
     }
 
     fun handleOpenLink(payload: OpenLinkPayload, context: IPayloadContext) {

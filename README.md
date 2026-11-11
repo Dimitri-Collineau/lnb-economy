@@ -13,6 +13,7 @@ the mod on a player's computer only talks to the server. The contract is `docs/e
   - `/pay <player|#account> <amount> [message]`: pays from your default account. Above `pay.confirmAbove`, asks to
     confirm with a click.
   - `/payfrom <#account> <player|#account> <amount> [message]`: pays from a shared account you own or are a member of.
+  - `/trade <player>`: asks to trade, from any distance (a key, unbound by default, asks the player in front of you).
   - `/mailbox` (`/courrier`): collects items that didn't fit in your inventory.
   - `/economy notify on|off`: messages when someone buys from or sells to your shops.
   - `/economy status|pending|retry <key>|casino <#account> [outstanding <value>]`: operators.
@@ -26,6 +27,10 @@ the mod on a player's computer only talks to the server. The contract is `docs/e
   at a lower or equal price. Its owners and members fill it (hoppers can fill it too, never empty it), set it up and
   break it; everyone else buys. The site registers each shop and prices every order from its saved prices. While
   the site decides, the items are held aside in the journal entry, so a refusal or a crash gives them back.
+- **Trades.** Both players offer items (copies: nothing leaves the inventories yet) and LNBits from an account, then
+  press Ready; any change sets both back. After a 3 second countdown, both offers leave the inventories together and
+  are held in the journal entry while the site moves the difference in money. Each player then gets the other's
+  items, or their own back if the site refuses.
 - **Mailbox.** Items owed to a player (bought chips or items, items handed back) go straight to the inventory; what
   doesn't fit waits for `/mailbox`. Nothing is dropped on the ground.
 - **Reliability.** Every money move is written to `<world>/data/lnbeconomy_journal.json` before it is sent, and sent
@@ -65,6 +70,7 @@ AGPL-3.0-or-later, like LNB Warden and the site.
 | `LNB_API_TOKEN`   | the site's `WARDEN_SERVER_SECRET`                                           |
 | `LNB_TEST_PLAYER` | UUID of a linked Minecraft account (offline mode: `OfflinePlayer:<name>`)    |
 | `LNB_TEST_CASINO` | handle of a shared account that player owns or is a member of              |
+| `LNB_TEST_PARTNER` | optional: UUID of another player's linked Minecraft account, for trades     |
 
 The tests move 1 LNBit to that account and back. Without these variables, they are skipped.
 

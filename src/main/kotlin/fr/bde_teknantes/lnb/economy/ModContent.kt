@@ -8,6 +8,7 @@ import fr.bde_teknantes.lnb.economy.counter.CounterBlock
 import fr.bde_teknantes.lnb.economy.shop.ShopBlock
 import fr.bde_teknantes.lnb.economy.shop.ShopBlockEntity
 import fr.bde_teknantes.lnb.economy.shop.ShopMenu
+import fr.bde_teknantes.lnb.economy.trade.TradeMenu
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.codec.ByteBufCodecs
@@ -63,6 +64,8 @@ object ModContent {
     })
 
     val SHOP_MENU: Supplier<MenuType<ShopMenu>> = MENUS.register("shop", Supplier { IMenuTypeExtension.create(::ShopMenu) })
+
+    val TRADE_MENU: Supplier<MenuType<TradeMenu>> = MENUS.register("trade", Supplier { IMenuTypeExtension.create(::TradeMenu) })
 
     val LINK_TOOL: DeferredItem<LinkToolItem> = ITEMS.registerItem("casino_link_tool", ::LinkToolItem, Item.Properties().stacksTo(1))
 

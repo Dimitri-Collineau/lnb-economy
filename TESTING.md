@@ -154,7 +154,28 @@ A is an owner of `#test-casino`, B a player with LNBits. Give A 64 diamonds and 
 | 6.19 | Push it with a piston, move it with a Create contraption | It doesn't move |
 | 6.20 | Turn `features.shops` off in `lnbeconomy-server.toml`, restart | Right click: "Shops are switched off on this server." |
 
-## 7. Without MineVegas
+## 7. Trades
+
+A and B are both online with LNBits, A with 10 diamonds, B with 5 emeralds.
+
+| # | Do | Expect |
+|---|----|--------|
+| 7.1 | A: `/trade B` from far away (another dimension too) | B gets "A wants to trade with you. [Accept] [Decline]" |
+| 7.2 | B: Decline | A: "B declined your trade." |
+| 7.3 | Bind the trade key in the controls; A: look at B within 5 blocks, press it | Same request. Further than 5 blocks: nothing |
+| 7.4 | B: Accept | Both get the trade screen, each with the other's name |
+| 7.5 | A: click an offer slot with the diamonds, right click another with one diamond | Copies show in A's offer and on B's screen; A still holds the 10 diamonds |
+| 7.6 | A: Ready, then B changes their offer | Both back to not ready |
+| 7.7 | A gives 100 LNBits, B gives 30, both Ready | Countdown 3, 2, 1, then: A has the emeralds, B the diamonds; A's account down 70, B's up 70, one Trade line in each history |
+| 7.8 | Offer 10 diamonds, throw one away during the countdown | "A no longer has everything they offered": nothing moves |
+| 7.9 | Equal amounts on both sides | Items swap; no transaction on the site |
+| 7.10 | Stop the site, trade with money | Items leave both inventories; "LNB's site is slow to answer…". Start the site: each gets the other's items, once |
+| 7.11 | A gives more than A's balance | Refused by the site: each gets their own items back |
+| 7.12 | A closes the screen, or logs out, during a trade | B: "The trade is off." Nothing moved |
+| 7.13 | A: `/trade A`, and between two Minecraft accounts of the same LNB account | Refused |
+| 7.14 | Turn `features.trades` off, restart, `/trade B` | "Trades are switched off on this server." |
+
+## 8. Without MineVegas
 
 Remove MineVegas from the server and the client: the game starts, payments and counters work, the log has no mixin
 error.

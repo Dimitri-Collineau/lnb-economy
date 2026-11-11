@@ -50,6 +50,13 @@ class PayloadCodecTest {
     }
 
     @Test
+    fun `trade state`() {
+        listOf(TradeStatePayload(70, "a", 0, true, false, 3), TradeStatePayload(0, null, 25, false, false, -1)).forEach {
+            assertEquals(it, roundTrip(TradeStatePayload.STREAM_CODEC, it))
+        }
+    }
+
+    @Test
     fun `accounts snapshot`() {
         val snapshot = AccountsSnapshotPayload(
             EconomyStatus.READY,
@@ -86,6 +93,9 @@ class PayloadCodecTest {
         }
         val save = ShopSavePayload(pos, 16, 40, 0, 1728, "a")
         assertEquals(save, roundTrip(ShopSavePayload.STREAM_CODEC, save))
+        assertEquals(TradeRequestPayload(42), roundTrip(TradeRequestPayload.STREAM_CODEC, TradeRequestPayload(42)))
+        listOf(TradeMoneyPayload(0, null), TradeMoneyPayload(70, "a")).forEach { assertEquals(it, roundTrip(TradeMoneyPayload.STREAM_CODEC, it)) }
+        listOf(true, false).forEach { assertEquals(TradeReadyPayload(it), roundTrip(TradeReadyPayload.STREAM_CODEC, TradeReadyPayload(it))) }
     }
 
     @Test

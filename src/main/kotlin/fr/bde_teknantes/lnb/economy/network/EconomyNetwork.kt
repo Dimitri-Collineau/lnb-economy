@@ -4,6 +4,7 @@ import fr.bde_teknantes.lnb.economy.casino.Links
 import fr.bde_teknantes.lnb.economy.client.ClientPayloadHandler
 import fr.bde_teknantes.lnb.economy.counter.Counters
 import fr.bde_teknantes.lnb.economy.shop.Shops
+import fr.bde_teknantes.lnb.economy.trade.Trades
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent
 
 /**
@@ -11,7 +12,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent
  * Bump [PROTOCOL_VERSION] whenever a payload changes, so mismatched client and server versions refuse to connect.
  */
 object EconomyNetwork {
-    private const val PROTOCOL_VERSION = "2"
+    private const val PROTOCOL_VERSION = "3"
 
     fun register(event: RegisterPayloadHandlersEvent) {
         val registrar = event.registrar(PROTOCOL_VERSION)
@@ -33,11 +34,17 @@ object EconomyNetwork {
         registrar.playToClient(OpenShopPayload.TYPE, OpenShopPayload.STREAM_CODEC) { payload, context ->
             ClientPayloadHandler.handleOpenShop(payload, context)
         }
+        registrar.playToClient(TradeStatePayload.TYPE, TradeStatePayload.STREAM_CODEC) { payload, context ->
+            ClientPayloadHandler.handleTradeState(payload, context)
+        }
         registrar.playToServer(CounterBuyPayload.TYPE, CounterBuyPayload.STREAM_CODEC, Counters::handleBuy)
         registrar.playToServer(CounterCashPayload.TYPE, CounterCashPayload.STREAM_CODEC, Counters::handleCash)
         registrar.playToServer(CounterChangePayload.TYPE, CounterChangePayload.STREAM_CODEC, Counters::handleChange)
         registrar.playToServer(ShopOrderPayload.TYPE, ShopOrderPayload.STREAM_CODEC, Shops::handleOrder)
         registrar.playToServer(ShopSavePayload.TYPE, ShopSavePayload.STREAM_CODEC, Shops::handleSave)
+        registrar.playToServer(TradeRequestPayload.TYPE, TradeRequestPayload.STREAM_CODEC, Trades::handleRequest)
+        registrar.playToServer(TradeMoneyPayload.TYPE, TradeMoneyPayload.STREAM_CODEC, Trades::handleMoney)
+        registrar.playToServer(TradeReadyPayload.TYPE, TradeReadyPayload.STREAM_CODEC, Trades::handleReady)
         registrar.playToServer(LinkPayload.TYPE, LinkPayload.STREAM_CODEC, Links::handleLink)
         registrar.playToServer(RefreshAccountsPayload.TYPE, RefreshAccountsPayload.STREAM_CODEC, ServerPayloadHandler::handleRefresh)
         registrar.playToServer(SetDefaultAccountPayload.TYPE, SetDefaultAccountPayload.STREAM_CODEC, ServerPayloadHandler::handleSetDefault)
