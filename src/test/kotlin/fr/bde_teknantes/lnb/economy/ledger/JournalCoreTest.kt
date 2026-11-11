@@ -8,13 +8,14 @@ import fr.bde_teknantes.lnb.economy.api.TransferResult
 import fr.bde_teknantes.lnb.economy.api.TransferSide
 import fr.bde_teknantes.lnb.warden.common.api.ApiClient
 import fr.bde_teknantes.lnb.warden.common.api.ApiResult
+import org.junit.jupiter.api.Assertions.assertInstanceOf
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 class JournalCoreTest {
@@ -55,7 +56,7 @@ class JournalCoreTest {
 
         assertEquals(1, sent.size)
         assertTrue(core.pending.isEmpty())
-        val done = assertIs<Outcome.Done>(outcomes.single().second)
+        val done = assertInstanceOf(Outcome.Done::class.java, outcomes.single().second)
         assertEquals(250, done.result.amount)
     }
 
@@ -69,7 +70,7 @@ class JournalCoreTest {
 
         assertEquals(1, sent.size)
         assertTrue(core.pending.isEmpty())
-        assertIs<Outcome.Refused>(outcomes.single().second)
+        assertInstanceOf(Outcome.Refused::class.java, outcomes.single().second)
     }
 
     @Test
@@ -77,7 +78,7 @@ class JournalCoreTest {
         val core = core()
         answers.add(ApiResult.Network(RuntimeException("timeout")))
         core.submit(entry())
-        assertIs<Outcome.Delayed>(outcomes.single().second)
+        assertInstanceOf(Outcome.Delayed::class.java, outcomes.single().second)
 
         core.tick()
         assertEquals(1, sent.size, "not before the delay")
@@ -88,7 +89,7 @@ class JournalCoreTest {
 
         assertEquals(2, sent.size)
         assertEquals(sent[0].key, sent[1].key)
-        assertIs<Outcome.Done>(outcomes.last().second)
+        assertInstanceOf(Outcome.Done::class.java, outcomes.last().second)
         assertTrue(core.pending.isEmpty())
     }
 
@@ -137,7 +138,7 @@ class JournalCoreTest {
         assertEquals("k1", entry.key)
         assertEquals(null, entry.transfer)
         assertEquals(3, entry.body.get("lots").asInt)
-        assertEquals(7, assertIs<Outcome.Done>(outcomes.single().second).decode<OrderAnswer>().orderId)
+        assertEquals(7, assertInstanceOf(Outcome.Done::class.java, outcomes.single().second).decode<OrderAnswer>().orderId)
     }
 
     @Test
@@ -160,7 +161,7 @@ class JournalCoreTest {
 
     @Test
     fun `an entry without an idempotency key is refused`() {
-        kotlin.test.assertFailsWith<IllegalArgumentException> { JournalEntry.of("/x", mapOf("amount" to 1), "test") }
+        assertThrows(IllegalArgumentException::class.java) { JournalEntry.of("/x", mapOf("amount" to 1), "test") }
     }
 
     private data class Order(val idempotencyKey: String, val direction: String, val lots: Int)

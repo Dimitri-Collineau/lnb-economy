@@ -58,14 +58,22 @@ neoForge {
         }
     }
 
-    // Puts Minecraft and its libraries (Gson, logging...) on the test classpaths.
-    addModdingDependenciesTo(sourceSets.test.get())
+    // Unit tests run with the mod loaded, so they can use items and registries. Integration tests only need
+    // Minecraft's libraries (Gson, logging...).
     addModdingDependenciesTo(integrationTest)
 
     mods {
         register(prop("mod_id")) {
             sourceSet(sourceSets.main.get())
         }
+    }
+
+    // Unit tests run with the game and this mod loaded (FML's JUnit launcher), so they can use items and registries.
+    // Kotlin is then loaded twice (Kotlin for Forge's and the test classpath's): kotlin.test assertions that use
+    // reflection (assertIs, assertFailsWith) break, so tests use JUnit's assertInstanceOf and assertThrows instead.
+    unitTest {
+        enable()
+        testedMod = mods.getByName(prop("mod_id"))
     }
 }
 

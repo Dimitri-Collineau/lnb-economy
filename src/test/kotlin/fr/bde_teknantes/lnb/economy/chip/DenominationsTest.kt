@@ -1,8 +1,8 @@
 package fr.bde_teknantes.lnb.economy.chip
 
+import org.junit.jupiter.api.Assertions.assertThrows
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 
 class DenominationsTest {
     @Test
@@ -32,6 +32,6 @@ class DenominationsTest {
 
     @Test
     fun `only chip values as a ceiling`() {
-        assertFailsWith<IllegalArgumentException> { Denominations.breakdown(10, largest = 10) }
+        assertThrows(IllegalArgumentException::class.java) { Denominations.breakdown(10, largest = 10) }
     }
 }
