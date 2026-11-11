@@ -14,9 +14,10 @@ the mod on a player's computer only talks to the server. The contract is `docs/e
     confirm with a click.
   - `/payfrom <#account> <player|#account> <amount> [message]`: pays from a shared account you own or are a member of.
   - `/trade <player>`: asks to trade, from any distance (a key, unbound by default, asks the player in front of you).
+  - `/hdv` (`/ah`): opens the auction house, unless `features.auctionsCommand` is off.
   - `/mailbox` (`/courrier`): collects items that didn't fit in your inventory.
   - `/economy notify on|off`: messages when someone buys from or sells to your shops.
-  - `/economy status|pending|retry <key>|casino <#account> [outstanding <value>]`: operators.
+  - `/economy status|pending|retry <key>|casino <#account> [outstanding <value>]|npc hdv [name]`: operators.
 - **Casinos.** A casino is a shared account. Its counters sell chips (the player pays the casino's account) and cash
   them (the account pays the player). Chips carry their casino and only its machines and counters take them. While
   playing, nothing reaches the site: the mod counts each casino's chips in circulation, which its account must back,
@@ -31,6 +32,12 @@ the mod on a player's computer only talks to the server. The contract is `docs/e
   press Ready; any change sets both back. After a 3 second countdown, both offers leave the inventories together and
   are held in the journal entry while the site moves the difference in money. Each player then gets the other's
   items, or their own back if the site refuses.
+- **Auction house.** Players list the stack in their hand at a fixed price, browse, buy, and take their listings
+  back. Listings and their items live on the site: a listed item leaves the game, held in the journal entry until
+  the site has it. A purchase lands in the buyer's mailbox on the site, which the server claims with a key and hands
+  over; unsold items come back the same way from "To collect". It opens with `/hdv`, an auction house block (in the
+  operators' creative tab, unbreakable outside creative) or the auctioneer NPC (`/economy npc hdv [name]`, removed
+  by an operator hitting it in creative).
 - **Mailbox.** Items owed to a player (bought chips or items, items handed back) go straight to the inventory; what
   doesn't fit waits for `/mailbox`. Nothing is dropped on the ground.
 - **Reliability.** Every money move is written to `<world>/data/lnbeconomy_journal.json` before it is sent, and sent

@@ -1,5 +1,6 @@
 package fr.bde_teknantes.lnb.economy.network
 
+import fr.bde_teknantes.lnb.economy.auction.Auctions
 import fr.bde_teknantes.lnb.economy.casino.Links
 import fr.bde_teknantes.lnb.economy.client.ClientPayloadHandler
 import fr.bde_teknantes.lnb.economy.counter.Counters
@@ -12,7 +13,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent
  * Bump [PROTOCOL_VERSION] whenever a payload changes, so mismatched client and server versions refuse to connect.
  */
 object EconomyNetwork {
-    private const val PROTOCOL_VERSION = "3"
+    private const val PROTOCOL_VERSION = "4"
 
     fun register(event: RegisterPayloadHandlersEvent) {
         val registrar = event.registrar(PROTOCOL_VERSION)
@@ -37,6 +38,15 @@ object EconomyNetwork {
         registrar.playToClient(TradeStatePayload.TYPE, TradeStatePayload.STREAM_CODEC) { payload, context ->
             ClientPayloadHandler.handleTradeState(payload, context)
         }
+        registrar.playToClient(OpenAuctionPayload.TYPE, OpenAuctionPayload.STREAM_CODEC) { payload, context ->
+            ClientPayloadHandler.handleOpenAuction(payload, context)
+        }
+        registrar.playToClient(AuctionListingsPayload.TYPE, AuctionListingsPayload.STREAM_CODEC) { payload, context ->
+            ClientPayloadHandler.handleAuctionListings(payload, context)
+        }
+        registrar.playToClient(AuctionMailboxPayload.TYPE, AuctionMailboxPayload.STREAM_CODEC) { payload, context ->
+            ClientPayloadHandler.handleAuctionMailbox(payload, context)
+        }
         registrar.playToServer(CounterBuyPayload.TYPE, CounterBuyPayload.STREAM_CODEC, Counters::handleBuy)
         registrar.playToServer(CounterCashPayload.TYPE, CounterCashPayload.STREAM_CODEC, Counters::handleCash)
         registrar.playToServer(CounterChangePayload.TYPE, CounterChangePayload.STREAM_CODEC, Counters::handleChange)
@@ -45,6 +55,11 @@ object EconomyNetwork {
         registrar.playToServer(TradeRequestPayload.TYPE, TradeRequestPayload.STREAM_CODEC, Trades::handleRequest)
         registrar.playToServer(TradeMoneyPayload.TYPE, TradeMoneyPayload.STREAM_CODEC, Trades::handleMoney)
         registrar.playToServer(TradeReadyPayload.TYPE, TradeReadyPayload.STREAM_CODEC, Trades::handleReady)
+        registrar.playToServer(AuctionRequestPayload.TYPE, AuctionRequestPayload.STREAM_CODEC, Auctions::handleRequest)
+        registrar.playToServer(AuctionSellPayload.TYPE, AuctionSellPayload.STREAM_CODEC, Auctions::handleSell)
+        registrar.playToServer(AuctionBuyPayload.TYPE, AuctionBuyPayload.STREAM_CODEC, Auctions::handleBuy)
+        registrar.playToServer(AuctionCancelPayload.TYPE, AuctionCancelPayload.STREAM_CODEC, Auctions::handleCancel)
+        registrar.playToServer(AuctionCollectPayload.TYPE, AuctionCollectPayload.STREAM_CODEC, Auctions::handleCollect)
         registrar.playToServer(LinkPayload.TYPE, LinkPayload.STREAM_CODEC, Links::handleLink)
         registrar.playToServer(RefreshAccountsPayload.TYPE, RefreshAccountsPayload.STREAM_CODEC, ServerPayloadHandler::handleRefresh)
         registrar.playToServer(SetDefaultAccountPayload.TYPE, SetDefaultAccountPayload.STREAM_CODEC, ServerPayloadHandler::handleSetDefault)

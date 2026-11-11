@@ -1,6 +1,8 @@
 package fr.bde_teknantes.lnb.economy
 
 import com.mojang.serialization.Codec
+import fr.bde_teknantes.lnb.economy.auction.AuctionBlock
+import fr.bde_teknantes.lnb.economy.auction.Auctioneer
 import fr.bde_teknantes.lnb.economy.casino.LinkToolItem
 import fr.bde_teknantes.lnb.economy.chip.ChipItem
 import fr.bde_teknantes.lnb.economy.chip.Denominations
@@ -14,6 +16,8 @@ import net.minecraft.core.registries.Registries
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.CreativeModeTabs
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.MobCategory
 import net.minecraft.world.inventory.MenuType
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.SoundType
@@ -24,6 +28,7 @@ import net.minecraft.world.level.material.PushReaction
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent
 import net.neoforged.neoforge.registries.DeferredBlock
 import net.neoforged.neoforge.registries.DeferredItem
 import net.neoforged.neoforge.registries.DeferredRegister
@@ -36,6 +41,7 @@ object ModContent {
     private val COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, LnbEconomy.ID)
     private val BLOCK_ENTITIES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, LnbEconomy.ID)
     private val MENUS = DeferredRegister.create(Registries.MENU, LnbEconomy.ID)
+    private val ENTITIES = DeferredRegister.create(Registries.ENTITY_TYPE, LnbEconomy.ID)
 
     /** The casino a chip belongs to: its account's handle, without the `#`. */
     val CASINO: Supplier<DataComponentType<String>> = COMPONENTS.registerComponentType("casino") { builder ->
@@ -67,6 +73,17 @@ object ModContent {
 
     val TRADE_MENU: Supplier<MenuType<TradeMenu>> = MENUS.register("trade", Supplier { IMenuTypeExtension.create(::TradeMenu) })
 
+    /** Unbreakable outside creative mode, like bedrock, and drops nothing: operators place it. */
+    val AUCTION: DeferredBlock<AuctionBlock> = BLOCKS.registerBlock("auction_house", ::AuctionBlock,
+        BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BROWN).strength(-1f, 3_600_000f).sound(SoundType.WOOD).noLootTable()
+            .pushReaction(PushReaction.BLOCK))
+
+    val AUCTION_ITEM: DeferredItem<BlockItem> = ITEMS.registerSimpleBlockItem(AUCTION)
+
+    val AUCTIONEER: Supplier<EntityType<Auctioneer>> = ENTITIES.register("auctioneer", Supplier {
+        EntityType.Builder.of(::Auctioneer, MobCategory.MISC).sized(0.6f, 1.95f).clientTrackingRange(10).build("auctioneer")
+    })
+
     val LINK_TOOL: DeferredItem<LinkToolItem> = ITEMS.registerItem("casino_link_tool", ::LinkToolItem, Item.Properties().stacksTo(1))
 
     fun register(modBus: IEventBus) {
@@ -75,13 +92,16 @@ object ModContent {
         COMPONENTS.register(modBus)
         BLOCK_ENTITIES.register(modBus)
         MENUS.register(modBus)
+        ENTITIES.register(modBus)
         modBus.addListener(::addToCreativeTabs)
+        modBus.addListener<EntityAttributeCreationEvent> { it.put(AUCTIONEER.get(), Auctioneer.attributes().build()) }
     }
 
     private fun addToCreativeTabs(event: BuildCreativeModeTabContentsEvent) {
         // Chips are only made by counters: a chip without a casino is worth nothing, so none in the creative tabs.
         when (event.tabKey) {
             CreativeModeTabs.TOOLS_AND_UTILITIES -> event.accept(LINK_TOOL.get())
+            CreativeModeTabs.OP_BLOCKS -> if (event.hasPermissions()) event.accept(AUCTION_ITEM.get())
             CreativeModeTabs.FUNCTIONAL_BLOCKS -> {
                 event.accept(COUNTER_ITEM.get())
                 event.accept(SHOP_ITEM.get())

@@ -7,6 +7,7 @@ import com.mojang.brigadier.suggestion.Suggestions
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import fr.bde_teknantes.lnb.economy.account.KnownHandles
 import fr.bde_teknantes.lnb.economy.LnbEconomy
+import fr.bde_teknantes.lnb.economy.ModContent
 import fr.bde_teknantes.lnb.economy.account.PlayerAccounts
 import fr.bde_teknantes.lnb.economy.api.EconomyApi
 import fr.bde_teknantes.lnb.economy.api.Handles
@@ -97,6 +98,15 @@ object EconomyCommands {
                             builder.buildFuture()
                         }
                         .executes(::casino),
+                ),
+            )
+            .then(
+                Commands.literal("npc").requires(operator).then(
+                    Commands.literal("hdv")
+                        .executes { context -> spawnAuctioneer(context, null) }
+                        .then(Commands.argument("name", StringArgumentType.greedyString()).executes { context ->
+                            spawnAuctioneer(context, StringArgumentType.getString(context, "name"))
+                        }),
                 ),
             )
             .then(
@@ -238,6 +248,19 @@ object EconomyCommands {
                 )
             }, false)
         }
+        return 1
+    }
+
+    /** Spawns an auctioneer where the operator stands, facing the way they face. */
+    private fun spawnAuctioneer(context: CommandContext<CommandSourceStack>, name: String?): Int {
+        val player = context.source.playerOrException
+        val auctioneer = ModContent.AUCTIONEER.get().create(player.serverLevel()) ?: return 0
+        auctioneer.moveTo(player.x, player.y, player.z, player.yRot, 0f)
+        auctioneer.yHeadRot = player.yRot
+        auctioneer.yBodyRot = player.yRot
+        name?.let { auctioneer.customName = Component.literal(it) }
+        player.serverLevel().addFreshEntity(auctioneer)
+        context.source.sendSuccess({ Component.translatable("commands.lnbeconomy.npc.spawned") }, true)
         return 1
     }
 

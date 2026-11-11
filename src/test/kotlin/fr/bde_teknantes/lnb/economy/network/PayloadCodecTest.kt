@@ -50,6 +50,35 @@ class PayloadCodecTest {
     }
 
     @Test
+    fun `auction house`() {
+        val entries = listOf(
+            AuctionEntry("l1", ItemStack(Items.DIAMOND, 16), "Diamond", 16, 50, "Branlouis", "2026-11-18T12:00:00Z"),
+            AuctionEntry("l2", ItemStack.EMPTY, "Gone widget", 1, 0, "expired", "2026-11-11T12:00:00Z"),
+        )
+        val listings = AuctionListingsPayload(AuctionRequestPayload.MINE, entries, null, "45", 20, 5, 7)
+        val buf = registryBuf()
+        AuctionListingsPayload.STREAM_CODEC.encode(buf, listings)
+        val decoded = AuctionListingsPayload.STREAM_CODEC.decode(buf)
+        assertEquals(0, buf.readableBytes())
+        assertEquals(listings.copy(entries = emptyList()), decoded.copy(entries = emptyList()))
+        assertEquals(entries.map { it.copy(stack = ItemStack.EMPTY) }, decoded.entries.map { it.copy(stack = ItemStack.EMPTY) })
+        assertTrue(ItemStack.matches(entries[0].stack, decoded.entries[0].stack))
+        assertTrue(decoded.entries[1].stack.isEmpty)
+
+        val mailBuf = registryBuf()
+        AuctionMailboxPayload.STREAM_CODEC.encode(mailBuf, AuctionMailboxPayload(entries.takeLast(1)))
+        assertEquals(1, AuctionMailboxPayload.STREAM_CODEC.decode(mailBuf).entries.size)
+
+        assertEquals(OpenAuctionPayload, roundTrip(OpenAuctionPayload.STREAM_CODEC, OpenAuctionPayload))
+        assertEquals(AuctionCollectPayload, roundTrip(AuctionCollectPayload.STREAM_CODEC, AuctionCollectPayload))
+        listOf(AuctionRequestPayload(AuctionRequestPayload.BROWSE, "diam", "unitPrice", "45"), AuctionRequestPayload(AuctionRequestPayload.MAILBOX, null, "newest", null))
+            .forEach { assertEquals(it, roundTrip(AuctionRequestPayload.STREAM_CODEC, it)) }
+        listOf(AuctionSellPayload(16, 50, null), AuctionSellPayload(1, 1_000_000_000, "a")).forEach { assertEquals(it, roundTrip(AuctionSellPayload.STREAM_CODEC, it)) }
+        assertEquals(AuctionBuyPayload("l1", "a"), roundTrip(AuctionBuyPayload.STREAM_CODEC, AuctionBuyPayload("l1", "a")))
+        assertEquals(AuctionCancelPayload("l1"), roundTrip(AuctionCancelPayload.STREAM_CODEC, AuctionCancelPayload("l1")))
+    }
+
+    @Test
     fun `trade state`() {
         listOf(TradeStatePayload(70, "a", 0, true, false, 3), TradeStatePayload(0, null, 25, false, false, -1)).forEach {
             assertEquals(it, roundTrip(TradeStatePayload.STREAM_CODEC, it))

@@ -1,10 +1,14 @@
 package fr.bde_teknantes.lnb.economy.client
 
 import fr.bde_teknantes.lnb.economy.casino.MenuCasinos
+import fr.bde_teknantes.lnb.economy.client.gui.AuctionScreen
 import fr.bde_teknantes.lnb.economy.client.gui.CounterScreen
 import fr.bde_teknantes.lnb.economy.client.gui.LinkScreen
 import fr.bde_teknantes.lnb.economy.client.gui.ShopScreen
 import fr.bde_teknantes.lnb.economy.network.AccountsSnapshotPayload
+import fr.bde_teknantes.lnb.economy.network.AuctionListingsPayload
+import fr.bde_teknantes.lnb.economy.network.AuctionMailboxPayload
+import fr.bde_teknantes.lnb.economy.network.OpenAuctionPayload
 import fr.bde_teknantes.lnb.economy.network.MenuCasinoPayload
 import fr.bde_teknantes.lnb.economy.network.OpenCounterPayload
 import fr.bde_teknantes.lnb.economy.network.OpenLinkPayload
@@ -31,6 +35,19 @@ object ClientPayloadHandler {
             current != null && current.pos == payload.pos -> current.update(payload)
             !payload.refresh -> minecraft.setScreen(ShopScreen(payload))
         }
+    }
+
+    fun handleOpenAuction(payload: OpenAuctionPayload, context: IPayloadContext) {
+        ClientAuction.clear()
+        Minecraft.getInstance().setScreen(AuctionScreen())
+    }
+
+    fun handleAuctionListings(payload: AuctionListingsPayload, context: IPayloadContext) {
+        ClientAuction.update(payload)
+    }
+
+    fun handleAuctionMailbox(payload: AuctionMailboxPayload, context: IPayloadContext) {
+        ClientAuction.update(payload)
     }
 
     fun handleTradeState(payload: TradeStatePayload, context: IPayloadContext) {

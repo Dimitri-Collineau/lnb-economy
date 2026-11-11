@@ -2,6 +2,7 @@ package fr.bde_teknantes.lnb.economy
 
 import com.mojang.logging.LogUtils
 import fr.bde_teknantes.lnb.economy.account.PlayerAccounts
+import fr.bde_teknantes.lnb.economy.auction.Auctions
 import fr.bde_teknantes.lnb.economy.casino.CasinoLinks
 import fr.bde_teknantes.lnb.economy.casino.Casinos
 import fr.bde_teknantes.lnb.economy.casino.Links
@@ -47,6 +48,7 @@ class LnbEconomy(modBus: IEventBus, container: ModContainer) {
         Counters.register()
         Shops.register()
         Trades.register()
+        Auctions.register()
         modBus.addListener(ShopItemHandler::register)
         Casinos.linked = { server -> CasinoLinks.get(server).handles }
         NeoForge.EVENT_BUS.addListener(EconomyCommands::register)
@@ -63,6 +65,8 @@ class LnbEconomy(modBus: IEventBus, container: ModContainer) {
         NeoForge.EVENT_BUS.addListener(ItemMailbox::onPlayerLoggedIn)
         NeoForge.EVENT_BUS.addListener(ItemMailbox::registerCommands)
         NeoForge.EVENT_BUS.addListener(Trades::registerCommands)
+        NeoForge.EVENT_BUS.addListener(Auctions::registerCommands)
+        NeoForge.EVENT_BUS.addListener(Auctions::onLoggedOut)
         NeoForge.EVENT_BUS.addListener(Trades::onServerTick)
         NeoForge.EVENT_BUS.addListener(Trades::onLoggedOut)
         NeoForge.EVENT_BUS.addListener(Trades::onServerStopped)

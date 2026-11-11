@@ -175,7 +175,29 @@ A and B are both online with LNBits, A with 10 diamonds, B with 5 emeralds.
 | 7.13 | A: `/trade A`, and between two Minecraft accounts of the same LNB account | Refused |
 | 7.14 | Turn `features.trades` off, restart, `/trade B` | "Trades are switched off on this server." |
 
-## 8. Without MineVegas
+## 8. Auction house
+
+A and B online, A with 16 diamonds in hand. In the site admin's settings, the tax is 5 %.
+
+| # | Do | Expect |
+|---|----|--------|
+| 8.1 | A: `/hdv` | The auction house opens on Browse |
+| 8.2 | A: My listings, 16, price 100, List it | The diamonds leave A's hand; "Listed: 16 × Diamond for 100." The listing shows in My listings and in Browse |
+| 8.3 | Stop the site, list another stack, start it again | The stack leaves the hand; once the site answers, it's listed once |
+| 8.4 | Same, but the site refuses (A banned on the site) | The stack comes back |
+| 8.5 | B: search "diam", sort Cheapest each, hover the listing | Price, price per item, seller A, time left |
+| 8.6 | B: select it, Buy | B gets the 16 diamonds; B −100, A +95; one Auction house line each; 5 burned (admin Overview, by reason) |
+| 8.7 | B: buy it again from a stale screen | "That listing is no longer up." |
+| 8.8 | A: list, then take it back | "Listing taken back."; the stack comes back to A |
+| 8.9 | A: list, set its end in the past in the database, open Browse | Gone; A's To collect shows it as "Didn't sell in time"; Collect everything gives it back |
+| 8.10 | B: buy with a full inventory | The item waits in the local mailbox; `/mailbox` gives it |
+| 8.11 | List more than the per-player limit | "You have the most listings you can at once." |
+| 8.12 | Operator: place an auction house block; survival player tries to break it | Unbreakable; right click opens the auction house |
+| 8.13 | Operator: `/economy npc hdv Bob` | An auctioneer named Bob; right click opens; it can't be hurt or pushed; hit in creative: gone |
+| 8.14 | `features.auctionsCommand = false`, restart, `/hdv` | "Go to an auction house to use it."; the block and the NPC still open it |
+| 8.15 | Turn the site flag `economy.auctions` off | Browsing and buying refused; taking back and collecting still work |
+
+## 9. Without MineVegas
 
 Remove MineVegas from the server and the client: the game starts, payments and counters work, the log has no mixin
 error.
