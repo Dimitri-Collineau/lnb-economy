@@ -1,7 +1,6 @@
 package fr.bde_teknantes.lnb.economy.client.gui
 
 import fr.bde_teknantes.lnb.economy.client.ClientEconomy
-import fr.bde_teknantes.lnb.economy.money.Amounts
 import fr.bde_teknantes.lnb.economy.network.AccountEntry
 import fr.bde_teknantes.lnb.economy.network.ShopSavePayload
 import fr.bde_teknantes.lnb.economy.shop.ShopBlockEntity
@@ -147,6 +146,6 @@ class ShopSettingsScreen(menu: ShopMenu, inventory: Inventory, title: Component)
 
     private fun accountLabel(account: AccountEntry): Component {
         val name = if (account.isPersonal) Component.translatable("gui.lnbeconomy.accounts.personal").string else "#${account.handle}"
-        return Component.literal("$name  ${Amounts.compact(account.balance, language)}")
+        return Component.literal("$name  ").append(Lnbit.compact(account.balance, language))
     }
 }

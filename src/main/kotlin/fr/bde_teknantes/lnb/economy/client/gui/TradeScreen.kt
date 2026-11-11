@@ -127,6 +127,6 @@ class TradeScreen(menu: TradeMenu, inventory: Inventory, title: Component) :
 
     private fun accountLabel(account: AccountEntry): Component {
         val name = if (account.isPersonal) Component.translatable("gui.lnbeconomy.accounts.personal").string else "#${account.handle}"
-        return Component.literal("$name  ${Amounts.compact(account.balance, language)}")
+        return Component.literal("$name  ").append(Lnbit.compact(account.balance, language))
     }
 }

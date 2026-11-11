@@ -113,7 +113,7 @@ class CounterScreen(private val counter: OpenCounterPayload) :
         val top = height / 2 - 80
         graphics.drawCenteredString(font, title, width / 2, top - 14, 0xFFFFFF)
         graphics.drawString(font, Component.translatable("gui.lnbeconomy.counter.buy.title"), left, top + 8, 0xFFD45A)
-        graphics.drawString(font, Component.translatable("gui.lnbeconomy.counter.cash.title", Amounts.compact(chipsValue(), language)), left, top + 80, 0xFFD45A)
+        graphics.drawString(font, Component.translatable("gui.lnbeconomy.counter.cash.title", Lnbit.compact(chipsValue(), language)), left, top + 80, 0xFFD45A)
         graphics.drawString(font, Component.translatable("gui.lnbeconomy.counter.change.title"), left, top + 124, 0xFFD45A)
     }
 
@@ -121,6 +121,6 @@ class CounterScreen(private val counter: OpenCounterPayload) :
 
     private fun accountLabel(account: AccountEntry): Component {
         val name = if (account.isPersonal) Component.translatable("gui.lnbeconomy.accounts.personal").string else "#${account.handle}"
-        return Component.literal("$name  ${Amounts.compact(account.balance, language)}")
+        return Component.literal("$name  ").append(Lnbit.compact(account.balance, language))
     }
 }

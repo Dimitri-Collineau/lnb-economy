@@ -22,9 +22,4 @@ class AmountsTest {
     fun `negative amounts keep their sign`() {
         assertEquals("-1,250", Amounts.format(-1250, "en_us"))
     }
-
-    @Test
-    fun `compact amounts start with the symbol`() {
-        assertEquals("Ⓛ 1,250", Amounts.compact(1250, "en_us"))
-    }
 }

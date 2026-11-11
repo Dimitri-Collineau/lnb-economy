@@ -1,7 +1,6 @@
 package fr.bde_teknantes.lnb.economy.client.gui
 
 import fr.bde_teknantes.lnb.economy.client.ClientEconomy
-import fr.bde_teknantes.lnb.economy.money.Amounts
 import fr.bde_teknantes.lnb.economy.network.AccountEntry
 import fr.bde_teknantes.lnb.economy.network.EconomyStatus
 import fr.bde_teknantes.lnb.economy.network.SetDefaultAccountPayload
@@ -103,7 +102,7 @@ class AccountsScreen(private val parent: Screen?) : Screen(Component.translatabl
         val name = if (account.isPersonal) Component.translatable("gui.lnbeconomy.accounts.personal").string
         else "${account.name} (#${account.handle})"
         val line = Component.literal("$star$name  ").append(
-            Component.literal(Amounts.compact(account.balance, language)).withStyle(ChatFormatting.GOLD),
+            Lnbit.compact(account.balance, language).withStyle(ChatFormatting.GOLD),
         )
         if (account.frozen) line.append(Component.translatable("economy.lnbeconomy.balance.frozen").withStyle(ChatFormatting.AQUA))
         return line

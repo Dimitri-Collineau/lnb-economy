@@ -1,7 +1,6 @@
 package fr.bde_teknantes.lnb.economy.client.gui
 
 import fr.bde_teknantes.lnb.economy.client.ClientEconomy
-import fr.bde_teknantes.lnb.economy.money.Amounts
 import fr.bde_teknantes.lnb.economy.network.EconomyStatus
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.Button
@@ -48,7 +47,7 @@ object InventoryBalance {
         if (!button.visible) return
         val account = ClientEconomy.snapshot.defaultAccount ?: return
         val minecraft = Minecraft.getInstance()
-        val text = Amounts.compact(account.balance, minecraft.options.languageCode)
+        val text = Lnbit.compact(account.balance, minecraft.options.languageCode)
         val font = minecraft.font
         val x = button.x - GAP - font.width(text)
         val y = button.y + (BUTTON_HEIGHT - font.lineHeight) / 2 + 1
