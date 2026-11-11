@@ -16,7 +16,8 @@ import kotlin.test.assertTrue
  *
  * - `LNB_API_URL` and `LNB_API_TOKEN`: the site and its `WARDEN_SERVER_SECRET`;
  * - `LNB_TEST_PLAYER`: the UUID of a Minecraft account linked to an eligible LNB account, with at least 1 LNBit;
- * - `LNB_TEST_CASINO`: the handle of a shared account that player owns or is a member of.
+ * - `LNB_TEST_CASINO`: the handle of a shared account that player owns or is a member of;
+ * - `LNB_TEST_PARTNER` (optional, for trades): the UUID of a Minecraft account of another eligible LNB account.
  *
  * Moves 1 LNBit to the shared account and back, twice: once by transfer, once at a test shop (left closed).
  */
@@ -117,5 +118,24 @@ class EconomyApiIntegrationTest {
         EconomyApi.post("/shops/${shop.id}/disable", ApiClient.GSON.toJsonTree(ShopDisableBody(UUID.randomUUID().toString(), null)).asJsonObject).get().ok()
         assertEquals(true, EconomyApi.shop(shop.id).get().ok().disabled)
         assertEquals(ApiResult.Http(409, Problems.SHOP_DISABLED), order(ShopOrderBody.BUY, expectedLotPrice = 3))
+    }
+
+    @Test
+    fun `a trade moves the difference once, and back`() {
+        val partner = System.getenv("LNB_TEST_PARTNER")
+        assumeTrue(!partner.isNullOrBlank(), "LNB_TEST_PARTNER isn't set")
+        fun trade(from: String, to: String, key: String = UUID.randomUUID().toString()) = EconomyApi.post(
+            "/trades",
+            ApiClient.GSON.toJsonTree(TradeBody(key, TradeSide(from, null), TradeSide(to, null), 1, "lnb-economy integration test")).asJsonObject,
+        ).get()
+
+        val key = UUID.randomUUID().toString()
+        val first = ApiClient.GSON.fromJson(trade(player.toString(), partner, key).ok(), TransferResult::class.java)
+        val again = ApiClient.GSON.fromJson(trade(player.toString(), partner, key).ok(), TransferResult::class.java)
+        assertEquals(first.transactionId, again.transactionId)
+        assertEquals(true, again.replayed)
+        trade(partner, player.toString()).ok()
+
+        assertEquals(ApiResult.Http(400, null), trade(player.toString(), player.toString()).let { if (it is ApiResult.Http) it.copy(problem = null) else it })
     }
 }

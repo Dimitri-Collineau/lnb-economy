@@ -145,3 +145,15 @@ data class ShopOrderBody(
         const val SELL = "sell"
     }
 }
+
+/** One player in a trade, and the account they trade with (their default one when null). */
+data class TradeSide(val player: String, val account: String?)
+
+/** `POST /trades`: what [from] gave minus what [to] gave, from the account [from] trades with to the other's. */
+data class TradeBody(
+    val idempotencyKey: String,
+    val from: TradeSide,
+    val to: TradeSide,
+    val amount: Long,
+    val memo: String? = null,
+)
