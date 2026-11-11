@@ -44,10 +44,14 @@ object ItemStacks {
     fun toSnbt(stacks: Iterable<ItemStack>, registries: HolderLookup.Provider): String =
         CompoundTag().apply { put(ITEMS, ListTag().apply { addAll(toTags(stacks, registries)) }) }.toString()
 
-    /** The stacks written by [toSnbt]. Text that isn't SNBT at all reads as nothing, and is reported by the caller. */
-    fun fromSnbt(snbt: String, registries: HolderLookup.Provider): Read {
-        val root = runCatching { TagParser.parseTag(snbt) }.getOrNull() ?: return Read(emptyList(), emptyList())
+    /** The stacks written by [toSnbt], as saved tags, or null when [snbt] isn't SNBT at all. */
+    fun tagsFromSnbt(snbt: String): List<CompoundTag>? {
+        val root = runCatching { TagParser.parseTag(snbt) }.getOrNull() ?: return null
         val list = root.getList(ITEMS, Tag.TAG_COMPOUND.toInt())
-        return fromTags(List(list.size) { list.getCompound(it) }, registries)
+        return List(list.size) { list.getCompound(it) }
     }
+
+    /** The stacks written by [toSnbt]. Text that isn't SNBT at all reads as nothing. */
+    fun fromSnbt(snbt: String, registries: HolderLookup.Provider): Read =
+        fromTags(tagsFromSnbt(snbt).orEmpty(), registries)
 }

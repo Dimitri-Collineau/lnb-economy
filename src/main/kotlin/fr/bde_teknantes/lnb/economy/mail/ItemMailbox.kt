@@ -2,6 +2,7 @@ package fr.bde_teknantes.lnb.economy.mail
 
 import fr.bde_teknantes.lnb.economy.LnbEconomy
 import fr.bde_teknantes.lnb.economy.chip.Chips
+import fr.bde_teknantes.lnb.economy.item.ItemStacks
 import net.minecraft.ChatFormatting
 import net.minecraft.commands.Commands
 import net.minecraft.core.HolderLookup
@@ -62,9 +63,13 @@ class ItemMailbox private constructor() : SavedData() {
         fun count(server: MinecraftServer, player: UUID): Int = get(server).contents.count(player)
 
         /** Gives [stacks] to the player: what fits right away when they're online, the rest when they collect it. */
-        fun deliver(server: MinecraftServer, player: UUID, stacks: List<ItemStack>) {
+        fun deliver(server: MinecraftServer, player: UUID, stacks: List<ItemStack>) =
+            deliverSaved(server, player, ItemStacks.toTags(stacks, server.registryAccess()))
+
+        /** As [deliver], for stacks already saved as tags (escrowed items), including those the game can't read. */
+        fun deliverSaved(server: MinecraftServer, player: UUID, tags: List<CompoundTag>) {
             val mailbox = get(server)
-            if (!mailbox.contents.add(player, stacks, server.registryAccess())) return
+            if (!mailbox.contents.addSaved(player, tags)) return
             changed(server, mailbox)
             server.playerList.getPlayer(player)?.let { collect(it, quiet = true) }
         }

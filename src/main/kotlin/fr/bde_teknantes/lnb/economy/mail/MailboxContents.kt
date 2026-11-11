@@ -20,8 +20,11 @@ class MailboxContents {
 
     fun count(player: UUID): Int = held[player]?.sumOf { it.getInt(COUNT).coerceAtLeast(1) } ?: 0
 
-    fun add(player: UUID, stacks: Iterable<ItemStack>, registries: HolderLookup.Provider): Boolean {
-        val tags = ItemStacks.toTags(stacks, registries)
+    fun add(player: UUID, stacks: Iterable<ItemStack>, registries: HolderLookup.Provider): Boolean =
+        addSaved(player, ItemStacks.toTags(stacks, registries))
+
+    /** Adds stacks as saved tags, read or not: a stack the game can't read is kept for when it can again. */
+    fun addSaved(player: UUID, tags: List<CompoundTag>): Boolean {
         if (tags.isEmpty()) return false
         held.getOrPut(player, ::mutableListOf).addAll(tags)
         return true
