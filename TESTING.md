@@ -6,9 +6,10 @@ What the unit and integration tests can't cover: the game itself, with a client.
 
 ### The site
 
-1. In `lnb-website` (branch `feat/economy`): `docker compose up -d`, then `pnpm dev`.
+1. In `lnb-website` (branch `feat/economy-auctions` until shops, trades and the auction house are merged into `main`):
+   `docker compose up -d`, then `pnpm dev --host ::1` (without `--host`, Nuxt 4.6.4 fails to start).
 2. In `.env`, set `WARDEN_SERVER_SECRET` to any long random string.
-3. In the admin, turn on the `economy`, `economy.serverApi`, `economy.transfers` and `economy.sharedAccounts` flags.
+3. In the admin, check that the `economy` flags are on (they are unless an admin turned one off).
 4. Without Microsoft sign-in, `MICROSOFT_CLIENT_ID` and `MICROSOFT_CLIENT_SECRET` can hold any placeholder: the server
    routes don't use them, but the site refuses to start when they are empty.
 5. Make two LNB accounts, A and B, each with a linked Minecraft account, a starting balance, and a shared account
@@ -112,6 +113,7 @@ and without a call):
 | 4.2 | Wand on the machine as A, link to `#test-casino` with a largest bet of 100 | Linked |
 | 4.3 | Try a diamond, a gold ingot, another casino's chip | Refused by the slot, on the client too (no flicker back) |
 | 4.4 | Bet `#test-casino` chips worth 100 and play | The game runs; payouts come out in the same chips. `/economy casino #test-casino`: chips in circulation go down by the stake and up by the payout |
+| 4.4b | Wheel: bet one chip of 100 until it lands on ×0.25 | 25 in chips comes back, every time |
 | 4.5 | Bet 125 | "The largest bet here is 100 LNBits." |
 | 4.6 | Lower the casino's balance on the site so its free balance is under the best payout, wait for the refresh | "#test-casino can't cover that bet right now." before any chip is taken |
 | 4.7 | Blackjack/poker: start a round, then `/economy casino` | "held for rounds" shows the reserved amount until the result |

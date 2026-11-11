@@ -10,6 +10,7 @@ import fr.bde_teknantes.lnb.economy.casino.Exposure
 import fr.bde_teknantes.lnb.economy.casino.MenuCasinos
 import fr.bde_teknantes.lnb.economy.chip.ChipItem
 import fr.bde_teknantes.lnb.economy.chip.ChipLedger
+import fr.bde_teknantes.lnb.economy.chip.ChipPayout
 import fr.bde_teknantes.lnb.economy.chip.Chips
 import fr.bde_teknantes.lnb.economy.money.Texts
 import fr.minevegas.casino.CasinoMachine
@@ -21,6 +22,7 @@ import net.minecraft.world.Container
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntity
+import java.util.function.Supplier
 
 /**
  * What the MineVegas mixins call. Machines only take chips of the casino they are linked to; a game starts only when
@@ -148,6 +150,17 @@ object CasinoHooks {
 
     @JvmStatic
     fun destroyedAll(machine: BlockEntity, stakes: List<ItemStack>) = record(machine, stakes, -1)
+
+    /**
+     * A game's payout. For a chip stake, pays its value times the multiplier in chips of the same casino (see
+     * [ChipPayout]); a refund gives the stake back as it was. Anything else keeps MineVegas's payout, [original].
+     */
+    @JvmStatic
+    fun payout(stake: ItemStack, numerator: Int, denominator: Int, roll: Int, refund: Boolean, original: Supplier<List<ItemStack>>): List<ItemStack> {
+        val casino = Chips.casinoOf(stake) ?: return original.get()
+        if (refund) return listOf(stake.copy())
+        return Chips.make(casino, ChipPayout.value(Chips.valueOf(stake), numerator, denominator, roll))
+    }
 
     /** MineVegas made these chips as a payout. Returns them unchanged. */
     @JvmStatic

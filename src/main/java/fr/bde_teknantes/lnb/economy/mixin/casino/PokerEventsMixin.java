@@ -44,6 +44,7 @@ public abstract class PokerEventsMixin {
     private List<ItemStack> lnbeconomy$payoutMade(ItemStack stake, int numerator, int denominator, int roll,
                                                   CasinoExchange.Rule rule, boolean refund,
                                                   Operation<List<ItemStack>> original) {
-        return CasinoHooks.created(this.this$0, original.call(stake, numerator, denominator, roll, null, refund));
+        return CasinoHooks.created(this.this$0, CasinoHooks.payout(stake, numerator, denominator, roll, refund,
+                () -> original.call(stake, numerator, denominator, roll, null, refund)));
     }
 }

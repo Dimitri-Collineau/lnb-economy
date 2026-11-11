@@ -53,6 +53,7 @@ public abstract class SlotMachineBlockEntityMixin {
     private List<ItemStack> lnbeconomy$payoutMade(ItemStack stake, int numerator, int denominator, int roll,
                                                   CasinoExchange.Rule rule, boolean refund,
                                                   Operation<List<ItemStack>> original) {
-        return CasinoHooks.created(lnbeconomy$self(), original.call(stake, numerator, denominator, roll, null, refund));
+        return CasinoHooks.created(lnbeconomy$self(), CasinoHooks.payout(stake, numerator, denominator, roll, refund,
+                () -> original.call(stake, numerator, denominator, roll, null, refund)));
     }
 }
