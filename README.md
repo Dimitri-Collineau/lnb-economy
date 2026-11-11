@@ -27,7 +27,7 @@ the mod on a player's computer only talks to the server. The contract is `docs/e
 
 The site's URL and the server's token are LNB Warden's: `api.url` and `api.token` in `config/lnbwarden-server.toml`.
 LNB Economy's own settings are in `config/lnbeconomy-server.toml` (confirmation threshold, refresh times, games on or
-off). Neither file is ever sent to players.
+off, and switches for shops, trades, the auction house and its `/hdv` command). Neither file is ever sent to players.
 
 ## Building
 
