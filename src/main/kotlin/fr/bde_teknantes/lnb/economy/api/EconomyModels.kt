@@ -83,3 +83,65 @@ data class TransferResult(
     val from: TransferSide,
     val to: TransferSide,
 )
+
+/** A shop's item: its ID, the stack as the game saved it (SNBT, never read by the site), and its name in the game. */
+data class ShopItem(val id: String, val snbt: String, val name: String)
+
+data class ShopPosition(val world: String, val x: Int, val y: Int, val z: Int)
+
+/**
+ * `POST /shops` and `PUT /shops/:id`. [buyPrice] null means the shop doesn't buy back: Gson leaves it out, which is
+ * what the site expects.
+ */
+data class ShopSettingsBody(
+    val player: String,
+    val account: String,
+    val item: ShopItem,
+    val lotSize: Int,
+    val sellPrice: Long,
+    val buyPrice: Long?,
+    val position: ShopPosition,
+)
+
+data class ShopAccountView(val id: String, val kind: String, val handle: String?)
+
+data class ShopItemView(val id: String, val name: String)
+
+/** A shop as the site has it. */
+data class ServerShop(
+    val id: String,
+    val account: ShopAccountView,
+    val item: ShopItemView,
+    val lotSize: Int,
+    val sellPrice: Long,
+    val buyPrice: Long?,
+    val position: ShopPosition,
+    val disabled: Boolean,
+    /** `removed` (its block was broken) or `admin`. */
+    val disabledReason: String?,
+) {
+    companion object {
+        const val DISABLED_BY_ADMIN = "admin"
+    }
+}
+
+/** `POST /shops/:id/disable`, sent through the journal so a broken shop always closes. */
+data class ShopDisableBody(val idempotencyKey: String, val player: String?)
+
+/**
+ * `POST /shops/:id/orders`. [account] pays for a `buy` (default account when null) and is paid for a `sell`
+ * (personal account when null).
+ */
+data class ShopOrderBody(
+    val idempotencyKey: String,
+    val player: String,
+    val account: String?,
+    val direction: String,
+    val lots: Int,
+    val expectedLotPrice: Long,
+) {
+    companion object {
+        const val BUY = "buy"
+        const val SELL = "sell"
+    }
+}

@@ -43,6 +43,15 @@ object EconomyApi {
     fun transfer(body: TransferBody): CompletableFuture<ApiResult<TransferResult>> =
         call("economy transfer", "POST", "$BASE/transfers", body)
 
+    fun createShop(body: ShopSettingsBody): CompletableFuture<ApiResult<ServerShop>> =
+        call("economy shop save", "POST", "$BASE/shops", body)
+
+    fun updateShop(id: String, body: ShopSettingsBody): CompletableFuture<ApiResult<ServerShop>> =
+        call("economy shop save", "PUT", "$BASE/shops/${encode(id)}", body)
+
+    fun shop(id: String): CompletableFuture<ApiResult<ServerShop>> =
+        call("economy shop lookup", "GET", "$BASE/shops/${encode(id)}")
+
     /**
      * A POST to [route] (under `/api/economy/server`, such as `/transfers`), with an answer left as JSON. The journal
      * sends every money move through here, whatever its route.

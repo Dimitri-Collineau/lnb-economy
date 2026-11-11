@@ -1,5 +1,6 @@
 package fr.bde_teknantes.lnb.economy.api
 
+import fr.bde_teknantes.lnb.warden.common.api.ApiClient
 import fr.bde_teknantes.lnb.warden.common.api.ApiResult
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.BeforeEach
@@ -17,7 +18,7 @@ import kotlin.test.assertTrue
  * - `LNB_TEST_PLAYER`: the UUID of a Minecraft account linked to an eligible LNB account, with at least 1 LNBit;
  * - `LNB_TEST_CASINO`: the handle of a shared account that player owns or is a member of.
  *
- * Moves 1 LNBit to the shared account and back.
+ * Moves 1 LNBit to the shared account and back, twice: once by transfer, once at a test shop (left closed).
  */
 class EconomyApiIntegrationTest {
     private lateinit var player: UUID
@@ -81,5 +82,40 @@ class EconomyApiIntegrationTest {
 
         val payout = TransferBody(UUID.randomUUID().toString(), Party(account = casino), Party(player = player.toString()), 1, TransferBody.KIND_CASINO, "lnb-economy integration test")
         EconomyApi.transfer(payout).get().ok()
+    }
+
+    @Test
+    fun `a shop sells and buys back at its saved prices, then closes`() {
+        val settings = ShopSettingsBody(
+            player = player.toString(),
+            account = casino,
+            item = ShopItem("minecraft:stick", "{id:\"minecraft:stick\",count:1}", "Stick"),
+            lotSize = 4,
+            sellPrice = 1,
+            buyPrice = 1,
+            position = ShopPosition("minecraft:overworld", 0, -64, 0),
+        )
+        val shop = EconomyApi.createShop(settings).get().ok()
+        assertEquals(casino, shop.account.handle)
+        assertEquals(false, shop.disabled)
+
+        fun order(direction: String, expectedLotPrice: Long = 1) = EconomyApi.post(
+            "/shops/${shop.id}/orders",
+            ApiClient.GSON.toJsonTree(ShopOrderBody(UUID.randomUUID().toString(), player.toString(), null, direction, 1, expectedLotPrice)).asJsonObject,
+        ).get()
+
+        assertEquals(ApiResult.Http(409, Problems.PRICE_CHANGED), order(ShopOrderBody.BUY, expectedLotPrice = 2))
+        val bought = ApiClient.GSON.fromJson(order(ShopOrderBody.BUY).ok(), TransferResult::class.java)
+        assertEquals(1, bought.amount)
+        val soldBack = ApiClient.GSON.fromJson(order(ShopOrderBody.SELL).ok(), TransferResult::class.java)
+        assertEquals(bought.to.accountId, soldBack.from.accountId)
+
+        val updated = EconomyApi.updateShop(shop.id, settings.copy(buyPrice = null, sellPrice = 3)).get().ok()
+        assertEquals(null, updated.buyPrice)
+        assertEquals(ApiResult.Http(409, Problems.NO_BUY_BACK), order(ShopOrderBody.SELL))
+
+        EconomyApi.post("/shops/${shop.id}/disable", ApiClient.GSON.toJsonTree(ShopDisableBody(UUID.randomUUID().toString(), null)).asJsonObject).get().ok()
+        assertEquals(true, EconomyApi.shop(shop.id).get().ok().disabled)
+        assertEquals(ApiResult.Http(409, Problems.SHOP_DISABLED), order(ShopOrderBody.BUY, expectedLotPrice = 3))
     }
 }

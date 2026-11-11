@@ -14,9 +14,15 @@ object Problems {
     const val SAME_ACCOUNT = "sameAccount"
     const val IDEMPOTENCY_MISMATCH = "idempotencyMismatch"
     const val DISABLED = "disabled"
+    const val SHOP_DISABLED = "shopDisabled"
+    const val PRICE_CHANGED = "priceChanged"
+    const val NO_BUY_BACK = "noBuyBack"
 
     /** Problems with their own message; anything else gets the generic one with its code. */
-    val KNOWN = setOf(INSUFFICIENT_FUNDS, FROZEN, NOT_ALLOWED, NOT_LINKED, NOT_ELIGIBLE, NOT_FOUND, CLOSED, SAME_ACCOUNT, DISABLED)
+    val KNOWN = setOf(
+        INSUFFICIENT_FUNDS, FROZEN, NOT_ALLOWED, NOT_LINKED, NOT_ELIGIBLE, NOT_FOUND, CLOSED, SAME_ACCOUNT, DISABLED,
+        SHOP_DISABLED, PRICE_CHANGED, NO_BUY_BACK,
+    )
 
     /** Players without an economy: no linked LNB account, or an LNB account without access. */
     fun isNoEconomy(problem: String?): Boolean = problem == NOT_LINKED || problem == NOT_ELIGIBLE
