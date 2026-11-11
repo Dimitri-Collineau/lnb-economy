@@ -138,4 +138,37 @@ class EconomyApiIntegrationTest {
 
         assertEquals(ApiResult.Http(400, null), trade(player.toString(), player.toString()).let { if (it is ApiResult.Http) it.copy(problem = null) else it })
     }
+
+    @Test
+    fun `a listing sells to another player, who claims it once, and a listing taken back comes home`() {
+        val partner = System.getenv("LNB_TEST_PARTNER")
+        assumeTrue(!partner.isNullOrBlank(), "LNB_TEST_PARTNER isn't set")
+        fun post(route: String, body: Any) = EconomyApi.post(route, ApiClient.GSON.toJsonTree(body).asJsonObject).get()
+        val stick = ShopItem("minecraft:stick", "{id:\"minecraft:stick\",count:2}", "Stick")
+
+        val listing = ApiClient.GSON.fromJson(
+            post("/auctions", ListingBody(UUID.randomUUID().toString(), player.toString(), null, stick, 2, 20)).ok(),
+            ServerListing::class.java,
+        )
+        assertTrue(EconomyApi.playerListings(player).get().ok().items.any { it.id == listing.id })
+        assertEquals(ApiResult.Http(409, "sameAccount"), post("/auctions/${listing.id}/buy", ListingBuyBody(UUID.randomUUID().toString(), player.toString(), null)))
+
+        val answer = post("/auctions/${listing.id}/buy", ListingBuyBody(UUID.randomUUID().toString(), partner, null)).ok()
+        val bought = ApiClient.GSON.fromJson(answer, ListingBuyResult::class.java)
+        assertEquals(20, ApiClient.GSON.fromJson(answer, TransferResult::class.java).amount)
+        val claimKey = UUID.randomUUID().toString()
+        val claimed = ApiClient.GSON.fromJson(post("/mailbox/${bought.mailboxItem.id}/claim", ListingActionBody(claimKey, partner)).ok(), MailboxView::class.java)
+        assertEquals(stick.snbt, claimed.item.snbt)
+        post("/mailbox/${bought.mailboxItem.id}/claim", ListingActionBody(claimKey, partner)).ok()
+        assertEquals(ApiResult.Http(409, Problems.ALREADY_CLAIMED), post("/mailbox/${bought.mailboxItem.id}/claim", ListingActionBody(UUID.randomUUID().toString(), partner)))
+
+        val back = ApiClient.GSON.fromJson(
+            post("/auctions", ListingBody(UUID.randomUUID().toString(), player.toString(), null, stick, 2, 5)).ok(),
+            ServerListing::class.java,
+        )
+        post("/auctions/${back.id}/cancel", ListingActionBody(UUID.randomUUID().toString(), player.toString())).ok()
+        val waiting = EconomyApi.siteMailbox(player).get().ok().items.filter { it.reason == "cancelled" }
+        assertTrue(waiting.isNotEmpty())
+        waiting.forEach { post("/mailbox/${it.id}/claim", ListingActionBody(UUID.randomUUID().toString(), player.toString())).ok() }
+    }
 }

@@ -157,3 +157,51 @@ data class TradeBody(
     val amount: Long,
     val memo: String? = null,
 )
+
+/** An item stored on the site: its ID, its name in the game, and the stack as the game saved it. */
+data class StoredItem(val id: String, val name: String, val snbt: String)
+
+/** `POST /auctions`: one stack at a fixed price. [account] is paid on a sale (default account when null). */
+data class ListingBody(
+    val idempotencyKey: String,
+    val player: String,
+    val account: String?,
+    val item: ShopItem,
+    val count: Int,
+    val price: Long,
+) {
+    companion object {
+        const val MAX_PRICE = 1_000_000_000L
+    }
+}
+
+/** A listing at the auction house. [status] is `active`, `sold`, `cancelled` or `expired`. */
+data class ServerListing(
+    val id: String,
+    val item: StoredItem,
+    val count: Int,
+    val price: Long,
+    val seller: String,
+    val status: String,
+    val createdAt: String,
+    val expiresAt: String,
+)
+
+data class ListingPage(val items: List<ServerListing>, val nextCursor: String?)
+
+/** `GET /players/:uuid/listings`: a player's listings up now, and the limits for new ones. */
+data class PlayerListings(val items: List<ServerListing>, val max: Int, val taxPercent: Int, val days: Int)
+
+/** `POST /auctions/:id/cancel` and `POST /mailbox/:id/claim`. */
+data class ListingActionBody(val idempotencyKey: String, val player: String)
+
+/** `POST /auctions/:id/buy`. [account] pays (default account when null). */
+data class ListingBuyBody(val idempotencyKey: String, val player: String, val account: String?)
+
+/** An item waiting for a player on the site. [reason]: `bought`, `cancelled`, `expired` or `removed`. */
+data class MailboxView(val id: String, val item: StoredItem, val count: Int, val reason: String, val createdAt: String)
+
+data class SiteMailbox(val items: List<MailboxView>)
+
+/** The answer of a purchase: a transfer's (from the buyer, to the seller), the tax, and the item to claim. */
+data class ListingBuyResult(val tax: Long, val listingId: String, val mailboxItem: MailboxView)

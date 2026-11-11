@@ -17,11 +17,14 @@ object Problems {
     const val SHOP_DISABLED = "shopDisabled"
     const val PRICE_CHANGED = "priceChanged"
     const val NO_BUY_BACK = "noBuyBack"
+    const val TOO_MANY_LISTINGS = "tooManyListings"
+    const val LISTING_GONE = "listingGone"
+    const val ALREADY_CLAIMED = "alreadyClaimed"
 
     /** Problems with their own message; anything else gets the generic one with its code. */
     val KNOWN = setOf(
         INSUFFICIENT_FUNDS, FROZEN, NOT_ALLOWED, NOT_LINKED, NOT_ELIGIBLE, NOT_FOUND, CLOSED, SAME_ACCOUNT, DISABLED,
-        SHOP_DISABLED, PRICE_CHANGED, NO_BUY_BACK,
+        SHOP_DISABLED, PRICE_CHANGED, NO_BUY_BACK, TOO_MANY_LISTINGS, LISTING_GONE,
     )
 
     /** Players without an economy: no linked LNB account, or an LNB account without access. */

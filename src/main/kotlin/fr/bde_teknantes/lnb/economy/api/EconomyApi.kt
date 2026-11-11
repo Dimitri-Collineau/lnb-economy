@@ -52,6 +52,22 @@ object EconomyApi {
     fun shop(id: String): CompletableFuture<ApiResult<ServerShop>> =
         call("economy shop lookup", "GET", "$BASE/shops/${encode(id)}")
 
+    /** Listings up now. [sort]: `newest`, `price` or `unitPrice`. [cursor] is the page's `nextCursor`. */
+    fun listings(query: String?, sort: String, cursor: String?): CompletableFuture<ApiResult<ListingPage>> {
+        val params = buildList {
+            query?.takeIf { it.isNotBlank() }?.let { add("q=${encode(it)}") }
+            add("sort=${encode(sort)}")
+            cursor?.let { add("cursor=${encode(it)}") }
+        }
+        return call("economy listings", "GET", "$BASE/auctions?${params.joinToString("&")}")
+    }
+
+    fun playerListings(uuid: UUID): CompletableFuture<ApiResult<PlayerListings>> =
+        call("economy player listings", "GET", "$BASE/players/$uuid/listings")
+
+    fun siteMailbox(uuid: UUID): CompletableFuture<ApiResult<SiteMailbox>> =
+        call("economy mailbox", "GET", "$BASE/players/$uuid/mailbox")
+
     /**
      * A POST to [route] (under `/api/economy/server`, such as `/transfers`), with an answer left as JSON. The journal
      * sends every money move through here, whatever its route.
