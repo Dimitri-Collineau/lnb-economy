@@ -128,5 +128,9 @@
   "item.lnbeconomy.chip_1000": "1,000 LNBit Chip",
   "item.lnbeconomy.chip_25": "25 LNBit Chip",
   "item.lnbeconomy.chip_5": "5 LNBit Chip",
-  "item.lnbeconomy.chip_500": "500 LNBit Chip"
+  "item.lnbeconomy.chip_500": "500 LNBit Chip",
+  "economy.lnbeconomy.mailbox.waiting": "%s item(s) wait in your mailbox. Make room, then type %s.",
+  "economy.lnbeconomy.mailbox.collected": "You collected %s item(s) from your mailbox.",
+  "economy.lnbeconomy.mailbox.empty": "Your mailbox is empty.",
+  "economy.lnbeconomy.mailbox.unreadable": "%s item stack(s) in your mailbox can no longer be read by the server. Tell an operator."
 }

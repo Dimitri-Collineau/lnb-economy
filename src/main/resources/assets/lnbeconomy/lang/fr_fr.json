@@ -128,5 +128,9 @@
   "item.lnbeconomy.chip_1000": "Jeton de 1 000 LNBits",
   "item.lnbeconomy.chip_25": "Jeton de 25 LNBits",
   "item.lnbeconomy.chip_5": "Jeton de 5 LNBits",
-  "item.lnbeconomy.chip_500": "Jeton de 500 LNBits"
+  "item.lnbeconomy.chip_500": "Jeton de 500 LNBits",
+  "economy.lnbeconomy.mailbox.waiting": "%s objet(s) t’attendent dans ta boîte aux lettres. Fais de la place, puis tape %s.",
+  "economy.lnbeconomy.mailbox.collected": "Tu as récupéré %s objet(s) de ta boîte aux lettres.",
+  "economy.lnbeconomy.mailbox.empty": "Ta boîte aux lettres est vide.",
+  "economy.lnbeconomy.mailbox.unreadable": "%s pile(s) d’objets de ta boîte aux lettres ne peuvent plus être lues par le serveur. Préviens un opérateur."
 }

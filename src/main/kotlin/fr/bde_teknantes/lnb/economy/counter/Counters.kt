@@ -10,12 +10,12 @@ import fr.bde_teknantes.lnb.economy.casino.CasinoBook
 import fr.bde_teknantes.lnb.economy.casino.CasinoLinks
 import fr.bde_teknantes.lnb.economy.casino.Casinos
 import fr.bde_teknantes.lnb.economy.chip.ChipLedger
-import fr.bde_teknantes.lnb.economy.chip.ChipMailbox
 import fr.bde_teknantes.lnb.economy.chip.Chips
 import fr.bde_teknantes.lnb.economy.chip.Denominations
 import fr.bde_teknantes.lnb.economy.ledger.JournalEntry
 import fr.bde_teknantes.lnb.economy.ledger.Outcome
 import fr.bde_teknantes.lnb.economy.ledger.TransferJournal
+import fr.bde_teknantes.lnb.economy.mail.ItemMailbox
 import fr.bde_teknantes.lnb.economy.money.Texts
 import fr.bde_teknantes.lnb.economy.network.CounterBuyPayload
 import fr.bde_teknantes.lnb.economy.network.CounterCashPayload
@@ -128,7 +128,7 @@ object Counters {
             is Outcome.Done -> {
                 PlayerAccounts.applyTransfer(server, outcome.result)
                 ChipLedger.get(server).add(handle, outcome.result.amount)
-                ChipMailbox.deliver(server, uuid, handle, outcome.result.amount)
+                ItemMailbox.deliverChips(server, uuid, handle, outcome.result.amount)
                 player?.sendSystemMessage(
                     Component.translatable("economy.lnbeconomy.counter.bought", Texts.amount(outcome.result.amount, player), Handles.display(handle))
                         .withStyle(ChatFormatting.GREEN),
@@ -146,7 +146,7 @@ object Counters {
             is Outcome.Refused -> {
                 val amount = entry.amount ?: 0
                 ChipLedger.get(server).add(handle, amount)
-                ChipMailbox.deliver(server, uuid, handle, amount)
+                ItemMailbox.deliverChips(server, uuid, handle, amount)
                 player?.let {
                     val problem = (outcome.result as? ApiResult.Http)?.problem
                     val reason = if (problem == Problems.INSUFFICIENT_FUNDS) Component.translatable("economy.lnbeconomy.counter.casino_short", Handles.display(handle))
