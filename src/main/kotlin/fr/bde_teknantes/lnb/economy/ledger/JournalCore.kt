@@ -1,13 +1,20 @@
 package fr.bde_teknantes.lnb.economy.ledger
 
-import fr.bde_teknantes.lnb.economy.api.TransferBody
+import com.google.gson.JsonElement
 import fr.bde_teknantes.lnb.economy.api.TransferResult
+import fr.bde_teknantes.lnb.warden.common.api.ApiClient
 import fr.bde_teknantes.lnb.warden.common.api.ApiResult
 import java.util.concurrent.CompletableFuture
 
 /** The end of a journal entry, or news about it. */
 sealed interface Outcome {
-    data class Done(val result: TransferResult) : Outcome
+    /** [answer] is the site's answer, as JSON: read it with [decode], or [result] for a transfer. */
+    data class Done(val answer: JsonElement) : Outcome {
+        inline fun <reified T> decode(): T = ApiClient.GSON.fromJson(answer, T::class.java)
+
+        /** The answer of a transfer (an entry on [JournalEntry.TRANSFERS]). */
+        val result: TransferResult get() = decode()
+    }
 
     data class Refused(val result: ApiResult<*>) : Outcome
 
@@ -23,7 +30,7 @@ sealed interface Outcome {
  */
 class JournalCore(
     private val store: JournalStore,
-    private val send: (TransferBody) -> CompletableFuture<ApiResult<TransferResult>>,
+    private val send: (JournalEntry) -> CompletableFuture<ApiResult<JsonElement>>,
     private val clock: () -> Long,
     private val executor: (Runnable) -> Unit,
     private val onOutcome: (JournalEntry, Outcome) -> Unit,
@@ -65,13 +72,13 @@ class JournalCore(
     private fun attempt(key: String) {
         val entry = entries[key] ?: return
         inFlight.add(key)
-        send(entry.body).whenComplete { result, error ->
+        send(entry).whenComplete { result, error ->
             val answer = result ?: ApiResult.Network(error ?: IllegalStateException("No answer"))
             executor(Runnable { answered(key, answer) })
         }
     }
 
-    private fun answered(key: String, result: ApiResult<TransferResult>) {
+    private fun answered(key: String, result: ApiResult<JsonElement>) {
         inFlight.remove(key)
         val entry = entries[key] ?: return
         when (RetryPolicy.verdict(result)) {

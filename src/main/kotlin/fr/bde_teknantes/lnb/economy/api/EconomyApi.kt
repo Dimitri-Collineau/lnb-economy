@@ -1,5 +1,7 @@
 package fr.bde_teknantes.lnb.economy.api
 
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import fr.bde_teknantes.lnb.warden.common.api.ApiClient
 import fr.bde_teknantes.lnb.warden.common.api.ApiResult
 import fr.bde_teknantes.lnb.warden.server.ServerConfig
@@ -40,6 +42,13 @@ object EconomyApi {
 
     fun transfer(body: TransferBody): CompletableFuture<ApiResult<TransferResult>> =
         call("economy transfer", "POST", "$BASE/transfers", body)
+
+    /**
+     * A POST to [route] (under `/api/economy/server`, such as `/transfers`), with an answer left as JSON. The journal
+     * sends every money move through here, whatever its route.
+     */
+    fun post(route: String, body: JsonObject): CompletableFuture<ApiResult<JsonElement>> =
+        call("economy ${route.trimStart('/').substringBefore('/')}", "POST", BASE + route, body)
 
     private fun encode(segment: String): String = URLEncoder.encode(segment, StandardCharsets.UTF_8).replace("+", "%20")
 

@@ -240,7 +240,7 @@ object EconomyCommands {
             return 1
         }
         for (entry in entries) {
-            val body = entry.body
+            val transfer = entry.transfer
             val retry = Component.translatable("commands.lnbeconomy.pending.retry").withStyle { style ->
                 style.withColor(ChatFormatting.AQUA).withUnderlined(true)
                     .withClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/economy retry ${entry.key}"))
@@ -249,9 +249,9 @@ object EconomyCommands {
             val line = Component.translatable(
                 "commands.lnbeconomy.pending.line",
                 entry.purpose,
-                body.amount,
-                body.from.account?.let(Handles::display) ?: body.from.player ?: "?",
-                body.to.account?.let(Handles::display) ?: body.to.player ?: "?",
+                entry.amount?.toString() ?: "-",
+                transfer?.from?.let { it.account?.let(Handles::display) ?: it.player } ?: entry.route,
+                transfer?.to?.let { it.account?.let(Handles::display) ?: it.player } ?: "-",
                 entry.attempts,
                 entry.lastError ?: "-",
             ).append(" ").append(retry)

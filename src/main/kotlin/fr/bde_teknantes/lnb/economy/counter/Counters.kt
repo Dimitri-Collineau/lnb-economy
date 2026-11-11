@@ -144,8 +144,9 @@ object Counters {
         when (outcome) {
             is Outcome.Delayed -> player?.sendSystemMessage(Component.translatable("economy.lnbeconomy.counter.delayed").withStyle(ChatFormatting.GRAY))
             is Outcome.Refused -> {
-                ChipLedger.get(server).add(handle, entry.body.amount)
-                ChipMailbox.deliver(server, uuid, handle, entry.body.amount)
+                val amount = entry.amount ?: 0
+                ChipLedger.get(server).add(handle, amount)
+                ChipMailbox.deliver(server, uuid, handle, amount)
                 player?.let {
                     val problem = (outcome.result as? ApiResult.Http)?.problem
                     val reason = if (problem == Problems.INSUFFICIENT_FUNDS) Component.translatable("economy.lnbeconomy.counter.casino_short", Handles.display(handle))
