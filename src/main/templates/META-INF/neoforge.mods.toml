@@ -36,6 +36,14 @@ config="${mod_id}.casino.mixins.json"
     ordering="NONE"
     side="BOTH"
 
+# Animated block models (the counter's teller).
+[[dependencies.${mod_id}]]
+    modId="geckolib"
+    type="required"
+    versionRange="${geckolib_version_range}"
+    ordering="AFTER"
+    side="BOTH"
+
 # Player identity and the connection to LNB's API (api.url and api.token in lnbwarden-server.toml).
 [[dependencies.${mod_id}]]
     modId="lnbwarden"

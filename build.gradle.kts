@@ -23,6 +23,10 @@ repositories {
         name = "Kotlin for Forge"
         content { includeGroup("thedarkcolour") }
     }
+    maven("https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/") {
+        name = "GeckoLib"
+        content { includeGroup("software.bernie.geckolib") }
+    }
 }
 
 // Other mods' jars live in libs/ and are never committed or redistributed (see README).
@@ -87,6 +91,7 @@ configurations[integrationTest.runtimeOnlyConfigurationName].extendsFrom(configu
 
 dependencies {
     implementation("thedarkcolour:kotlinforforge-neoforge:${prop("kff_version")}")
+    implementation("software.bernie.geckolib:geckolib-neoforge-${prop("minecraft_version")}:${prop("geckolib_version")}")
 
     compileOnly(wardenJar)
     localRuntime(wardenJar)
@@ -113,6 +118,7 @@ val generateModMetadata = tasks.register<ProcessResources>("generateModMetadata"
         "neo_version_range",
         "loader_version_range",
         "kff_version",
+        "geckolib_version_range",
         "lnbwarden_version_range",
         "minevegas_version_range",
         "mod_id",
