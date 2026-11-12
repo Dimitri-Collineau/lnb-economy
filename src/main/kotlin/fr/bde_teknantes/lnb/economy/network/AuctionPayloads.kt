@@ -132,19 +132,23 @@ data class AuctionRequestPayload(val tab: Int, val query: String?, val sort: Str
     }
 }
 
-/** Client -> server: list [count] items of the stack in the main hand for [price], paid to [accountId] (null: default). */
-data class AuctionSellPayload(val count: Int, val price: Long, val accountId: String?) : CustomPacketPayload {
+/**
+ * Client -> server: list [count] items of the stack in the player's inventory [slot] (0..35: the main inventory and the
+ * hotbar) for [price], sold for [accountId] (null: the default account).
+ */
+data class AuctionSellPayload(val slot: Int, val count: Int, val price: Long, val accountId: String?) : CustomPacketPayload {
     override fun type() = TYPE
 
     companion object {
         val TYPE = CustomPacketPayload.Type<AuctionSellPayload>(LnbEconomy.id("auction_sell"))
         val STREAM_CODEC: StreamCodec<FriendlyByteBuf, AuctionSellPayload> = StreamCodec.of(
             { buf, p ->
+                buf.writeVarInt(p.slot)
                 buf.writeVarInt(p.count)
                 buf.writeVarLong(p.price)
                 buf.writeNullable(p.accountId) { b, v -> b.writeUtf(v, 64) }
             },
-            { buf -> AuctionSellPayload(buf.readVarInt(), buf.readVarLong(), buf.readNullable { it.readUtf(64) }) },
+            { buf -> AuctionSellPayload(buf.readVarInt(), buf.readVarInt(), buf.readVarLong(), buf.readNullable { it.readUtf(64) }) },
         )
     }
 }

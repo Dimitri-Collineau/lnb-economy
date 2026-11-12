@@ -73,7 +73,7 @@ class PayloadCodecTest {
         assertEquals(AuctionCollectPayload, roundTrip(AuctionCollectPayload.STREAM_CODEC, AuctionCollectPayload))
         listOf(AuctionRequestPayload(AuctionRequestPayload.BROWSE, "diam", "unitPrice", "45"), AuctionRequestPayload(AuctionRequestPayload.MAILBOX, null, "newest", null))
             .forEach { assertEquals(it, roundTrip(AuctionRequestPayload.STREAM_CODEC, it)) }
-        listOf(AuctionSellPayload(16, 50, null), AuctionSellPayload(1, 1_000_000_000, "a")).forEach { assertEquals(it, roundTrip(AuctionSellPayload.STREAM_CODEC, it)) }
+        listOf(AuctionSellPayload(0, 16, 50, null), AuctionSellPayload(35, 1, 1_000_000_000, "a")).forEach { assertEquals(it, roundTrip(AuctionSellPayload.STREAM_CODEC, it)) }
         assertEquals(AuctionBuyPayload("l1", "a"), roundTrip(AuctionBuyPayload.STREAM_CODEC, AuctionBuyPayload("l1", "a")))
         assertEquals(AuctionCancelPayload("l1"), roundTrip(AuctionCancelPayload.STREAM_CODEC, AuctionCancelPayload("l1")))
     }

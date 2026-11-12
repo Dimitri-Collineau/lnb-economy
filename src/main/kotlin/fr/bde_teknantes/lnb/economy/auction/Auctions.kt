@@ -38,6 +38,7 @@ import net.minecraft.nbt.TagParser
 import net.minecraft.network.chat.Component
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.item.ItemStack
 import net.neoforged.neoforge.event.RegisterCommandsEvent
 import net.neoforged.neoforge.event.entity.player.PlayerEvent
@@ -149,8 +150,10 @@ object Auctions {
     fun handleSell(payload: AuctionSellPayload, context: IPayloadContext) {
         val player = context.player() as? ServerPlayer ?: return
         if (!isOpen(player)) return
-        val hand = player.mainHandItem
-        if (hand.isEmpty || payload.count !in 1..hand.count || payload.price !in 1..ListingBody.MAX_PRICE) return
+        // Any stack of the main inventory or the hotbar, not only the one in hand.
+        if (payload.slot !in 0 until Inventory.INVENTORY_SIZE) return
+        val stack = player.inventory.getItem(payload.slot)
+        if (stack.isEmpty || payload.count !in 1..stack.count || payload.price !in 1..ListingBody.MAX_PRICE) return
         PlayerAccounts.noEconomyMessage(player.uuid)?.let {
             player.sendSystemMessage(it)
             return
@@ -160,7 +163,8 @@ object Auctions {
             return
         }
         val server = player.server
-        val taken = hand.split(payload.count)
+        val taken = stack.split(payload.count)
+        player.inventory.setChanged()
         val tag = ItemStacks.toTag(taken, server.registryAccess()) ?: return
         val item = ShopItem(
             id = BuiltInRegistries.ITEM.getKey(taken.item).toString(),
