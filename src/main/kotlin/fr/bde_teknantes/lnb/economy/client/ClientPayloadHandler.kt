@@ -5,6 +5,8 @@ import fr.bde_teknantes.lnb.economy.client.gui.AuctionScreen
 import fr.bde_teknantes.lnb.economy.client.gui.CounterScreen
 import fr.bde_teknantes.lnb.economy.client.gui.LinkScreen
 import fr.bde_teknantes.lnb.economy.client.gui.ShopScreen
+import fr.bde_teknantes.lnb.economy.network.AccountFeedbackPayload
+import fr.bde_teknantes.lnb.economy.network.AccountMembersPayload
 import fr.bde_teknantes.lnb.economy.network.AccountsSnapshotPayload
 import fr.bde_teknantes.lnb.economy.network.AuctionListingsPayload
 import fr.bde_teknantes.lnb.economy.network.AuctionMailboxPayload
@@ -21,6 +23,14 @@ import net.neoforged.neoforge.network.handling.IPayloadContext
 object ClientPayloadHandler {
     fun handleAccounts(payload: AccountsSnapshotPayload, context: IPayloadContext) {
         ClientEconomy.update(payload)
+    }
+
+    fun handleAccountMembers(payload: AccountMembersPayload, context: IPayloadContext) {
+        ClientAccounts.update(payload)
+    }
+
+    fun handleAccountFeedback(payload: AccountFeedbackPayload, context: IPayloadContext) {
+        ClientAccounts.update(payload)
     }
 
     fun handleOpenCounter(payload: OpenCounterPayload, context: IPayloadContext) {

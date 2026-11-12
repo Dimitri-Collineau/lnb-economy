@@ -40,6 +40,37 @@ object EconomyApi {
     fun account(handle: String): CompletableFuture<ApiResult<ServerAccount>> =
         call("economy account lookup", "GET", "$BASE/accounts/${encode(Handles.bare(handle))}")
 
+    fun createAccount(body: AccountCreateBody): CompletableFuture<ApiResult<AccountView>> =
+        call("economy account creation", "POST", "$BASE/accounts", body)
+
+    fun patchAccount(handle: String, body: AccountPatchBody): CompletableFuture<ApiResult<AccountView>> =
+        call("economy account change", "PATCH", "$BASE/accounts/${encode(Handles.bare(handle))}", body)
+
+    fun members(handle: String, player: UUID): CompletableFuture<ApiResult<AccountMembers>> =
+        call("economy account members", "GET", "$BASE/accounts/${encode(Handles.bare(handle))}/members?player=$player")
+
+    fun invite(handle: String, body: InviteBody): CompletableFuture<ApiResult<InviteResult>> =
+        call("economy invitation", "POST", "$BASE/accounts/${encode(Handles.bare(handle))}/invitations", body)
+
+    fun cancelInvitation(handle: String, invitationId: String, player: UUID): CompletableFuture<ApiResult<Unit>> =
+        call("economy invitation", "DELETE", "$BASE/accounts/${encode(Handles.bare(handle))}/invitations/${encode(invitationId)}?player=$player")
+
+    fun invitations(uuid: UUID): CompletableFuture<ApiResult<InvitationList>> =
+        call("economy invitations", "GET", "$BASE/players/$uuid/invitations")
+
+    fun acceptInvitation(invitationId: String, player: UUID): CompletableFuture<ApiResult<AccountView>> =
+        call("economy invitation", "POST", "$BASE/invitations/${encode(invitationId)}/accept", PlayerBody(player.toString()))
+
+    fun declineInvitation(invitationId: String, player: UUID): CompletableFuture<ApiResult<Unit>> =
+        call("economy invitation", "POST", "$BASE/invitations/${encode(invitationId)}/decline", PlayerBody(player.toString()))
+
+    /** The player's listings that sold and that nobody told them about yet. */
+    fun unseenSales(uuid: UUID): CompletableFuture<ApiResult<SaleList>> =
+        call("economy sales", "GET", "$BASE/players/$uuid/sales")
+
+    fun salesSeen(uuid: UUID, listingIds: List<String>): CompletableFuture<ApiResult<Unit>> =
+        call("economy sales", "POST", "$BASE/players/$uuid/sales/seen", SalesSeenBody(listingIds))
+
     fun transfer(body: TransferBody): CompletableFuture<ApiResult<TransferResult>> =
         call("economy transfer", "POST", "$BASE/transfers", body)
 

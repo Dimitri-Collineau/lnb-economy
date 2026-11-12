@@ -4,6 +4,7 @@ import fr.bde_teknantes.lnb.economy.LnbEconomy
 import fr.bde_teknantes.lnb.economy.EconomyConfig
 import fr.bde_teknantes.lnb.economy.api.AccountView
 import fr.bde_teknantes.lnb.economy.api.EconomyApi
+import fr.bde_teknantes.lnb.economy.api.InvitationView
 import fr.bde_teknantes.lnb.economy.api.Problems
 import fr.bde_teknantes.lnb.economy.api.ServerPlayer as SitePlayer
 import fr.bde_teknantes.lnb.economy.api.TransferResult
@@ -11,6 +12,7 @@ import fr.bde_teknantes.lnb.economy.casino.Casinos
 import fr.bde_teknantes.lnb.economy.network.AccountEntry
 import fr.bde_teknantes.lnb.economy.network.AccountsSnapshotPayload
 import fr.bde_teknantes.lnb.economy.network.EconomyStatus
+import fr.bde_teknantes.lnb.economy.network.InvitationEntry
 import fr.bde_teknantes.lnb.warden.common.api.ApiResult
 import net.minecraft.network.chat.Component
 import net.minecraft.server.MinecraftServer
@@ -26,7 +28,7 @@ import java.util.concurrent.CompletableFuture
  * every transfer the server makes. Only touched on the server thread.
  */
 object PlayerAccounts {
-    data class Entry(val status: EconomyStatus, val player: SitePlayer?, val fetchedAt: Long)
+    data class Entry(val status: EconomyStatus, val player: SitePlayer?, val fetchedAt: Long, val invitations: List<InvitationView> = emptyList())
 
     /** A player can't make the server read the site more often than this. */
     private const val MIN_REFRESH_MS = 10_000L
@@ -54,10 +56,14 @@ object PlayerAccounts {
 
         val done = CompletableFuture<Entry>()
         loading[uuid] = done
-        EconomyApi.player(uuid).thenAccept { result ->
+        EconomyApi.player(uuid).thenCompose { result ->
+            // Invitations are extra: without them (an older site, shared accounts switched off) the accounts still show.
+            if (result !is ApiResult.Ok) CompletableFuture.completedFuture(result to emptyList())
+            else EconomyApi.invitations(uuid).thenApply { invitations -> result to (invitations as? ApiResult.Ok)?.body?.items.orEmpty() }
+        }.thenAccept { (result, invitations) ->
             server.execute {
                 loading.remove(uuid)
-                val entry = entryOf(result)
+                val entry = entryOf(result).copy(invitations = invitations)
                 // The player may have left while the site answered.
                 if (server.playerList.getPlayer(uuid) != null) {
                     // Keep the last good accounts on a failed refresh: the inventory goes on showing them.
@@ -83,7 +89,7 @@ object PlayerAccounts {
 
     /** The site's answer to a default account change: the accounts again. */
     fun update(server: MinecraftServer, uuid: UUID, player: SitePlayer) {
-        entries[uuid] = Entry(EconomyStatus.READY, player, System.currentTimeMillis())
+        entries[uuid] = Entry(EconomyStatus.READY, player, System.currentTimeMillis(), entries[uuid]?.invitations.orEmpty())
         send(server, uuid)
     }
 
@@ -160,11 +166,17 @@ object PlayerAccounts {
             player != null -> EconomyStatus.READY
             else -> entry.status
         }
-        return AccountsSnapshotPayload(status, player?.accounts.orEmpty().map(::entryOf), player?.defaultAccountId)
+        return AccountsSnapshotPayload(
+            status, player?.accounts.orEmpty().map(::entryOf), player?.defaultAccountId,
+            invitations = entry?.invitations.orEmpty().map { InvitationEntry(it.id, it.account.handle, it.account.name, it.account.type, it.invitedBy.orEmpty()) },
+            licensesFree = player?.casinoLicenses?.free ?: 0,
+            licensesTotal = player?.casinoLicenses?.total ?: 0,
+            licensePrice = player?.casinoLicensePrice ?: -1,
+        )
     }
 
     private fun entryOf(account: AccountView) =
-        AccountEntry(account.id, account.handle, account.name, account.balance, account.role, account.frozen, account.canSpend)
+        AccountEntry(account.id, account.handle, account.name, account.balance, account.role, account.frozen, account.canSpend, account.type)
 
     /** The message for a player who has no economy, or null when they have one (or it's still loading). */
     fun noEconomyMessage(uuid: UUID) = when (entries[uuid]?.status) {

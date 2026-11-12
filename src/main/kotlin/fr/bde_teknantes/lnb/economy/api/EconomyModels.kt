@@ -18,8 +18,13 @@ data class AccountView(
     val role: String,
     val frozen: Boolean,
     val memberCount: Int,
+    /** Shared accounts only: one of [AccountTypes]. Null on a site that has no types yet. */
+    val type: String? = null,
 ) {
     val isPersonal: Boolean get() = kind == KIND_PERSONAL
+
+    /** Whether machines and counters can be linked to it. A site without types lets every shared account be one. */
+    val isCasino: Boolean get() = !isPersonal && (type == null || type == AccountTypes.CASINO)
 
     /** Owners and members spend from an account; viewers only read it. Frozen accounts give nothing. */
     val canSpend: Boolean get() = !frozen && (role == ROLE_OWNER || role == ROLE_MEMBER)
@@ -32,11 +37,24 @@ data class AccountView(
     }
 }
 
+/** What a shared account is for. Only `casino` changes anything in the game, and it needs a casino licence. */
+object AccountTypes {
+    const val TEAM = "team"
+    const val SHOP = "shop"
+    const val CASINO = "casino"
+    val ALL = listOf(TEAM, SHOP, CASINO)
+}
+
+/** A player's casino licences: [free] of the [total] aren't bound to a casino yet. */
+data class Licenses(val total: Int, val free: Int)
+
 /** `GET /players/:uuid`: the player's accounts, personal first, and the one that pays by default. */
 data class ServerPlayer(
     val userId: String,
     val defaultAccountId: String,
     val accounts: List<AccountView>,
+    val casinoLicenses: Licenses? = null,
+    val casinoLicensePrice: Long? = null,
 ) {
     val defaultAccount: AccountView? get() = accounts.firstOrNull { it.id == defaultAccountId }
 }
@@ -48,7 +66,47 @@ data class ServerAccount(
     val name: String,
     val balance: Long,
     val frozen: Boolean,
-)
+    val type: String? = null,
+) {
+    /** See [AccountView.isCasino]. */
+    val isCasino: Boolean get() = type == null || type == AccountTypes.CASINO
+}
+
+/** `POST /accounts`: [player] opens a shared account and owns it. */
+data class AccountCreateBody(val player: String, val handle: String, val name: String, val type: String?)
+
+/** `PATCH /accounts/:handle`: an owner renames it, changes its type, or both. Null fields are left as they are. */
+data class AccountPatchBody(val player: String, val name: String?, val type: String?)
+
+/** A member of a shared account, by their Minecraft username. */
+data class MemberView(val userId: String, val username: String?, val role: String)
+
+data class PendingInvitation(val id: String, val username: String, val createdAt: String?)
+
+/** `GET /accounts/:handle/members`. [invitations] is empty for anyone but an owner. */
+data class AccountMembers(val account: AccountView, val members: List<MemberView>, val invitations: List<PendingInvitation>)
+
+/** `POST /accounts/:handle/invitations`. */
+data class InviteBody(val player: String, val username: String)
+
+data class InvitedAccount(val id: String, val handle: String, val name: String, val type: String?)
+
+/** The answer to an invitation sent: [inviteeUuids] are every Minecraft account of the invited person. */
+data class InviteResult(val id: String, val username: String, val account: InvitedAccount, val invitedBy: String?, val inviteeUuids: List<String>?)
+
+/** An invitation waiting for a player's answer. */
+data class InvitationView(val id: String, val account: InvitedAccount, val invitedBy: String?, val createdAt: String?)
+
+data class InvitationList(val items: List<InvitationView>)
+
+/** A body that only names the acting player. */
+data class PlayerBody(val player: String)
+
+/** `POST /licenses`: [player] buys a casino licence, paid from [account] (the default account when null). */
+data class LicenseBody(val idempotencyKey: String, val player: String, val account: String?)
+
+/** [transactionId] is null when licences are free. */
+data class LicenseResult(val transactionId: Long?, val replayed: Boolean, val amount: Long, val from: TransferSide?, val licenses: Licenses)
 
 /** `PUT /players/:uuid/default-account`. */
 data class DefaultAccountBody(val account: String)
@@ -213,4 +271,12 @@ data class MailboxView(val id: String, val item: StoredItem, val count: Int, val
 data class SiteMailbox(val items: List<MailboxView>)
 
 /** The answer of a purchase: a transfer's (from the buyer, to the seller), the tax, and the item to claim. */
-data class ListingBuyResult(val tax: Long, val listingId: String, val mailboxItem: MailboxView)
+data class ListingBuyResult(val tax: Long, val listingId: String, val mailboxItem: MailboxView, val sellerUserId: String? = null)
+
+/** A listing of the player that sold while nobody told them. */
+data class SaleView(val listingId: String, val item: ShopItemView, val count: Int, val price: Long, val tax: Long, val buyer: String?, val soldAt: String?)
+
+data class SaleList(val items: List<SaleView>)
+
+/** `POST /players/:uuid/sales/seen`. */
+data class SalesSeenBody(val listingIds: List<String>)

@@ -30,8 +30,11 @@ data class AccountEntry(
     val role: String,
     val frozen: Boolean,
     val canSpend: Boolean,
+    /** A shared account's type (see [fr.bde_teknantes.lnb.economy.api.AccountTypes]), or null when it has none. */
+    val type: String? = null,
 ) {
     val isPersonal: Boolean get() = handle == null
+    val isOwner: Boolean get() = role == "owner"
 
     companion object {
         fun write(buf: FriendlyByteBuf, entry: AccountEntry) {
@@ -42,6 +45,7 @@ data class AccountEntry(
             buf.writeUtf(entry.role, 16)
             buf.writeBoolean(entry.frozen)
             buf.writeBoolean(entry.canSpend)
+            buf.writeNullable(entry.type) { b, v -> b.writeUtf(v, 16) }
         }
 
         fun read(buf: FriendlyByteBuf) = AccountEntry(
@@ -52,15 +56,45 @@ data class AccountEntry(
             role = buf.readUtf(16),
             frozen = buf.readBoolean(),
             canSpend = buf.readBoolean(),
+            type = buf.readNullable { it.readUtf(16) },
         )
     }
 }
 
-/** Server -> client: the player's accounts (personal first) and the one that pays by default. */
+/** An invitation to a shared account, waiting for the player's answer. */
+data class InvitationEntry(val id: String, val handle: String, val name: String, val type: String?, val invitedBy: String) {
+    companion object {
+        fun write(buf: FriendlyByteBuf, entry: InvitationEntry) {
+            buf.writeUtf(entry.id, 64)
+            buf.writeUtf(entry.handle, 32)
+            buf.writeUtf(entry.name, 128)
+            buf.writeNullable(entry.type) { b, v -> b.writeUtf(v, 16) }
+            buf.writeUtf(entry.invitedBy, 64)
+        }
+
+        fun read(buf: FriendlyByteBuf) = InvitationEntry(
+            id = buf.readUtf(64),
+            handle = buf.readUtf(32),
+            name = buf.readUtf(128),
+            type = buf.readNullable { it.readUtf(16) },
+            invitedBy = buf.readUtf(64),
+        )
+    }
+}
+
+/**
+ * Server -> client: the player's accounts (personal first), the one that pays by default, the invitations waiting for
+ * them, and their casino licences ([licensesFree] of [licensesTotal] not used yet, at [licensePrice] each; -1 when
+ * the site doesn't sell any).
+ */
 data class AccountsSnapshotPayload(
     val status: EconomyStatus,
     val accounts: List<AccountEntry>,
     val defaultAccountId: String?,
+    val invitations: List<InvitationEntry> = emptyList(),
+    val licensesFree: Int = 0,
+    val licensesTotal: Int = 0,
+    val licensePrice: Long = -1,
 ) : CustomPacketPayload {
     override fun type() = TYPE
 
@@ -76,12 +110,20 @@ data class AccountsSnapshotPayload(
                 buf.writeEnum(payload.status)
                 buf.writeCollection(payload.accounts, AccountEntry::write)
                 buf.writeNullable(payload.defaultAccountId) { b, v -> b.writeUtf(v, 64) }
+                buf.writeCollection(payload.invitations, InvitationEntry::write)
+                buf.writeVarInt(payload.licensesFree)
+                buf.writeVarInt(payload.licensesTotal)
+                buf.writeVarLong(payload.licensePrice + 1)
             },
             { buf ->
                 AccountsSnapshotPayload(
                     status = buf.readEnum(EconomyStatus::class.java),
                     accounts = buf.readCollection({ size -> ArrayList(minOf(size, MAX_ACCOUNTS)) }, AccountEntry::read),
                     defaultAccountId = buf.readNullable { it.readUtf(64) },
+                    invitations = buf.readCollection({ size -> ArrayList(minOf(size, MAX_ACCOUNTS)) }, InvitationEntry::read),
+                    licensesFree = buf.readVarInt(),
+                    licensesTotal = buf.readVarInt(),
+                    licensePrice = buf.readVarLong() - 1,
                 )
             },
         )

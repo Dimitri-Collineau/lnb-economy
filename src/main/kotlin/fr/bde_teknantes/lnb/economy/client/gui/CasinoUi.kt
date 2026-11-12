@@ -67,6 +67,29 @@ object CasinoUi {
         graphics.blitSprite(PANEL, x, y, width, height)
     }
 
+    /** [text] cut with an ellipsis so it is at most [width] pixels wide. */
+    fun fit(font: Font, text: String, width: Int): String =
+        if (font.width(text) <= width) text else font.plainSubstrByWidth(text, maxOf(0, width - font.width("..."))) + "..."
+
+    /**
+     * A borderless text box meant to sit on the [TEXT_FIELD] sprite, which the screen draws itself with [field]
+     * at ([x], [y]) over [width] x 18.
+     */
+    fun editBox(font: Font, x: Int, y: Int, width: Int, hint: Component, maxLength: Int): net.minecraft.client.gui.components.EditBox {
+        val box = net.minecraft.client.gui.components.EditBox(font, x + 5, y + 5, width - 10, 10, hint)
+        box.setBordered(false)
+        box.setTextColor(IVORY)
+        box.setMaxLength(maxLength)
+        box.setHint(hint.copy().withColor(HINT))
+        return box
+    }
+
+    /** The sunken field behind a box made by [editBox]. */
+    fun field(graphics: GuiGraphics, box: net.minecraft.client.gui.components.EditBox) {
+        if (!box.visible) return
+        graphics.blitSprite(if (box.isFocused) TEXT_FIELD_HIGHLIGHTED else TEXT_FIELD, box.x - 5, box.y - 5, box.width + 10, 18)
+    }
+
     /** A window title: gold letters ringed with a dark outline, centered on [centerX]. */
     fun title(graphics: GuiGraphics, font: Font, text: Component, centerX: Int, y: Int) {
         val x = centerX - font.width(text) / 2

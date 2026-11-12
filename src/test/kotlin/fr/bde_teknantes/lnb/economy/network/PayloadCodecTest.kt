@@ -140,4 +140,37 @@ class PayloadCodecTest {
         assertEquals(MenuCasinoPayload(7, "casino"), roundTrip(MenuCasinoPayload.STREAM_CODEC, MenuCasinoPayload(7, "casino")))
         assertEquals(MenuCasinoPayload(7, null), roundTrip(MenuCasinoPayload.STREAM_CODEC, MenuCasinoPayload(7, null)))
     }
+
+    @Test
+    fun `accounts and shared accounts`() {
+        val snapshot = AccountsSnapshotPayload(
+            EconomyStatus.READY,
+            listOf(
+                AccountEntry("p", null, null, 120, "owner", frozen = false, canSpend = true),
+                AccountEntry("s", "casino-royal", "Casino Royal", 9_000, "member", frozen = true, canSpend = false, type = "casino"),
+            ),
+            "p",
+            invitations = listOf(InvitationEntry("i1", "forge", "La Forge", "shop", "Branlouis"), InvitationEntry("i2", "old", "Old", null, "")),
+            licensesFree = 1,
+            licensesTotal = 3,
+            licensePrice = 100_000,
+        )
+        assertEquals(snapshot, roundTrip(AccountsSnapshotPayload.STREAM_CODEC, snapshot))
+        val none = AccountsSnapshotPayload(EconomyStatus.LOADING, emptyList(), null)
+        assertEquals(none, roundTrip(AccountsSnapshotPayload.STREAM_CODEC, none))
+
+        val create = AccountCreatePayload("casino-royal", "Casino Royal", "casino")
+        assertEquals(create, roundTrip(AccountCreatePayload.STREAM_CODEC, create))
+        for (edit in listOf(AccountEditPayload("forge", "La Forge", null), AccountEditPayload("forge", null, "shop"))) {
+            assertEquals(edit, roundTrip(AccountEditPayload.STREAM_CODEC, edit))
+        }
+        val members = AccountMembersPayload("forge", listOf(MemberEntry("Branlouis", "owner"), MemberEntry("LnbTester", "viewer")), listOf(PendingEntry("i1", "Steve")))
+        assertEquals(members, roundTrip(AccountMembersPayload.STREAM_CODEC, members))
+        assertEquals(AccountMembersRequestPayload("forge"), roundTrip(AccountMembersRequestPayload.STREAM_CODEC, AccountMembersRequestPayload("forge")))
+        assertEquals(AccountInvitePayload("forge", "Steve"), roundTrip(AccountInvitePayload.STREAM_CODEC, AccountInvitePayload("forge", "Steve")))
+        assertEquals(InvitationCancelPayload("forge", "i1"), roundTrip(InvitationCancelPayload.STREAM_CODEC, InvitationCancelPayload("forge", "i1")))
+        assertEquals(InvitationAnswerPayload("i1", true), roundTrip(InvitationAnswerPayload.STREAM_CODEC, InvitationAnswerPayload("i1", true)))
+        val feedback = AccountFeedbackPayload(false, "economy.lnbeconomy.problem.other", listOf("handleTaken"))
+        assertEquals(feedback, roundTrip(AccountFeedbackPayload.STREAM_CODEC, feedback))
+    }
 }

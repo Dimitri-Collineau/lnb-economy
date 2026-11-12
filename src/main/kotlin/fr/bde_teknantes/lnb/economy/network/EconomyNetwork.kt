@@ -1,5 +1,6 @@
 package fr.bde_teknantes.lnb.economy.network
 
+import fr.bde_teknantes.lnb.economy.account.SharedAccounts
 import fr.bde_teknantes.lnb.economy.auction.Auctions
 import fr.bde_teknantes.lnb.economy.casino.Links
 import fr.bde_teknantes.lnb.economy.client.ClientPayloadHandler
@@ -13,7 +14,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent
  * Bump [PROTOCOL_VERSION] whenever a payload changes, so mismatched client and server versions refuse to connect.
  */
 object EconomyNetwork {
-    private const val PROTOCOL_VERSION = "7"
+    private const val PROTOCOL_VERSION = "8"
 
     fun register(event: RegisterPayloadHandlersEvent) {
         val registrar = event.registrar(PROTOCOL_VERSION)
@@ -47,6 +48,18 @@ object EconomyNetwork {
         registrar.playToClient(AuctionMailboxPayload.TYPE, AuctionMailboxPayload.STREAM_CODEC) { payload, context ->
             ClientPayloadHandler.handleAuctionMailbox(payload, context)
         }
+        registrar.playToClient(AccountMembersPayload.TYPE, AccountMembersPayload.STREAM_CODEC) { payload, context ->
+            ClientPayloadHandler.handleAccountMembers(payload, context)
+        }
+        registrar.playToClient(AccountFeedbackPayload.TYPE, AccountFeedbackPayload.STREAM_CODEC) { payload, context ->
+            ClientPayloadHandler.handleAccountFeedback(payload, context)
+        }
+        registrar.playToServer(AccountCreatePayload.TYPE, AccountCreatePayload.STREAM_CODEC, SharedAccounts::handleCreate)
+        registrar.playToServer(AccountEditPayload.TYPE, AccountEditPayload.STREAM_CODEC, SharedAccounts::handleEdit)
+        registrar.playToServer(AccountMembersRequestPayload.TYPE, AccountMembersRequestPayload.STREAM_CODEC, SharedAccounts::handleMembersRequest)
+        registrar.playToServer(AccountInvitePayload.TYPE, AccountInvitePayload.STREAM_CODEC, SharedAccounts::handleInvite)
+        registrar.playToServer(InvitationCancelPayload.TYPE, InvitationCancelPayload.STREAM_CODEC, SharedAccounts::handleCancel)
+        registrar.playToServer(InvitationAnswerPayload.TYPE, InvitationAnswerPayload.STREAM_CODEC, SharedAccounts::handleAnswer)
         registrar.playToServer(CounterBuyPayload.TYPE, CounterBuyPayload.STREAM_CODEC, Counters::handleBuy)
         registrar.playToServer(CounterCashPayload.TYPE, CounterCashPayload.STREAM_CODEC, Counters::handleCash)
         registrar.playToServer(CounterChangePayload.TYPE, CounterChangePayload.STREAM_CODEC, Counters::handleChange)
