@@ -131,7 +131,8 @@ class CounterScreen(private val counter: OpenCounterPayload) :
         val chosen = account?.value ?: return
         val accountId = chosen.id.takeIf { it != ClientEconomy.snapshot.defaultAccountId }
         PacketDistributor.sendToServer(CounterBuyPayload(counter.pos, accountId, value))
-        amount.value = ""
+        // The answer comes in the chat, and the chips in the inventory: nothing more to do here.
+        onClose()
     }
 
     private fun chipsValue(): Long = minecraft?.player?.inventory?.let { Chips.valueIn(it, counter.handle) } ?: 0
