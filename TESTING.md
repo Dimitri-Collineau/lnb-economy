@@ -6,7 +6,7 @@ What the unit and integration tests can't cover: the game itself, with a client.
 
 ### The site
 
-1. In `lnb-website` (branch `feat/economy-auctions` until shops, trades and the auction house are merged into `main`):
+1. In `lnb-website` (branch `feat/economy-ingame-accounts` until it and the branches under it are merged into `main`):
    `docker compose up -d`, then `pnpm dev --host ::1` (without `--host`, Nuxt 4.6.4 fails to start).
 2. In `.env`, set `WARDEN_SERVER_SECRET` to any long random string.
 3. In the admin, check that the `economy` flags are on (they are unless an admin turned one off).
@@ -23,7 +23,7 @@ What the unit and integration tests can't cover: the game itself, with a client.
      ('dev-a', 'Player A', 'dev-a@example.invalid', true, '901cb4ca-b862-4029-9306-e5cd0f6d9f86'),
      ('dev-b', 'Player B', 'dev-b@example.invalid', true, '901cb4ca-b862-4029-9306-e5cd0f6d9f86');
    insert into minecraft_account (uuid, user_id, username) values ('<uuid A>', 'dev-a', '<name A>'), ('<uuid B>', 'dev-b', '<name B>');
-   with acc as (insert into economy_account (kind, handle, name) values ('shared', 'test-casino', 'Test Casino') returning id)
+   with acc as (insert into economy_account (kind, handle, name, type) values ('shared', 'test-casino', 'Test Casino', 'casino') returning id)
    insert into economy_member (account_id, user_id, role)
      select id, 'dev-a', 'owner' from acc union all select id, 'dev-b', 'viewer' from acc;
    ```
@@ -93,10 +93,12 @@ test needs two players.
 | 3.2 | Right click the counter | "This counter isn't linked to a casino yet." |
 | 3.3 | A: wand on the counter, choose `#test-casino`, Link | "Linked to #test-casino." |
 | 3.4 | B: wand on the counter | The screen says only its owners and members can change the link; no Link button |
-| 3.5 | A: counter, buy 1,733 from the personal account | Chips 1000, 500, 100 ×2, 25, 5, 1 ×3 of `#test-casino` (tooltip). The casino's balance rose by 1,733 on the site. `/economy casino #test-casino`: chips in circulation 1733 |
+| 3.5 | A: counter, buy 1,733 from the personal account | The screen closes; "You bought … in chips from Test Casino." (its name, not its `#`). Chips 1000, 500, 100 ×2, 25, 5, 1 ×3 of `#test-casino` (tooltip). The casino's balance rose by 1,733 on the site. `/economy casino #test-casino`: chips in circulation 1733 |
 | 3.6 | Buy from `#test-casino` itself | Not offered in the account list |
 | 3.7 | Change with the largest chip at 25 | Same total in chips of 25 and less; chips in circulation unchanged |
 | 3.8 | Cash them all | Chips gone, personal balance back, chips in circulation 0 |
+| 3.8b | Empty the casino's account on the site, wait for the refresh, cash chips | "Cashing failed, your chips are given back: Test Casino doesn't have enough money right now."; the chips come back |
+| 3.8c | Stand in front of the counter and walk around it | The teller plays its animations and never turns its head toward you |
 | 3.9 | Freeze `#test-casino` in the site admin, wait 5 minutes (or `/economy casino #test-casino`), buy | Refused: the casino is frozen. Unfreeze |
 | 3.10 | Stop the site, buy | "LNB's site isn't answering yet…"; `/economy pending` lists it. Start the site: the chips arrive, once |
 | 3.11 | Same, but A leaves before the site comes back, then joins again | The chips are given on join |
@@ -114,8 +116,8 @@ and without a call):
 | 4.3 | Try a diamond, a gold ingot, another casino's chip | Refused by the slot, on the client too (no flicker back) |
 | 4.4 | Bet `#test-casino` chips worth 100 and play | The game runs; payouts come out in the same chips. `/economy casino #test-casino`: chips in circulation go down by the stake and up by the payout |
 | 4.4b | Wheel: bet one chip of 100 until it lands on ×0.25 | 25 in chips comes back, every time |
-| 4.5 | Bet 125 | "The largest bet here is 100 LNBits." |
-| 4.6 | Lower the casino's balance on the site so its free balance is under the best payout, wait for the refresh | "#test-casino can't cover that bet right now." before any chip is taken |
+| 4.5 | Bet 125 | "The largest bet at Test Casino is 100 LNBits." in red above the hotbar, a low note, and the machine's screen closes; the chips are back in the inventory |
+| 4.6 | Lower the casino's balance on the site so its free balance is under the best payout, wait for the refresh | "Test Casino can't cover that bet right now.", in red with the note, the screen closes, before any chip is taken |
 | 4.7 | Blackjack/poker: start a round, then `/economy casino` | "held for rounds" shows the reserved amount until the result |
 | 4.8 | Open the casino settings screen (Croupier's Hand), add diamonds as a bet and an exchange rule | Diamonds are still refused; payouts stay in chips |
 | 4.9 | Break a linked machine and place it again | It is unlinked |
@@ -155,6 +157,14 @@ A is an owner of `#test-casino`, B a player with LNBits. Give A 64 diamonds and 
 | 6.18 | A: break the shop | The stock drops; the shop is off on the site |
 | 6.19 | Push it with a piston, move it with a Create contraption | It doesn't move |
 | 6.20 | Turn `features.shops` off in `lnbeconomy-server.toml`, restart | Right click: "Shops are switched off on this server." |
+| 6.21 | A: place a second shop, choose "Buys" at the top | The selling price goes away; "Price paid per lot", "Buys until it holds" and "Search an item…" show |
+| 6.22 | Search an item…, type "diam", click the diamond | Back on the settings with a diamond in the item slot. Clicking the slot with an item still works |
+| 6.23 | Lots of 8, price 30, until 64, account `#test-casino`, Save | "Shop saved." |
+| 6.24 | B: right click it | "Shop: buying": what it pays per lot, how many lots it still takes, how many B carries, one button "Sell" |
+| 6.25 | B: sell 2 lots | 16 diamonds leave B for the stock, 60 from `#test-casino` to B; A gets "B sold 16 × Diamond to your shop for 60" |
+| 6.26 | B: sell until the shop holds 64 | Then "The shop has no room for that many."; A takes the diamonds out of the stock and it buys again |
+| 6.27 | Empty `#test-casino` on the site, B sells | "The order didn't go through: There isn't enough money on that account."; B's diamonds come back |
+| 6.28 | A: switch that shop back to "Sells" while B's screen is open, save, then B orders | B's screen changes to the selling one on the next refresh; nothing is bought at a stale price |
 
 ## 7. Trades
 
@@ -198,8 +208,61 @@ A and B online, A with 16 diamonds in hand. In the site admin's settings, the ta
 | 8.13 | Operator: `/economy npc hdv Bob` | An auctioneer named Bob; right click opens; it can't be hurt or pushed; hit in creative: gone |
 | 8.14 | `features.auctionsCommand = false`, restart, `/hdv` | "Go to an auction house to use it."; the block and the NPC still open it |
 | 8.15 | Turn the site flag `economy.auctions` off | Browsing and buying refused; taking back and collecting still work |
+| 8.16 | A lists, B buys while A is online | A gets "B bought your 16 × Diamond at the auction house: +95. (tax: 5)" in gold, with a sound |
+| 8.17 | A lists, logs out, B buys, A joins | A gets the same message on joining, once: joining again says nothing |
+| 8.18 | A: `/economy notify off`, then B buys a listing of A | No message; and none later after `/economy notify on` |
+| 8.19 | A: List it with the price empty, then with a count above the stack | "Not listed: the price is from 1 to …" and "Not listed: you asked to list … but that stack only holds …", in red with a low note; the items stay |
 
-## 9. Without MineVegas
+## 9. Shared accounts from the game
+
+A and B online. The site flag `economy.sharedAccounts` is on.
+
+| # | Do | Expect |
+|---|----|--------|
+| 9.1 | A: My accounts, "+ New", type a name | The handle follows the name (`Casino Royal !` gives `casino-royal`) until A edits it; Team is chosen; Casino is locked with "Needs a casino licence" |
+| 9.2 | A: Open the account | "Shared account … opened. You own it."; back on My accounts, the new account is there; the site's bank page shows it |
+| 9.3 | A: `/account create ab x` and a handle already taken | A red message for each (bad handle, "That # is already taken."), with a low note |
+| 9.4 | A: "..." on the account, change the name, Save | "… is now called …" in green; My accounts and B's screens show the new name |
+| 9.5 | A: Members, type the start of B's name | B is proposed with their face and "online"; Tab completes, Enter invites |
+| 9.6 | B, right away | A gold chat message "A invites you to …" with [Accept] [Decline], a sound, and the invitation at the top of My accounts |
+| 9.7 | B: Accept (chat or the + button) | "You joined …"; the account is in B's list as Member; A's Members screen lists B after reopening |
+| 9.8 | A: invite a linked player who is away, then that player joins | They get the invitation message on joining |
+| 9.9 | A: invite, then the x beside the pending invitation | "Invitation taken back."; the invited player's My accounts no longer shows it |
+| 9.10 | B (member): "..." on the account | Name and type are locked ("Only the account's owners…"); Members opens, without the invitation box |
+| 9.11 | `/compte invitations`, `/account members <handle>`, `/account rename`, `/account type` | The same answers in the chat |
+| 9.12 | Turn `economy.sharedAccounts` off on the site, create an account | "The economy is switched off for now." |
+
+## 10. Casino licences
+
+An operator, and A with 100,000 LNBits or more (give them with an adjustment in the site admin). The licence price is in
+the site admin's economy settings.
+
+| # | Do | Expect |
+|---|----|--------|
+| 10.1 | Operator: `/economy npc licence Marcel` | A dishevelled dealer named Marcel, head hanging, who doesn't turn toward players; can't be hurt or pushed; hit in creative: gone |
+| 10.2 | A: right click him | His offer, the price, "Yours: 0 free of 0", the account that pays |
+| 10.3 | A, with too little on the chosen account | "That account doesn't hold enough.", Buy greyed |
+| 10.4 | A: Buy, then Confirm | "Casino licence bought for …", a level-up sound, a signed book "Casino Licence" naming A; A −price; the site shows a burn with the reason casino licence; "Yours: 1 free of 1" |
+| 10.5 | A: My accounts, "+ New", Casino, Open | The account opens as a casino; free licences back to 0; Casino is locked again for a second account |
+| 10.6 | A: "..." on the casino | Team and Shop are locked: "A casino stays a casino." |
+| 10.7 | A: link wand on a counter | Only casinos are proposed; with none, the message says to buy a licence |
+| 10.8 | In the database, set `#test-casino`'s type to `team`, wait for the refresh (or `/economy casino #test-casino`), play a linked machine | Refused in red: "… isn't a casino: its account has no casino licence." |
+| 10.9 | Stop the site, buy a licence, start it again | "…isn't answering yet"; then bought once, one book |
+
+## 11. Mob drops
+
+`mobDrops` in `config/lnbeconomy-server.toml`: set `chance = 1.0` for the test. The site flag `economy.mobDrops` is on.
+
+| # | Do | Expect |
+|---|----|--------|
+| 11.1 | A: kill a zombie | "+N from the mob" in gold above the hotbar, N from `min` to `max` |
+| 11.2 | Wait `flushSeconds` | A's personal balance went up by the total; one mint per flush on the site, reason mob drop |
+| 11.3 | Kill a cow; kill a zombie from a spawner | Nothing (with `fromSpawners = false`) |
+| 11.4 | Kill a zombie, log out before the flush | The drop is sent at once; the balance is right on the next login |
+| 11.5 | `enabled = false`, or the site flag off | Nothing drops; with the flag off, the server stops rolling for ten minutes after the refusal |
+| 11.6 | A guest (no linked account) kills a zombie | Nothing |
+
+## 12. Without MineVegas
 
 Remove MineVegas from the server and the client: the game starts, payments and counters work, the log has no mixin
 error.

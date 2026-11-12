@@ -16,16 +16,25 @@ the mod on a player's computer only talks to the server. The contract is `docs/e
   - `/trade <player>`: asks to trade, from any distance (a key, unbound by default, asks the player in front of you).
   - `/hdv` (`/ah`): opens the auction house, unless `features.auctionsCommand` is off.
   - `/mailbox` (`/courrier`): collects items that didn't fit in your inventory.
-  - `/economy notify on|off`: messages when someone buys from or sells to your shops.
-  - `/economy status|pending|retry <key>|casino <#account> [outstanding <value>]|npc hdv [name]`: operators.
-- **Casinos.** A casino is a shared account. Its counters sell chips (the player pays the casino's account) and cash
+  - `/account` (`/compte`) `create <handle> <name>`, `rename <handle> <name>`, `type <handle> team|shop|casino`,
+    `invite <handle> <player>`, `members <handle>`, `invitations`, `accept|decline <invitation>`: shared accounts.
+  - `/economy notify on|off`: messages when someone buys from or sells to your shops, and when one of your auction
+    house listings sells.
+  - `/economy status|pending|retry <key>|casino <#account> [outstanding <value>]|npc hdv|licence [name]`: operators.
+- **Shared accounts.** "My accounts" (and `/account`) opens a shared account, renames it, sets its type (team, shop
+  or casino) and invites players, who answer from the chat or from "My accounts" at once or when they next join. The
+  members screen proposes the players who are on as the owner types. Roles, removals and closing stay on the site.
+- **Casinos.** A casino is a shared account of type casino, which takes a **casino licence**: the licence dealer (an
+  NPC placed with `/economy npc licence [name]`) sells one for the price set on the site, burned, and hands over a
+  signed book. One licence makes one account a casino, for good. Its counters sell chips (the player pays the casino's account) and cash
   them (the account pays the player). Chips carry their casino and only its machines and counters take them. While
   playing, nothing reaches the site: the mod counts each casino's chips in circulation, which its account must back,
   and a machine only starts a game the casino's **free balance** (balance − chips in circulation − rounds in
   progress) can cover. Machines and counters are linked to a casino with the casino link wand, by an owner or member
   of its account. With MineVegas Casino installed, its machines take only chips of their casino.
 - **Shops.** A shop block sells one item, in lots, for an account its owner or a member chooses, and may buy it back
-  at a lower or equal price. Its owners and members fill it (hoppers can fill it too, never empty it), set it up and
+  at a lower or equal price. Or it only **buys**: the owner picks any item from a search, a price per lot and how many
+  the shop holds at most, and players bring it the item; each kind has its own screen for customers. Its owners and members fill it (hoppers can fill it too, never empty it), set it up and
   break it; everyone else buys. The site registers each shop and prices every order from its saved prices. While
   the site decides, the items are held aside in the journal entry, so a refusal or a crash gives them back.
 - **Trades.** Both players offer items (copies: nothing leaves the inventories yet) and LNBits from an account, then
@@ -38,6 +47,8 @@ the mod on a player's computer only talks to the server. The contract is `docs/e
   over; unsold items come back the same way from "To collect". It opens with `/hdv`, an auction house block (in the
   operators' creative tab, unbreakable outside creative) or the auctioneer NPC (`/economy npc hdv [name]`, removed
   by an operator hitting it in creative).
+- **Mob drops.** A hostile mob killed by a player has a chance (10 %) to leave them a few LNBits (1 to 10), minted by
+  the site on their personal account. Chance, amounts and whether spawner mobs count are in the config.
 - **Mailbox.** Items owed to a player (bought chips or items, items handed back) go straight to the inventory; what
   doesn't fit waits for `/mailbox`. Nothing is dropped on the ground.
 - **Reliability.** Every money move is written to `<world>/data/lnbeconomy_journal.json` before it is sent, and sent
@@ -65,7 +76,8 @@ player has no economy.
 
 The site's URL and the server's token are LNB Warden's: `api.url` and `api.token` in `config/lnbwarden-server.toml`.
 LNB Economy's own settings are in `config/lnbeconomy-server.toml` (confirmation threshold, refresh times, games on or
-off, and switches for shops, trades, the auction house and its `/hdv` command). Neither file is ever sent to players.
+off, switches for shops, trades, the auction house and its `/hdv` command, and mob drops: on or off, chance, smallest
+and largest amount, spawner mobs, how often they are sent). Neither file is ever sent to players.
 
 ## Building
 
@@ -87,10 +99,12 @@ Casino, Kotlin for Forge and GeckoLib are installed separately. A tag fails the 
 
 ## Not done yet
 
-- **Shared accounts in game.** They are created, joined and closed on the site only. The mod can't do it, because the
-  Minecraft server's routes (`/api/economy/server`) have no account creation or invitation. It needs new routes in
-  `lnb-website` and a command or screen here (for example `/account create <handle> <name>`, with a clickable invitation
-  message).
+- **Roles and closing in game.** Changing a member's role, removing a member and closing a shared account are done on
+  the site.
+- **The licence dealer's look.** His clothes are a first pass drawn by script on the villager; a Blockbench pass is
+  planned.
+- **Several players at one MineVegas table.** Duck Derby already races several players. Roulette and "bet behind" at
+  blackjack would take more mixins into MineVegas; independent hands at one table would mean rewriting the game.
 - **The auctioneer's look.** The NPC still wears the plain vanilla villager texture. The plan is a clothing overlay on
   top of it, like the counter's teller: dark suit, waistcoat, crimson bow tie, gold monocle. A gavel in its hand would
   need GeckoLib.
