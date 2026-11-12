@@ -170,6 +170,9 @@ class PayloadCodecTest {
         assertEquals(AccountInvitePayload("forge", "Steve"), roundTrip(AccountInvitePayload.STREAM_CODEC, AccountInvitePayload("forge", "Steve")))
         assertEquals(InvitationCancelPayload("forge", "i1"), roundTrip(InvitationCancelPayload.STREAM_CODEC, InvitationCancelPayload("forge", "i1")))
         assertEquals(InvitationAnswerPayload("i1", true), roundTrip(InvitationAnswerPayload.STREAM_CODEC, InvitationAnswerPayload("i1", true)))
+        assertEquals(OpenLicensePayload("Le Croupier"), roundTrip(OpenLicensePayload.STREAM_CODEC, OpenLicensePayload("Le Croupier")))
+        for (buy in listOf(LicenseBuyPayload(null), LicenseBuyPayload("account-id"))) assertEquals(buy, roundTrip(LicenseBuyPayload.STREAM_CODEC, buy))
+        assertEquals(ShopItemPayload(BlockPos(1, 2, 3), "minecraft:diamond"), roundTrip(ShopItemPayload.STREAM_CODEC, ShopItemPayload(BlockPos(1, 2, 3), "minecraft:diamond")))
         val feedback = AccountFeedbackPayload(false, "economy.lnbeconomy.problem.other", listOf("handleTaken"))
         assertEquals(feedback, roundTrip(AccountFeedbackPayload.STREAM_CODEC, feedback))
     }

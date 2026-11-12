@@ -27,6 +27,8 @@ import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.Mob
 import net.neoforged.neoforge.event.RegisterCommandsEvent
 import java.util.concurrent.CompletableFuture
 
@@ -103,9 +105,15 @@ object EconomyCommands {
             .then(
                 Commands.literal("npc").requires(operator).then(
                     Commands.literal("hdv")
-                        .executes { context -> spawnAuctioneer(context, null) }
+                        .executes { context -> spawnNpc(context, ModContent.AUCTIONEER.get(), null) }
                         .then(Commands.argument("name", StringArgumentType.greedyString()).executes { context ->
-                            spawnAuctioneer(context, StringArgumentType.getString(context, "name"))
+                            spawnNpc(context, ModContent.AUCTIONEER.get(), StringArgumentType.getString(context, "name"))
+                        }),
+                ).then(
+                    Commands.literal("licence")
+                        .executes { context -> spawnNpc(context, ModContent.CASINO_DEALER.get(), null) }
+                        .then(Commands.argument("name", StringArgumentType.greedyString()).executes { context ->
+                            spawnNpc(context, ModContent.CASINO_DEALER.get(), StringArgumentType.getString(context, "name"))
                         }),
                 ),
             )
@@ -252,14 +260,15 @@ object EconomyCommands {
     }
 
     /** Spawns an auctioneer where the operator stands, facing the way they face. */
-    private fun spawnAuctioneer(context: CommandContext<CommandSourceStack>, name: String?): Int {
+    /** Places an NPC where the operator stands, facing the way they face. */
+    private fun spawnNpc(context: CommandContext<CommandSourceStack>, type: EntityType<out Mob>, name: String?): Int {
         val player = context.source.playerOrException
-        val auctioneer = ModContent.AUCTIONEER.get().create(player.serverLevel()) ?: return 0
-        auctioneer.moveTo(player.x, player.y, player.z, player.yRot, 0f)
-        auctioneer.yHeadRot = player.yRot
-        auctioneer.yBodyRot = player.yRot
-        name?.let { auctioneer.customName = Component.literal(it) }
-        player.serverLevel().addFreshEntity(auctioneer)
+        val npc = type.create(player.serverLevel()) ?: return 0
+        npc.moveTo(player.x, player.y, player.z, player.yRot, 0f)
+        npc.yHeadRot = player.yRot
+        npc.yBodyRot = player.yRot
+        name?.let { npc.customName = Component.literal(it) }
+        player.serverLevel().addFreshEntity(npc)
         context.source.sendSuccess({ Component.translatable("commands.lnbeconomy.npc.spawned") }, true)
         return 1
     }

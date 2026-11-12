@@ -6,6 +6,7 @@ import fr.bde_teknantes.lnb.economy.account.SharedAccounts
 import fr.bde_teknantes.lnb.economy.auction.Auctions
 import fr.bde_teknantes.lnb.economy.casino.CasinoLinks
 import fr.bde_teknantes.lnb.economy.casino.Casinos
+import fr.bde_teknantes.lnb.economy.casino.Licenses
 import fr.bde_teknantes.lnb.economy.casino.Links
 import fr.bde_teknantes.lnb.economy.casino.Machines
 import fr.bde_teknantes.lnb.economy.casino.minevegas.MineVegasEvents
@@ -52,6 +53,7 @@ class LnbEconomy(modBus: IEventBus, container: ModContainer) {
         Trades.register()
         Auctions.register()
         MobDrops.register()
+        Licenses.register()
         modBus.addListener(ShopItemHandler::register)
         Casinos.linked = { server -> CasinoLinks.get(server).handles }
         NeoForge.EVENT_BUS.addListener(EconomyCommands::register)
@@ -71,6 +73,7 @@ class LnbEconomy(modBus: IEventBus, container: ModContainer) {
         NeoForge.EVENT_BUS.addListener(ItemMailbox::registerCommands)
         NeoForge.EVENT_BUS.addListener(Trades::registerCommands)
         NeoForge.EVENT_BUS.addListener(Auctions::registerCommands)
+        NeoForge.EVENT_BUS.addListener(Licenses::onLoggedOut)
         NeoForge.EVENT_BUS.addListener(Auctions::onLoggedIn)
         NeoForge.EVENT_BUS.addListener(Auctions::onLoggedOut)
         NeoForge.EVENT_BUS.addListener(Trades::onServerTick)

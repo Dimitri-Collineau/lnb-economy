@@ -3,6 +3,7 @@ package fr.bde_teknantes.lnb.economy.client
 import fr.bde_teknantes.lnb.economy.casino.MenuCasinos
 import fr.bde_teknantes.lnb.economy.client.gui.AuctionScreen
 import fr.bde_teknantes.lnb.economy.client.gui.CounterScreen
+import fr.bde_teknantes.lnb.economy.client.gui.LicenseScreen
 import fr.bde_teknantes.lnb.economy.client.gui.LinkScreen
 import fr.bde_teknantes.lnb.economy.client.gui.ShopScreen
 import fr.bde_teknantes.lnb.economy.network.AccountFeedbackPayload
@@ -13,6 +14,7 @@ import fr.bde_teknantes.lnb.economy.network.AuctionMailboxPayload
 import fr.bde_teknantes.lnb.economy.network.OpenAuctionPayload
 import fr.bde_teknantes.lnb.economy.network.MenuCasinoPayload
 import fr.bde_teknantes.lnb.economy.network.OpenCounterPayload
+import fr.bde_teknantes.lnb.economy.network.OpenLicensePayload
 import fr.bde_teknantes.lnb.economy.network.OpenLinkPayload
 import fr.bde_teknantes.lnb.economy.network.OpenShopPayload
 import fr.bde_teknantes.lnb.economy.network.TradeStatePayload
@@ -31,6 +33,10 @@ object ClientPayloadHandler {
 
     fun handleAccountFeedback(payload: AccountFeedbackPayload, context: IPayloadContext) {
         ClientAccounts.update(payload)
+    }
+
+    fun handleOpenLicense(payload: OpenLicensePayload, context: IPayloadContext) {
+        Minecraft.getInstance().setScreen(LicenseScreen(payload.dealer))
     }
 
     fun handleOpenCounter(payload: OpenCounterPayload, context: IPayloadContext) {

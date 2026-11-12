@@ -3,6 +3,7 @@ package fr.bde_teknantes.lnb.economy.client
 import fr.bde_teknantes.lnb.economy.LnbEconomy
 import fr.bde_teknantes.lnb.economy.ModContent
 import fr.bde_teknantes.lnb.economy.client.gui.AuctioneerRenderer
+import fr.bde_teknantes.lnb.economy.client.gui.CasinoDealerRenderer
 import fr.bde_teknantes.lnb.economy.client.gui.CounterTellerRenderer
 import fr.bde_teknantes.lnb.economy.client.gui.InventoryBalance
 import fr.bde_teknantes.lnb.economy.client.gui.ShopShowcaseRenderer
@@ -27,6 +28,7 @@ class LnbEconomyClient(modBus: IEventBus, container: ModContainer) {
         modBus.addListener(ClientTrade::registerKeys)
         modBus.addListener<EntityRenderersEvent.RegisterRenderers> {
             it.registerEntityRenderer(ModContent.AUCTIONEER.get(), ::AuctioneerRenderer)
+            it.registerEntityRenderer(ModContent.CASINO_DEALER.get(), ::CasinoDealerRenderer)
             it.registerBlockEntityRenderer(ModContent.COUNTER_ENTITY.get(), ::CounterTellerRenderer)
             it.registerBlockEntityRenderer(ModContent.SHOP_ENTITY.get(), ::ShopShowcaseRenderer)
         }

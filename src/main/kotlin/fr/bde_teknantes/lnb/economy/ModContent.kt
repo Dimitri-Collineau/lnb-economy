@@ -3,6 +3,7 @@ package fr.bde_teknantes.lnb.economy
 import com.mojang.serialization.Codec
 import fr.bde_teknantes.lnb.economy.auction.AuctionBlock
 import fr.bde_teknantes.lnb.economy.auction.Auctioneer
+import fr.bde_teknantes.lnb.economy.casino.CasinoDealer
 import fr.bde_teknantes.lnb.economy.casino.LinkToolItem
 import fr.bde_teknantes.lnb.economy.chip.ChipItem
 import fr.bde_teknantes.lnb.economy.chip.Denominations
@@ -91,6 +92,10 @@ object ModContent {
         EntityType.Builder.of(::Auctioneer, MobCategory.MISC).sized(0.6f, 1.95f).clientTrackingRange(10).build("auctioneer")
     })
 
+    val CASINO_DEALER: Supplier<EntityType<CasinoDealer>> = ENTITIES.register("casino_dealer", Supplier {
+        EntityType.Builder.of(::CasinoDealer, MobCategory.MISC).sized(0.6f, 1.95f).clientTrackingRange(10).build("casino_dealer")
+    })
+
     val LINK_TOOL: DeferredItem<LinkToolItem> = ITEMS.registerItem("casino_link_tool", ::LinkToolItem, Item.Properties().stacksTo(1))
 
     fun register(modBus: IEventBus) {
@@ -101,7 +106,10 @@ object ModContent {
         MENUS.register(modBus)
         ENTITIES.register(modBus)
         modBus.addListener(::addToCreativeTabs)
-        modBus.addListener<EntityAttributeCreationEvent> { it.put(AUCTIONEER.get(), Auctioneer.attributes().build()) }
+        modBus.addListener<EntityAttributeCreationEvent> {
+            it.put(AUCTIONEER.get(), Auctioneer.attributes().build())
+            it.put(CASINO_DEALER.get(), CasinoDealer.attributes().build())
+        }
     }
 
     private fun addToCreativeTabs(event: BuildCreativeModeTabContentsEvent) {

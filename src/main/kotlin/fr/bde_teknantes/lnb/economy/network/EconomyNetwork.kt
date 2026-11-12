@@ -2,6 +2,7 @@ package fr.bde_teknantes.lnb.economy.network
 
 import fr.bde_teknantes.lnb.economy.account.SharedAccounts
 import fr.bde_teknantes.lnb.economy.auction.Auctions
+import fr.bde_teknantes.lnb.economy.casino.Licenses
 import fr.bde_teknantes.lnb.economy.casino.Links
 import fr.bde_teknantes.lnb.economy.client.ClientPayloadHandler
 import fr.bde_teknantes.lnb.economy.counter.Counters
@@ -54,6 +55,10 @@ object EconomyNetwork {
         registrar.playToClient(AccountFeedbackPayload.TYPE, AccountFeedbackPayload.STREAM_CODEC) { payload, context ->
             ClientPayloadHandler.handleAccountFeedback(payload, context)
         }
+        registrar.playToClient(OpenLicensePayload.TYPE, OpenLicensePayload.STREAM_CODEC) { payload, context ->
+            ClientPayloadHandler.handleOpenLicense(payload, context)
+        }
+        registrar.playToServer(LicenseBuyPayload.TYPE, LicenseBuyPayload.STREAM_CODEC, Licenses::handleBuy)
         registrar.playToServer(AccountCreatePayload.TYPE, AccountCreatePayload.STREAM_CODEC, SharedAccounts::handleCreate)
         registrar.playToServer(AccountEditPayload.TYPE, AccountEditPayload.STREAM_CODEC, SharedAccounts::handleEdit)
         registrar.playToServer(AccountMembersRequestPayload.TYPE, AccountMembersRequestPayload.STREAM_CODEC, SharedAccounts::handleMembersRequest)
