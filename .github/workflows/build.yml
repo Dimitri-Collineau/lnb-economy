@@ -1,10 +1,16 @@
 name: Build
 
-on: [push, pull_request]
+on:
+  push:
+    branches: ['**']
+    tags: ['v*']
+  pull_request:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -18,24 +24,57 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      # LNB Warden and MineVegas Casino are not in any Maven repository and are never committed.
-      # Set the WARDEN_JAR_URL and MINEVEGAS_JAR_URL secrets to download them. Without them, the build is skipped.
-      - name: Download mod jars
+      # LNB Warden is not in any Maven repository: build it from its public repository.
+      - name: Checkout LNB Warden
+        uses: actions/checkout@v4
+        with:
+          repository: Charles-Mahoudeau/lnb-warden
+          path: lnb-warden
+
+      - name: Build LNB Warden
+        working-directory: lnb-warden
+        run: |
+          ./gradlew jar
+          mkdir -p ../libs
+          cp build/libs/lnbwarden-*.jar ../libs/
+
+      # MineVegas Casino is in no Maven repository and is never committed or redistributed: the build only compiles
+      # against it. Set the MINEVEGAS_JAR_URL secret to a direct download of its NeoForge 1.21.1 jar. Without it, the
+      # build is skipped, and a release fails.
+      - name: Download MineVegas Casino
         id: jars
         env:
-          WARDEN_JAR_URL: ${{ secrets.WARDEN_JAR_URL }}
           MINEVEGAS_JAR_URL: ${{ secrets.MINEVEGAS_JAR_URL }}
         run: |
-          if [ -z "$WARDEN_JAR_URL" ] || [ -z "$MINEVEGAS_JAR_URL" ]; then
-            echo "WARDEN_JAR_URL or MINEVEGAS_JAR_URL is not set: skipping the build."
+          if [ -z "$MINEVEGAS_JAR_URL" ]; then
+            echo "MINEVEGAS_JAR_URL is not set: skipping the build."
             echo "available=false" >> "$GITHUB_OUTPUT"
+            [ "$GITHUB_REF_TYPE" != "tag" ] || exit 1
             exit 0
           fi
-          mkdir -p libs
-          curl -fsSL "$WARDEN_JAR_URL" -o libs/lnbwarden.jar
-          curl -fsSL "$MINEVEGAS_JAR_URL" -o libs/minevegas-casino.jar
+          curl -fsSL -A "Mozilla/5.0" "$MINEVEGAS_JAR_URL" -o libs/minevegas-casino.jar
           echo "available=true" >> "$GITHUB_OUTPUT"
 
+      # On a tag v1.2.3, the jar is built as version 1.2.3.
       - name: Build and test
         if: steps.jars.outputs.available == 'true'
-        run: ./gradlew build
+        run: |
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            ./gradlew build -Pmod_version="${GITHUB_REF_NAME#v}"
+          else
+            ./gradlew build
+          fi
+
+      - name: Upload the jar
+        if: steps.jars.outputs.available == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lnbeconomy
+          path: build/libs/lnbeconomy-*.jar
+
+      # Only this mod's jar is published: never LNB Warden's or MineVegas'.
+      - name: Publish the release
+        if: steps.jars.outputs.available == 'true' && github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" build/libs/lnbeconomy-*.jar --title "$GITHUB_REF_NAME" --generate-notes

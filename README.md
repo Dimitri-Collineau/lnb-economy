@@ -56,8 +56,16 @@ LNB Warden and MineVegas Casino are not in any Maven repository and are never co
 - `libs/lnbwarden-*.jar`: build it from `lnb-warden` with `./gradlew jar`;
 - `libs/minevegas-*.jar`: MineVegas Casino 1.1.1 for NeoForge 1.21.1.
 
-Then `./gradlew build` (Java 21). The CI downloads both jars from the `WARDEN_JAR_URL` and `MINEVEGAS_JAR_URL` secrets
-and skips the build when they are not set.
+Then `./gradlew build` (Java 21).
+
+The CI builds LNB Warden from its public repository and downloads MineVegas Casino from the `MINEVEGAS_JAR_URL`
+secret, a direct link to its jar. Without that secret, it skips the build.
+
+## Releases
+
+Push a tag `vX.Y.Z` and the CI builds the mod as version `X.Y.Z`, then publishes `lnbeconomy-X.Y.Z.jar` as a GitHub
+release. Players download that jar instead of building the mod. The release holds only this mod: LNB Warden, MineVegas
+Casino, Kotlin for Forge and GeckoLib are installed separately. A tag fails the CI when `MINEVEGAS_JAR_URL` is not set.
 
 ## License
 
