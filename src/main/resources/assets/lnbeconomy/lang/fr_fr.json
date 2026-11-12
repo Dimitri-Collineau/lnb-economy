@@ -143,7 +143,7 @@
   "gui.lnbeconomy.shop.lot_size": "Objets par lot",
   "gui.lnbeconomy.shop.sell_price": "Prix du lot",
   "gui.lnbeconomy.shop.buy_price": "Rachat du lot",
-  "gui.lnbeconomy.shop.buy_price.none": "Vide : ne rachète pas",
+  "gui.lnbeconomy.shop.buy_price.none": "Pas de rachat",
   "gui.lnbeconomy.shop.buy_cap": "Plafond de rachat",
   "gui.lnbeconomy.shop.buy_cap.hint": "Le shop ne rachète plus au-delà de ce nombre d’objets en stock.",
   "gui.lnbeconomy.shop.sells_for": "Vend pour",

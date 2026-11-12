@@ -143,7 +143,7 @@
   "gui.lnbeconomy.shop.lot_size": "Items per lot",
   "gui.lnbeconomy.shop.sell_price": "Price per lot",
   "gui.lnbeconomy.shop.buy_price": "Buy back per lot",
-  "gui.lnbeconomy.shop.buy_price.none": "Empty: doesn’t buy back",
+  "gui.lnbeconomy.shop.buy_price.none": "No buy-back",
   "gui.lnbeconomy.shop.buy_cap": "Buyback cap",
   "gui.lnbeconomy.shop.buy_cap.hint": "The shop stops buying back once it holds this many items.",
   "gui.lnbeconomy.shop.sells_for": "Sells for",
