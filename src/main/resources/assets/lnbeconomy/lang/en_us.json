@@ -76,7 +76,7 @@
   "economy.lnbeconomy.problem.sameAccount": "The money would stay on the same account.",
   "economy.lnbeconomy.problem.unavailable": "The economy is unavailable for now. Try again in a moment.",
   "gui.lnbeconomy.accounts.frozen": "Frozen: no money goes in or out.",
-  "gui.lnbeconomy.accounts.hint": "★ pays by default. Click another account to choose it.",
+  "gui.lnbeconomy.accounts.hint": "Click an account to make it pay by default.",
   "gui.lnbeconomy.accounts.is_default": "Pays by default.",
   "gui.lnbeconomy.accounts.loading": "Loading your accounts…",
   "gui.lnbeconomy.accounts.make_default": "Click to make it pay by default.",

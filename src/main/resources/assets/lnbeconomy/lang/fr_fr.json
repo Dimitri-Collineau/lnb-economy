@@ -76,7 +76,7 @@
   "economy.lnbeconomy.problem.sameAccount": "L’argent resterait sur le même compte.",
   "economy.lnbeconomy.problem.unavailable": "L’économie est momentanément indisponible. Réessaie dans un instant.",
   "gui.lnbeconomy.accounts.frozen": "Gelé : aucun argent n’y entre ni n’en sort.",
-  "gui.lnbeconomy.accounts.hint": "★ paie par défaut. Clique sur un autre compte pour le choisir.",
+  "gui.lnbeconomy.accounts.hint": "Clique sur un compte pour qu’il paie par défaut.",
   "gui.lnbeconomy.accounts.is_default": "Paie par défaut.",
   "gui.lnbeconomy.accounts.loading": "Chargement de tes comptes…",
   "gui.lnbeconomy.accounts.make_default": "Clique pour qu’il paie par défaut.",

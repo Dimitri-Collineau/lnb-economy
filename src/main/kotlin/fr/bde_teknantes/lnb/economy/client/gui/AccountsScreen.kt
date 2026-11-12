@@ -7,8 +7,9 @@ import fr.bde_teknantes.lnb.economy.network.SetDefaultAccountPayload
 import net.minecraft.ChatFormatting
 import net.minecraft.Util
 import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.client.gui.components.Button
+import net.minecraft.client.gui.components.AbstractButton
 import net.minecraft.client.gui.components.Tooltip
+import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.client.gui.screens.ConfirmLinkScreen
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.CommonComponents
@@ -21,47 +22,58 @@ import net.neoforged.neoforge.network.PacketDistributor
  */
 class AccountsScreen(private val parent: Screen?) : Screen(Component.translatable("gui.lnbeconomy.accounts.title")) {
     private companion object {
-        const val ROW_WIDTH = 260
+        const val PANEL_WIDTH = 292
+        const val PANEL_MAX_HEIGHT = 200
+        const val ROW_WIDTH = 256
         const val ROW_HEIGHT = 20
-        const val ROW_GAP = 2
-        const val TOP = 40
+        const val ROW_GAP = 3
+        const val ROWS_TOP = 42
+        const val FOOTER = 40
         const val BANK_URL = "https://lnb.bde-teknantes.fr/minecraft/bank"
     }
 
     private var shownRevision = -1
     private var scroll = 0
-    private val rows = mutableListOf<Button>()
+    private var panelX = 0
+    private var panelY = 0
+    private var panelHeight = 0
 
     override fun init() {
         ClientEconomy.requestRefresh(always = true)
         shownRevision = ClientEconomy.revision
-        rows.clear()
+        panelHeight = minOf(PANEL_MAX_HEIGHT, height - 16)
+        panelX = (width - PANEL_WIDTH) / 2
+        panelY = (height - panelHeight) / 2
+        val rowX = (width - ROW_WIDTH) / 2
 
         val accounts = ClientEconomy.snapshot.accounts
         val visible = visibleRows()
         scroll = scroll.coerceIn(0, maxOf(0, accounts.size - visible))
         accounts.drop(scroll).take(visible).forEachIndexed { index, account ->
-            val row = Button.builder(label(account)) { choose(account) }
-                .bounds((width - ROW_WIDTH) / 2, TOP + index * (ROW_HEIGHT + ROW_GAP), ROW_WIDTH, ROW_HEIGHT)
-                .tooltip(Tooltip.create(hint(account)))
-                .build()
-            row.active = account.canSpend && account.id != ClientEconomy.snapshot.defaultAccountId
-            rows.add(addRenderableWidget(row))
+            val row = AccountRow(account, rowX, panelY + ROWS_TOP + index * (ROW_HEIGHT + ROW_GAP))
+            row.setTooltip(Tooltip.create(hint(account)))
+            row.active = account.canSpend && !isDefault(account)
+            addRenderableWidget(row)
         }
 
-        val bottom = height - 28
+        val footerY = panelY + panelHeight - 34
         addRenderableWidget(
-            Button.builder(Component.translatable("gui.lnbeconomy.accounts.site")) {
+            CasinoButton.secondary(Component.translatable("gui.lnbeconomy.accounts.site")) {
                 minecraft?.setScreen(ConfirmLinkScreen({ open ->
                     if (open) Util.getPlatform().openUri(BANK_URL)
                     minecraft?.setScreen(this)
                 }, BANK_URL, true))
-            }.bounds(width / 2 - 154, bottom, 150, 20).build(),
+            }.bounds(rowX, footerY, 150, 20).build(),
         )
-        addRenderableWidget(Button.builder(CommonComponents.GUI_DONE) { onClose() }.bounds(width / 2 + 4, bottom, 150, 20).build())
+        addRenderableWidget(
+            CasinoButton.primary(CommonComponents.GUI_DONE) { onClose() }
+                .bounds(rowX + ROW_WIDTH - 100, footerY, 100, 20).build(),
+        )
     }
 
-    private fun visibleRows(): Int = maxOf(1, (height - TOP - 40) / (ROW_HEIGHT + ROW_GAP))
+    private fun visibleRows(): Int = maxOf(1, (panelHeight - ROWS_TOP - FOOTER) / (ROW_HEIGHT + ROW_GAP))
+
+    private fun isDefault(account: AccountEntry) = account.id == ClientEconomy.snapshot.defaultAccountId
 
     override fun tick() {
         if (ClientEconomy.revision != shownRevision) rebuildWidgets()
@@ -74,9 +86,14 @@ class AccountsScreen(private val parent: Screen?) : Screen(Component.translatabl
         return true
     }
 
+    override fun renderBackground(graphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
+        super.renderBackground(graphics, mouseX, mouseY, partialTick)
+        CasinoUi.panel(graphics, panelX, panelY, PANEL_WIDTH, panelHeight)
+    }
+
     override fun render(graphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
         super.render(graphics, mouseX, mouseY, partialTick)
-        graphics.drawCenteredString(font, title, width / 2, 14, 0xFFFFFF)
+        CasinoUi.title(graphics, font, title, width / 2, panelY + 12)
         val status = ClientEconomy.snapshot.status
         val message = when {
             status == EconomyStatus.LOADING -> Component.translatable("gui.lnbeconomy.accounts.loading")
@@ -85,37 +102,62 @@ class AccountsScreen(private val parent: Screen?) : Screen(Component.translatabl
             ClientEconomy.snapshot.accounts.isEmpty() -> Component.translatable("economy.lnbeconomy.problem.unavailable")
             else -> Component.translatable("gui.lnbeconomy.accounts.hint")
         }
-        graphics.drawCenteredString(font, message, width / 2, 26, 0xA0A0A0)
+        graphics.drawCenteredString(font, message, width / 2, panelY + 26, CasinoUi.DIM)
     }
 
     override fun onClose() {
         minecraft?.setScreen(parent)
     }
 
-    private fun choose(account: AccountEntry) {
-        PacketDistributor.sendToServer(SetDefaultAccountPayload(account.id))
-    }
-
-    private fun label(account: AccountEntry): Component {
-        val language = minecraft?.options?.languageCode ?: "en_us"
-        val star = if (account.id == ClientEconomy.snapshot.defaultAccountId) "★ " else ""
-        val name = if (account.isPersonal) Component.translatable("gui.lnbeconomy.accounts.personal").string
-        else "${account.name} (#${account.handle})"
-        val line = Component.literal("$star$name  ").append(
-            Lnbit.compact(account.balance, language).withStyle(ChatFormatting.GOLD),
-        )
-        if (account.frozen) line.append(Component.translatable("economy.lnbeconomy.balance.frozen").withStyle(ChatFormatting.AQUA))
-        return line
-    }
-
     private fun hint(account: AccountEntry): Component {
         val role = Component.translatable("gui.lnbeconomy.accounts.role.${account.role}")
         val action = when {
             account.frozen -> Component.translatable("gui.lnbeconomy.accounts.frozen")
-            account.id == ClientEconomy.snapshot.defaultAccountId -> Component.translatable("gui.lnbeconomy.accounts.is_default")
+            isDefault(account) -> Component.translatable("gui.lnbeconomy.accounts.is_default")
             account.canSpend -> Component.translatable("gui.lnbeconomy.accounts.make_default")
             else -> Component.translatable("gui.lnbeconomy.accounts.viewer")
         }
-        return Component.empty().append(role).append("\n").append(action)
+        return Component.empty().append(role).append("\n").append(Component.literal("").append(action).withStyle(ChatFormatting.GRAY))
+    }
+
+    /** One account: icon, name, frozen tag, balance, and a star on the default one. A click makes it the default. */
+    private inner class AccountRow(private val account: AccountEntry, x: Int, y: Int) :
+        AbstractButton(x, y, ROW_WIDTH, ROW_HEIGHT, Component.empty()) {
+
+        override fun onPress() {
+            PacketDistributor.sendToServer(SetDefaultAccountPayload(account.id))
+        }
+
+        override fun renderWidget(graphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
+            val isDefault = isDefault(account)
+            val sprites = CasinoUi.SECONDARY
+            val sprite = when {
+                isDefault -> sprites.highlighted
+                account.frozen -> sprites.normal
+                !active -> sprites.disabled
+                isHoveredOrFocused -> sprites.highlighted
+                else -> sprites.normal
+            }
+            graphics.blitSprite(sprite, x, y, width, height)
+            graphics.blitSprite(if (account.isPersonal) CasinoUi.ACCOUNT_PERSONAL else CasinoUi.ACCOUNT_SHARED, x + 6, y + 6, 9, 9)
+
+            val readOnly = !account.canSpend && !account.frozen && !isDefault
+            val name = if (account.isPersonal) Component.translatable("gui.lnbeconomy.accounts.personal")
+            else Component.literal("${account.name} (#${account.handle})")
+            val nameEnd = graphics.drawString(font, name, x + 20, y + 6, if (readOnly) CasinoUi.GREY else CasinoUi.IVORY, true)
+            if (account.frozen) {
+                graphics.drawString(font, Component.translatable("economy.lnbeconomy.balance.frozen"), nameEnd, y + 6, 0xFF55FFFF.toInt(), true)
+            }
+
+            val language = minecraft?.options?.languageCode ?: "en_us"
+            val amount = Lnbit.compact(account.balance, language)
+            graphics.drawString(font, amount, x + width - 22 - font.width(amount), y + 6, if (readOnly) CasinoUi.GREY else CasinoUi.GOLD_TEXT, true)
+            when {
+                isDefault -> graphics.blitSprite(CasinoUi.STAR, x + width - 15, y + 5, 9, 9)
+                active && isHoveredOrFocused -> graphics.blitSprite(CasinoUi.STAR_EMPTY, x + width - 15, y + 5, 9, 9)
+            }
+        }
+
+        override fun updateWidgetNarration(output: NarrationElementOutput) = defaultButtonNarrationText(output)
     }
 }
