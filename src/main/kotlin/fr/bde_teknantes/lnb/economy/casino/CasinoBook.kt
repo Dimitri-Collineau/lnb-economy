@@ -8,12 +8,15 @@ package fr.bde_teknantes.lnb.economy.casino
  * reservation keeps back the most a round in progress can still pay out.
  */
 class CasinoBook(private val clock: () -> Long) {
-    data class Account(val balance: Long, val frozen: Boolean, val fetchedAt: Long)
+    data class Account(val balance: Long, val frozen: Boolean, val fetchedAt: Long, val casino: Boolean = true)
 
     sealed interface Status {
         data class Open(val free: Long) : Status
         data object Frozen : Status
         data object Missing : Status
+
+        /** The account exists but isn't of type casino: it has no casino licence. */
+        data object NotCasino : Status
 
         /** Never read from the site, or read too long ago while the site is down. */
         data object Unknown : Status
@@ -29,9 +32,9 @@ class CasinoBook(private val clock: () -> Long) {
 
     fun account(handle: String): Account? = accounts[handle]
 
-    fun update(handle: String, balance: Long, frozen: Boolean) {
+    fun update(handle: String, balance: Long, frozen: Boolean, casino: Boolean = true) {
         missing.remove(handle)
-        accounts[handle] = Account(balance, frozen, clock())
+        accounts[handle] = Account(balance, frozen, clock(), casino)
     }
 
     /** A transfer's answer gives the balance right after it; it doesn't say whether the account is frozen. */
@@ -72,6 +75,7 @@ class CasinoBook(private val clock: () -> Long) {
         if (handle in missing) return Status.Missing
         val account = accounts[handle] ?: return Status.Unknown
         if (clock() - account.fetchedAt > maxAgeMs) return Status.Unknown
+        if (!account.casino) return Status.NotCasino
         if (account.frozen) return Status.Frozen
         return Status.Open(account.balance - outstanding - reserved(handle, except))
     }

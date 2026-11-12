@@ -58,4 +58,12 @@ class CasinoBookTest {
         book.update("royal", 100, frozen = false)
         assertEquals(CasinoBook.Status.Open(-50), book.status("royal", 150, 600_000))
     }
+
+    @Test
+    fun `an account that isn't of type casino is closed, and opens once it becomes one`() {
+        book.update("team", 5_000, frozen = false, casino = false)
+        assertEquals(CasinoBook.Status.NotCasino, book.status("team", 0, 600_000))
+        book.update("team", 5_000, frozen = false, casino = true)
+        assertEquals(CasinoBook.Status.Open(5_000), book.status("team", 0, 600_000))
+    }
 }

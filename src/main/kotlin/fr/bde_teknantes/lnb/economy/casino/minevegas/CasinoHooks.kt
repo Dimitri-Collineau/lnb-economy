@@ -135,6 +135,7 @@ object CasinoHooks {
                 true
             }
             CasinoBook.Status.Frozen -> refuse(player, Component.translatable("economy.lnbeconomy.casino.frozen", Casinos.name(link.handle)))
+            CasinoBook.Status.NotCasino -> refuse(player, Component.translatable("economy.lnbeconomy.casino.not_casino", Casinos.name(link.handle)))
             CasinoBook.Status.Missing -> refuse(player, Component.translatable("economy.lnbeconomy.casino.missing", Casinos.name(link.handle)))
             CasinoBook.Status.Unknown -> refuse(player, Component.translatable("economy.lnbeconomy.machine.casino_unknown", Casinos.name(link.handle)))
         }

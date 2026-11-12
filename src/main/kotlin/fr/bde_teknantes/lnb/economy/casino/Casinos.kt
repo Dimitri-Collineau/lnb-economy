@@ -51,7 +51,7 @@ object Casinos {
                 loading.remove(handle)
                 when {
                     result is ApiResult.Ok -> {
-                        book.update(handle, result.body.balance, result.body.frozen)
+                        book.update(handle, result.body.balance, result.body.frozen, result.body.isCasino)
                         names[handle] = result.body.name
                     }
                     result is ApiResult.Http && result.problem == Problems.NOT_FOUND -> book.markMissing(handle)

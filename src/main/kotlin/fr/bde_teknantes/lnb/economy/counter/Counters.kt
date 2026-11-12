@@ -190,6 +190,7 @@ object Counters {
     private fun casinoOpen(player: ServerPlayer, handle: String): Boolean {
         val message = when (Casinos.status(player.server, handle)) {
             CasinoBook.Status.Frozen -> Component.translatable("economy.lnbeconomy.casino.frozen", Casinos.name(handle))
+            CasinoBook.Status.NotCasino -> Component.translatable("economy.lnbeconomy.casino.not_casino", Casinos.name(handle))
             CasinoBook.Status.Missing -> Component.translatable("economy.lnbeconomy.casino.missing", Casinos.name(handle))
             else -> return true
         }

@@ -23,7 +23,8 @@ import net.neoforged.neoforge.network.PacketDistributor
 import net.neoforged.neoforge.network.handling.IPayloadContext
 
 /**
- * Linking machines and counters to a casino with the link wand. Only an owner or member of a casino's account may link
+ * Linking machines and counters to a casino with the link wand. A casino is a shared account of type casino, which
+ * takes a casino licence. Only an owner or member of a casino's account may link
  * something to it, checked with the site at that moment; an existing link is changed by an owner or member of its
  * casino, or an operator.
  */
@@ -152,7 +153,7 @@ object Links {
     }
 
     private fun mayLinkTo(account: AccountView): Boolean =
-        account.handle != null && (account.role == AccountView.ROLE_OWNER || account.role == AccountView.ROLE_MEMBER)
+        account.handle != null && account.isCasino && (account.role == AccountView.ROLE_OWNER || account.role == AccountView.ROLE_MEMBER)
 
     private fun mayEdit(player: ServerPlayer, accounts: List<AccountView>, link: CasinoLinks.Link): Boolean =
         player.hasPermissions(OPERATOR) || accounts.any { it.handle == link.handle && mayLinkTo(it) }
