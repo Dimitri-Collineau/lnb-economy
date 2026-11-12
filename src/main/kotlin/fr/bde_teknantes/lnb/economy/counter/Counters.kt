@@ -2,7 +2,6 @@ package fr.bde_teknantes.lnb.economy.counter
 
 import fr.bde_teknantes.lnb.economy.ModContent
 import fr.bde_teknantes.lnb.economy.account.PlayerAccounts
-import fr.bde_teknantes.lnb.economy.api.Handles
 import fr.bde_teknantes.lnb.economy.api.Party
 import fr.bde_teknantes.lnb.economy.api.Problems
 import fr.bde_teknantes.lnb.economy.api.TransferBody
@@ -89,7 +88,7 @@ object Counters {
         if (!hasEconomy(player) || !casinoOpen(player, handle)) return
         val value = Chips.takeAll(player.inventory, handle)
         if (value == 0L) {
-            error(player, Component.translatable("economy.lnbeconomy.counter.no_chips", Handles.display(handle)))
+            error(player, Component.translatable("economy.lnbeconomy.counter.no_chips", Casinos.name(handle)))
             return
         }
         teller(player, payload.pos)?.count()
@@ -112,7 +111,7 @@ object Counters {
         if (payload.largest !in Denominations.ALL) return
         val value = Chips.takeAll(player.inventory, handle)
         if (value == 0L) {
-            error(player, Component.translatable("economy.lnbeconomy.counter.no_chips", Handles.display(handle)))
+            error(player, Component.translatable("economy.lnbeconomy.counter.no_chips", Casinos.name(handle)))
             return
         }
         teller(player, payload.pos)?.count()
@@ -132,7 +131,7 @@ object Counters {
                 ChipLedger.get(server).add(handle, outcome.result.amount)
                 ItemMailbox.deliverChips(server, uuid, handle, outcome.result.amount)
                 player?.sendSystemMessage(
-                    Component.translatable("economy.lnbeconomy.counter.bought", Texts.amount(outcome.result.amount, player), Handles.display(handle))
+                    Component.translatable("economy.lnbeconomy.counter.bought", Texts.amount(outcome.result.amount, player), Casinos.name(handle))
                         .withStyle(ChatFormatting.GREEN),
                 )
             }
@@ -151,7 +150,7 @@ object Counters {
                 ItemMailbox.deliverChips(server, uuid, handle, amount)
                 player?.let {
                     val problem = (outcome.result as? ApiResult.Http)?.problem
-                    val reason = if (problem == Problems.INSUFFICIENT_FUNDS) Component.translatable("economy.lnbeconomy.counter.casino_short", Handles.display(handle))
+                    val reason = if (problem == Problems.INSUFFICIENT_FUNDS) Component.translatable("economy.lnbeconomy.counter.casino_short", Casinos.name(handle))
                     else Texts.problem(outcome.result)
                     error(it, Component.translatable("economy.lnbeconomy.counter.cash_refused", reason))
                 }
@@ -190,8 +189,8 @@ object Counters {
 
     private fun casinoOpen(player: ServerPlayer, handle: String): Boolean {
         val message = when (Casinos.status(player.server, handle)) {
-            CasinoBook.Status.Frozen -> Component.translatable("economy.lnbeconomy.casino.frozen", Handles.display(handle))
-            CasinoBook.Status.Missing -> Component.translatable("economy.lnbeconomy.casino.missing", Handles.display(handle))
+            CasinoBook.Status.Frozen -> Component.translatable("economy.lnbeconomy.casino.frozen", Casinos.name(handle))
+            CasinoBook.Status.Missing -> Component.translatable("economy.lnbeconomy.casino.missing", Casinos.name(handle))
             else -> return true
         }
         error(player, message)

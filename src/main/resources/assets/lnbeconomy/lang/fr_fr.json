@@ -41,7 +41,7 @@
   "economy.lnbeconomy.machine.casino_short": "%s ne peut pas couvrir cette mise pour le moment.",
   "economy.lnbeconomy.machine.casino_unknown": "Le solde de %s n’est pas encore connu. Réessaie dans un instant.",
   "economy.lnbeconomy.machine.disabled": "Ce jeu est désactivé sur ce serveur.",
-  "economy.lnbeconomy.machine.max_bet": "La mise maximale ici est de %s.",
+  "economy.lnbeconomy.machine.max_bet": "La mise maximale chez %s est de %s.",
   "economy.lnbeconomy.machine.not_linked": "Cette machine n’est liée à aucun casino.",
   "economy.lnbeconomy.machine.wrong_chips": "Cette machine ne prend que les jetons de %s.",
   "economy.lnbeconomy.pay.bad_amount": "Le montant est un nombre entier de LNBits, de 1 à 1 000 000 000 000.",

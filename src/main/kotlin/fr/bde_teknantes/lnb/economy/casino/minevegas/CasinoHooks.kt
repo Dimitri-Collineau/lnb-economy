@@ -2,7 +2,6 @@ package fr.bde_teknantes.lnb.economy.casino.minevegas
 
 import fr.bde_teknantes.lnb.economy.EconomyConfig
 import fr.bde_teknantes.lnb.economy.LnbEconomy
-import fr.bde_teknantes.lnb.economy.api.Handles
 import fr.bde_teknantes.lnb.economy.casino.CasinoBook
 import fr.bde_teknantes.lnb.economy.casino.CasinoLinks
 import fr.bde_teknantes.lnb.economy.casino.Casinos
@@ -15,9 +14,13 @@ import fr.bde_teknantes.lnb.economy.chip.Chips
 import fr.bde_teknantes.lnb.economy.money.Texts
 import fr.minevegas.casino.CasinoMachine
 import fr.minevegas.casino.CasinoSettings
+import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
+import net.minecraft.server.TickTask
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
 import net.minecraft.world.Container
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.item.ItemStack
@@ -116,29 +119,39 @@ object CasinoHooks {
         val game = CasinoMachine.type(machine)
         if (!EconomyConfig.gameEnabled(game)) return refuse(player, Component.translatable("economy.lnbeconomy.machine.disabled"))
         val link = linkOf(machine) ?: return refuse(player, Component.translatable("economy.lnbeconomy.machine.not_linked"))
-        if (stakes.any { Chips.casinoOf(it) != link.handle }) return refuse(player, Component.translatable("economy.lnbeconomy.machine.wrong_chips", Handles.display(link.handle)))
+        if (stakes.any { Chips.casinoOf(it) != link.handle }) return refuse(player, Component.translatable("economy.lnbeconomy.machine.wrong_chips", Casinos.name(link.handle)))
 
         val total = stakes.sumOf(Chips::valueOf)
         val maxBet = link.maxBet
         if (maxBet != null && total > maxBet) {
-            return refuse(player, Component.translatable("economy.lnbeconomy.machine.max_bet", Texts.amount(maxBet, player)))
+            return refuse(player, Component.translatable("economy.lnbeconomy.machine.max_bet", Casinos.name(link.handle), Texts.amount(maxBet, player)))
         }
         val key = keyOf(machine)
         return when (val status = Casinos.status(level.server, link.handle, except = key)) {
             is CasinoBook.Status.Open -> if (exposure > status.free) {
-                refuse(player, Component.translatable("economy.lnbeconomy.machine.casino_short", Handles.display(link.handle)))
+                refuse(player, Component.translatable("economy.lnbeconomy.machine.casino_short", Casinos.name(link.handle)))
             } else {
                 if (reserve) Casinos.book.reserve(key, link.handle, maxOf(0, exposure), RESERVATION_TTL_MS)
                 true
             }
-            CasinoBook.Status.Frozen -> refuse(player, Component.translatable("economy.lnbeconomy.casino.frozen", Handles.display(link.handle)))
-            CasinoBook.Status.Missing -> refuse(player, Component.translatable("economy.lnbeconomy.casino.missing", Handles.display(link.handle)))
-            CasinoBook.Status.Unknown -> refuse(player, Component.translatable("economy.lnbeconomy.machine.casino_unknown", Handles.display(link.handle)))
+            CasinoBook.Status.Frozen -> refuse(player, Component.translatable("economy.lnbeconomy.casino.frozen", Casinos.name(link.handle)))
+            CasinoBook.Status.Missing -> refuse(player, Component.translatable("economy.lnbeconomy.casino.missing", Casinos.name(link.handle)))
+            CasinoBook.Status.Unknown -> refuse(player, Component.translatable("economy.lnbeconomy.machine.casino_unknown", Casinos.name(link.handle)))
         }
     }
 
+    /**
+     * Tells the player why the game didn't start: in red above the hotbar, with a low note, and the machine's screen
+     * closes so the message shows. The screen closes on the next tick, once MineVegas is done with the click.
+     */
     private fun refuse(player: ServerPlayer?, message: Component): Boolean {
-        player?.displayClientMessage(message, true)
+        if (player == null) return false
+        player.displayClientMessage(message.copy().withStyle(ChatFormatting.RED), true)
+        player.playNotifySound(SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.PLAYERS, 1f, 0.5f)
+        val server = player.server
+        server.tell(TickTask(server.tickCount) {
+            if (player.containerMenu !== player.inventoryMenu) player.closeContainer()
+        })
         return false
     }
 

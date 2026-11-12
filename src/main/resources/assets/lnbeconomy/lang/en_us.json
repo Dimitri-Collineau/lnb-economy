@@ -41,7 +41,7 @@
   "economy.lnbeconomy.machine.casino_short": "%s can’t cover that bet right now.",
   "economy.lnbeconomy.machine.casino_unknown": "The balance of %s isn’t known yet. Try again in a moment.",
   "economy.lnbeconomy.machine.disabled": "This game is switched off on this server.",
-  "economy.lnbeconomy.machine.max_bet": "The largest bet here is %s.",
+  "economy.lnbeconomy.machine.max_bet": "The largest bet at %s is %s.",
   "economy.lnbeconomy.machine.not_linked": "This machine isn’t linked to a casino.",
   "economy.lnbeconomy.machine.wrong_chips": "This machine only takes chips from %s.",
   "economy.lnbeconomy.pay.bad_amount": "The amount is a whole number of LNBits, from 1 to 1,000,000,000,000.",
