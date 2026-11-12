@@ -266,5 +266,11 @@
   "economy.lnbeconomy.auction.refused": "L’hôtel des ventes a refusé : %s",
   "economy.lnbeconomy.problem.tooManyListings": "Tu as déjà le maximum d’annonces en même temps.",
   "economy.lnbeconomy.problem.listingGone": "Cette annonce n’est plus en vente.",
-  "commands.lnbeconomy.npc.spawned": "Commissaire-priseur placé. Frappe-le en créatif pour le retirer."
+  "commands.lnbeconomy.npc.spawned": "Commissaire-priseur placé. Frappe-le en créatif pour le retirer.",
+  "economy.lnbeconomy.auction.cant": "Pas mis en vente : %s",
+  "economy.lnbeconomy.auction.cant.no_item": "choisis d’abord un objet de ton inventaire.",
+  "economy.lnbeconomy.auction.cant.count": "mets au moins 1 objet en vente.",
+  "economy.lnbeconomy.auction.cant.not_enough": "tu veux en vendre %s mais cette pile ne contient que %s × %s.",
+  "economy.lnbeconomy.auction.cant.price": "le prix va de 1 à 1 000 000 000 LNBits.",
+  "economy.lnbeconomy.auction.cant.unreadable": "le serveur ne peut pas stocker cet objet."
 }

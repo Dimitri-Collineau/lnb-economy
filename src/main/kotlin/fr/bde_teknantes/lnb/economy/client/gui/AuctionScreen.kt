@@ -154,8 +154,9 @@ class AuctionScreen : Screen(Component.translatable("gui.lnbeconomy.auction.titl
         account = accountPicker(sideX + 6, sideY + 98)
         addRenderableWidget(
             CasinoButton.primary(Component.translatable("gui.lnbeconomy.auction.sell")) {
-                val n = count?.value?.toIntOrNull() ?: return@primary
-                val p = price?.value?.toLongOrNull() ?: return@primary
+                // An empty field is sent as 0: the server answers with what is missing.
+                val n = count?.value?.toIntOrNull() ?: 0
+                val p = price?.value?.toLongOrNull() ?: 0
                 PacketDistributor.sendToServer(AuctionSellPayload(sellSlot, n, p, chosenAccount()))
                 countText = null
                 priceText = ""

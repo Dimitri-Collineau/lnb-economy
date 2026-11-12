@@ -38,6 +38,8 @@ import net.minecraft.nbt.TagParser
 import net.minecraft.network.chat.Component
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.item.ItemStack
 import net.neoforged.neoforge.event.RegisterCommandsEvent
@@ -153,16 +155,31 @@ object Auctions {
         // Any stack of the main inventory or the hotbar, not only the one in hand.
         if (payload.slot !in 0 until Inventory.INVENTORY_SIZE) return
         val stack = player.inventory.getItem(payload.slot)
-        if (stack.isEmpty || payload.count !in 1..stack.count || payload.price !in 1..ListingBody.MAX_PRICE) return
+        val problem = when {
+            stack.isEmpty -> Component.translatable("economy.lnbeconomy.auction.cant.no_item")
+            payload.count < 1 -> Component.translatable("economy.lnbeconomy.auction.cant.count")
+            payload.count > stack.count -> Component.translatable("economy.lnbeconomy.auction.cant.not_enough", payload.count, stack.count, stack.hoverName)
+            payload.price !in 1..ListingBody.MAX_PRICE -> Component.translatable("economy.lnbeconomy.auction.cant.price")
+            else -> null
+        }
+        if (problem != null) {
+            cantList(player, problem)
+            return
+        }
         PlayerAccounts.noEconomyMessage(player.uuid)?.let {
-            player.sendSystemMessage(it)
+            cantList(player, it)
             return
         }
         if (payload.accountId != null && PlayerAccounts.accounts(player.uuid)?.accounts?.any { it.id == payload.accountId && it.canSpend } != true) {
-            player.sendSystemMessage(Component.translatable("economy.lnbeconomy.problem.notAllowed"))
+            cantList(player, Component.translatable("economy.lnbeconomy.problem.notAllowed"))
             return
         }
         val server = player.server
+        // Checked on a copy first: an item the server can't write down must stay in the inventory.
+        if (ItemStacks.toTag(stack.copyWithCount(payload.count), server.registryAccess()) == null) {
+            cantList(player, Component.translatable("economy.lnbeconomy.auction.cant.unreadable"))
+            return
+        }
         val taken = stack.split(payload.count)
         player.inventory.setChanged()
         val tag = ItemStacks.toTag(taken, server.registryAccess()) ?: return
@@ -313,6 +330,12 @@ object Auctions {
 
     private fun delayed(player: ServerPlayer) =
         player.sendSystemMessage(Component.translatable("economy.lnbeconomy.auction.delayed").withStyle(ChatFormatting.GRAY))
+
+    /** A listing the server didn't even send to the site: says why, in red, with a low note. */
+    private fun cantList(player: ServerPlayer, reason: Component) {
+        player.sendSystemMessage(Component.translatable("economy.lnbeconomy.auction.cant", reason).withStyle(ChatFormatting.RED))
+        player.playNotifySound(SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.PLAYERS, 1f, 0.5f)
+    }
 
     private fun refused(player: ServerPlayer, result: ApiResult<*>) =
         player.sendSystemMessage(Component.translatable("economy.lnbeconomy.auction.refused", Texts.problem(result)).withStyle(ChatFormatting.RED))

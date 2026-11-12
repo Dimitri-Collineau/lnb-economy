@@ -266,5 +266,11 @@
   "economy.lnbeconomy.auction.refused": "The auction house refused: %s",
   "economy.lnbeconomy.problem.tooManyListings": "You have the most listings you can at once.",
   "economy.lnbeconomy.problem.listingGone": "That listing is no longer up.",
-  "commands.lnbeconomy.npc.spawned": "Auctioneer placed. Hit it in creative mode to remove it."
+  "commands.lnbeconomy.npc.spawned": "Auctioneer placed. Hit it in creative mode to remove it.",
+  "economy.lnbeconomy.auction.cant": "Not listed: %s",
+  "economy.lnbeconomy.auction.cant.no_item": "pick an item of your inventory first.",
+  "economy.lnbeconomy.auction.cant.count": "list at least 1 item.",
+  "economy.lnbeconomy.auction.cant.not_enough": "you asked to list %s but that stack only holds %s × %s.",
+  "economy.lnbeconomy.auction.cant.price": "the price is from 1 to 1,000,000,000 LNBits.",
+  "economy.lnbeconomy.auction.cant.unreadable": "the server can’t store this item."
 }
