@@ -272,5 +272,6 @@
   "economy.lnbeconomy.auction.cant.count": "mets au moins 1 objet en vente.",
   "economy.lnbeconomy.auction.cant.not_enough": "tu veux en vendre %s mais cette pile ne contient que %s × %s.",
   "economy.lnbeconomy.auction.cant.price": "le prix va de 1 à 1 000 000 000 LNBits.",
-  "economy.lnbeconomy.auction.cant.unreadable": "le serveur ne peut pas stocker cet objet."
+  "economy.lnbeconomy.auction.cant.unreadable": "le serveur ne peut pas stocker cet objet.",
+  "economy.lnbeconomy.mob_drop": "+%s lâchés par le monstre"
 }

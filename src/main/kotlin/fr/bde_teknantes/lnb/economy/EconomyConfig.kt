@@ -44,6 +44,14 @@ object EconomyConfig {
     /** Whether `/hdv` (`/ah`) opens the auction house, or players must go to an auction house block or NPC. */
     val AUCTIONS_COMMAND: ModConfigSpec.BooleanValue
 
+    /** Whether hostile mobs leave LNBits to the player who kills them. */
+    val MOB_DROPS: ModConfigSpec.BooleanValue
+    val MOB_DROPS_CHANCE: ModConfigSpec.DoubleValue
+    val MOB_DROPS_MIN: ModConfigSpec.IntValue
+    val MOB_DROPS_MAX: ModConfigSpec.IntValue
+    val MOB_DROPS_SPAWNERS: ModConfigSpec.BooleanValue
+    val MOB_DROPS_FLUSH_SECONDS: ModConfigSpec.IntValue
+
     val SPEC: ModConfigSpec
 
     init {
@@ -59,6 +67,19 @@ object EconomyConfig {
         AUCTIONS_COMMAND = BUILDER
             .comment("Whether /hdv (or /ah) opens the auction house anywhere. Off, players go to an auction house block or NPC.")
             .define("auctionsCommand", true)
+        BUILDER.pop().comment(
+            "LNBits left by hostile mobs to the player who kills them. The money is created by the site (economy.mobDrops",
+            "must be on there too) on the player's personal account.",
+        ).push("mobDrops")
+        MOB_DROPS = BUILDER.comment("Whether hostile mobs give LNBits at all.").define("enabled", true)
+        MOB_DROPS_CHANCE = BUILDER.comment("Chance that a killed hostile mob gives LNBits, from 0 (never) to 1 (always). 0.1 is 10 %.")
+            .defineInRange("chance", 0.1, 0.0, 1.0)
+        MOB_DROPS_MIN = BUILDER.comment("Fewest LNBits a drop gives.").defineInRange("min", 1, 1, 100_000)
+        MOB_DROPS_MAX = BUILDER.comment("Most LNBits a drop gives.").defineInRange("max", 10, 1, 100_000)
+        MOB_DROPS_SPAWNERS = BUILDER.comment("Whether mobs born from a spawner give LNBits too. Off, mob farms on spawners make no money.")
+            .define("fromSpawners", false)
+        MOB_DROPS_FLUSH_SECONDS = BUILDER.comment("How often each player's drops are added up and sent to the site, in seconds.")
+            .defineInRange("flushSeconds", 30, 5, 600)
         SPEC = BUILDER.pop().build()
     }
 

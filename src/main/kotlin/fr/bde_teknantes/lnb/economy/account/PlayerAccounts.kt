@@ -100,6 +100,17 @@ object PlayerAccounts {
         }
     }
 
+    /** [accountId] has a new [balance] (a mint or a burn, which have one side): update everyone who holds it. */
+    fun applyBalance(server: MinecraftServer, accountId: String, balance: Long) {
+        for ((uuid, entry) in entries.toMap()) {
+            val player = entry.player ?: continue
+            if (player.accounts.none { it.id == accountId }) continue
+            val accounts = player.accounts.map { if (it.id == accountId) it.copy(balance = balance) else it }
+            entries[uuid] = entry.copy(player = player.copy(accounts = accounts))
+            send(server, uuid)
+        }
+    }
+
     /** Online players who hold [accountId] (all the Minecraft accounts of its members who are on). */
     fun holdersOf(server: MinecraftServer, accountId: String): List<ServerPlayer> =
         entries.filterValues { entry -> entry.player?.accounts?.any { it.id == accountId } == true }

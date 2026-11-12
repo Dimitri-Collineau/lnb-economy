@@ -84,6 +84,15 @@ data class TransferResult(
     val to: TransferSide,
 )
 
+/** `POST /mints`: new money on [player]'s personal account. [reason] says where it comes from. */
+data class MintBody(val idempotencyKey: String, val player: String, val amount: Long, val reason: String) {
+    companion object {
+        const val MOB_DROP = "mobDrop"
+    }
+}
+
+data class MintResult(val transactionId: Long?, val replayed: Boolean, val amount: Long, val to: TransferSide)
+
 /** A shop's item: its ID, the stack as the game saved it (SNBT, never read by the site), and its name in the game. */
 data class ShopItem(val id: String, val snbt: String, val name: String)
 

@@ -272,5 +272,6 @@
   "economy.lnbeconomy.auction.cant.count": "list at least 1 item.",
   "economy.lnbeconomy.auction.cant.not_enough": "you asked to list %s but that stack only holds %s × %s.",
   "economy.lnbeconomy.auction.cant.price": "the price is from 1 to 1,000,000,000 LNBits.",
-  "economy.lnbeconomy.auction.cant.unreadable": "the server can’t store this item."
+  "economy.lnbeconomy.auction.cant.unreadable": "the server can’t store this item.",
+  "economy.lnbeconomy.mob_drop": "+%s from the mob"
 }

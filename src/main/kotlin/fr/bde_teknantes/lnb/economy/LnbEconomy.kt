@@ -12,6 +12,7 @@ import fr.bde_teknantes.lnb.economy.chip.LostChips
 import fr.bde_teknantes.lnb.economy.command.EconomyCommands
 import fr.bde_teknantes.lnb.economy.command.Payments
 import fr.bde_teknantes.lnb.economy.counter.Counters
+import fr.bde_teknantes.lnb.economy.drop.MobDrops
 import fr.bde_teknantes.lnb.economy.ledger.TransferJournal
 import fr.bde_teknantes.lnb.economy.mail.ItemMailbox
 import fr.bde_teknantes.lnb.economy.network.EconomyNetwork
@@ -49,6 +50,7 @@ class LnbEconomy(modBus: IEventBus, container: ModContainer) {
         Shops.register()
         Trades.register()
         Auctions.register()
+        MobDrops.register()
         modBus.addListener(ShopItemHandler::register)
         Casinos.linked = { server -> CasinoLinks.get(server).handles }
         NeoForge.EVENT_BUS.addListener(EconomyCommands::register)
@@ -70,6 +72,11 @@ class LnbEconomy(modBus: IEventBus, container: ModContainer) {
         NeoForge.EVENT_BUS.addListener(Trades::onServerTick)
         NeoForge.EVENT_BUS.addListener(Trades::onLoggedOut)
         NeoForge.EVENT_BUS.addListener(Trades::onServerStopped)
+        NeoForge.EVENT_BUS.addListener(MobDrops::onSpawn)
+        NeoForge.EVENT_BUS.addListener(MobDrops::onDeath)
+        NeoForge.EVENT_BUS.addListener(MobDrops::onServerTick)
+        NeoForge.EVENT_BUS.addListener(MobDrops::onLoggedOut)
+        NeoForge.EVENT_BUS.addListener(MobDrops::onServerStopping)
         NeoForge.EVENT_BUS.addListener<BlockEvent.BreakEvent>(EventPriority.HIGH, Shops::onBreak)
         NeoForge.EVENT_BUS.addListener<BlockEvent.BreakEvent>(EventPriority.LOWEST) { if (!it.isCanceled) Links.onBlockBroken(it) }
         if (ModList.get().isLoaded(Machines.MINEVEGAS)) {
