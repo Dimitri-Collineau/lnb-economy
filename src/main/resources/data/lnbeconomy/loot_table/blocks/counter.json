@@ -4,7 +4,14 @@
     {
       "rolls": 1,
       "entries": [{ "type": "minecraft:item", "name": "lnbeconomy:counter" }],
-      "conditions": [{ "condition": "minecraft:survives_explosion" }]
+      "conditions": [
+        { "condition": "minecraft:survives_explosion" },
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "lnbeconomy:counter",
+          "properties": { "part": "1" }
+        }
+      ]
     }
   ]
 }

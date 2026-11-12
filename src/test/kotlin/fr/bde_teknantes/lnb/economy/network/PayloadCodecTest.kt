@@ -117,6 +117,7 @@ class PayloadCodecTest {
         assertEquals(CounterChangePayload(pos, 25), roundTrip(CounterChangePayload.STREAM_CODEC, CounterChangePayload(pos, 25)))
         assertEquals(LinkPayload(pos, "casino", 100), roundTrip(LinkPayload.STREAM_CODEC, LinkPayload(pos, "casino", 100)))
         assertEquals(LinkPayload(pos, null, null), roundTrip(LinkPayload.STREAM_CODEC, LinkPayload(pos, null, null)))
+        assertEquals(CounterWoodPayload(pos, "cherry"), roundTrip(CounterWoodPayload.STREAM_CODEC, CounterWoodPayload(pos, "cherry")))
         listOf(ShopOrderPayload(pos, true, 3, null, 40), ShopOrderPayload(pos, false, 1, "a", 25)).forEach {
             assertEquals(it, roundTrip(ShopOrderPayload.STREAM_CODEC, it))
         }
@@ -131,9 +132,9 @@ class PayloadCodecTest {
     fun `screens opened by the server`() {
         val pos = BlockPos(1, 2, 3)
         assertEquals(OpenCounterPayload(pos, "casino", "Casino Royal"), roundTrip(OpenCounterPayload.STREAM_CODEC, OpenCounterPayload(pos, "casino", "Casino Royal")))
-        val link = OpenLinkPayload(pos, "slots", "casino", 100, true, listOf(LinkOption("casino", "Casino Royal")))
+        val link = OpenLinkPayload(pos, "slots", "casino", 100, true, listOf(LinkOption("casino", "Casino Royal")), null)
         assertEquals(link, roundTrip(OpenLinkPayload.STREAM_CODEC, link))
-        val counter = OpenLinkPayload(pos, null, null, null, false, emptyList())
+        val counter = OpenLinkPayload(pos, null, null, null, false, emptyList(), "dark_oak")
         assertEquals(counter, roundTrip(OpenLinkPayload.STREAM_CODEC, counter))
         assertEquals(MenuCasinoPayload(7, "casino"), roundTrip(MenuCasinoPayload.STREAM_CODEC, MenuCasinoPayload(7, "casino")))
         assertEquals(MenuCasinoPayload(7, null), roundTrip(MenuCasinoPayload.STREAM_CODEC, MenuCasinoPayload(7, null)))

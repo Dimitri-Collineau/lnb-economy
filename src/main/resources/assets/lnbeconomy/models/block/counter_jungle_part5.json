@@ -1,0 +1,7 @@
+{
+  "parent": "lnbeconomy:block/counter_part5",
+  "textures": {
+    "wood": "minecraft:block/jungle_planks",
+    "particle": "minecraft:block/jungle_planks"
+  }
+}

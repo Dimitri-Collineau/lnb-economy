@@ -6,6 +6,9 @@ import fr.bde_teknantes.lnb.economy.account.PlayerAccounts
 import fr.bde_teknantes.lnb.economy.api.AccountView
 import fr.bde_teknantes.lnb.economy.api.Handles
 import fr.bde_teknantes.lnb.economy.api.TransferBody
+import fr.bde_teknantes.lnb.economy.counter.CounterBlock
+import fr.bde_teknantes.lnb.economy.counter.CounterWood
+import fr.bde_teknantes.lnb.economy.network.CounterWoodPayload
 import fr.bde_teknantes.lnb.economy.network.LinkOption
 import fr.bde_teknantes.lnb.economy.network.LinkPayload
 import fr.bde_teknantes.lnb.economy.network.OpenLinkPayload
@@ -14,6 +17,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Block
 import net.neoforged.neoforge.event.level.BlockEvent
 import net.neoforged.neoforge.network.PacketDistributor
 import net.neoforged.neoforge.network.handling.IPayloadContext
@@ -31,7 +35,8 @@ object Links {
     data class Target(val pos: BlockPos, val game: String?)
 
     fun targetAt(level: Level, pos: BlockPos): Target? {
-        if (level.getBlockState(pos).`is`(ModContent.COUNTER.get())) return Target(pos, null)
+        val state = level.getBlockState(pos)
+        if (state.`is`(ModContent.COUNTER.get())) return Target(CounterBlock.masterPos(state, pos), null)
         val support = Machines.support ?: return null
         val anchor = support.anchorAt(level, pos) ?: return null
         return Target(anchor, support.gameAt(level, anchor))
@@ -54,9 +59,11 @@ object Links {
                 return@thenAccept
             }
             val mayEdit = link == null || mayEdit(player, accounts.accounts, link)
+            val counter = player.level().getBlockState(target.pos).takeIf { target.game == null && it.`is`(ModContent.COUNTER.get()) }
+            val wood = counter?.takeIf { mayEdit }?.getValue(CounterBlock.WOOD)?.serializedName
             PacketDistributor.sendToPlayer(
                 player,
-                OpenLinkPayload(target.pos, target.game, link?.handle, link?.maxBet, link != null && mayEdit, if (mayEdit) options else emptyList()),
+                OpenLinkPayload(target.pos, target.game, link?.handle, link?.maxBet, link != null && mayEdit, if (mayEdit) options else emptyList(), wood),
             )
         }
     }
@@ -99,6 +106,39 @@ object Links {
             Casinos.refresh(server, handle)
             LnbEconomy.LOGGER.info("{} linked {} at {} to #{}", player.gameProfile.name, target.game ?: "counter", target.pos, handle)
             player.sendSystemMessage(Component.translatable("economy.lnbeconomy.link.done", Handles.display(handle)).withStyle(ChatFormatting.GREEN))
+        }
+    }
+
+    /**
+     * Rebuilds a counter's wall in another wood. Allowed to whoever may edit its link: an owner or member of its casino,
+     * or an operator; for a counter not linked yet, anyone who could link it to one of their casinos.
+     */
+    fun handleWood(payload: CounterWoodPayload, context: IPayloadContext) {
+        val player = context.player() as? ServerPlayer ?: return
+        val level = player.serverLevel()
+        val wood = CounterWood.byId(payload.wood) ?: return
+        if (!level.isLoaded(payload.pos) || player.distanceToSqr(payload.pos.center) > REACH * REACH) return
+        val master = level.getBlockState(payload.pos)
+        if (!master.`is`(ModContent.COUNTER.get()) || master.getValue(CounterBlock.PART) != CounterBlock.MASTER) return
+        val server = player.server
+        PlayerAccounts.refresh(server, player.uuid).thenAccept {
+            val accounts = PlayerAccounts.accounts(player.uuid)?.accounts
+            if (accounts == null) {
+                player.sendSystemMessage(Component.translatable("economy.lnbeconomy.problem.unavailable").withStyle(ChatFormatting.RED))
+                return@thenAccept
+            }
+            val link = CasinoLinks.get(server).get(level.dimension(), payload.pos)
+            val allowed = if (link != null) mayEdit(player, accounts, link) else player.hasPermissions(OPERATOR) || accounts.any(::mayLinkTo)
+            if (!allowed) {
+                player.sendSystemMessage(Component.translatable("economy.lnbeconomy.link.not_yours", Handles.display(link?.handle ?: "")).withStyle(ChatFormatting.RED))
+                return@thenAccept
+            }
+            val current = level.getBlockState(payload.pos)
+            if (!current.`is`(ModContent.COUNTER.get())) return@thenAccept
+            for ((_, p) in CounterBlock.allParts(payload.pos, current.getValue(CounterBlock.FACING))) {
+                val part = level.getBlockState(p)
+                if (part.`is`(ModContent.COUNTER.get())) level.setBlock(p, part.setValue(CounterBlock.WOOD, wood), Block.UPDATE_CLIENTS)
+            }
         }
     }
 

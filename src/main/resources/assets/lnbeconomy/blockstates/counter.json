@@ -1,5 +1,994 @@
 {
   "variants": {
-    "": { "model": "lnbeconomy:block/counter" }
+    "facing=north,part=0,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part0"
+    },
+    "facing=north,part=0,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part0"
+    },
+    "facing=north,part=0,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part0"
+    },
+    "facing=north,part=0,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part0"
+    },
+    "facing=north,part=0,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part0"
+    },
+    "facing=north,part=0,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part0"
+    },
+    "facing=north,part=0,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part0"
+    },
+    "facing=north,part=0,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part0"
+    },
+    "facing=north,part=0,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part0"
+    },
+    "facing=north,part=0,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part0"
+    },
+    "facing=north,part=0,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part0"
+    },
+    "facing=north,part=1,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part1"
+    },
+    "facing=north,part=1,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part1"
+    },
+    "facing=north,part=1,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part1"
+    },
+    "facing=north,part=1,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part1"
+    },
+    "facing=north,part=1,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part1"
+    },
+    "facing=north,part=1,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part1"
+    },
+    "facing=north,part=1,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part1"
+    },
+    "facing=north,part=1,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part1"
+    },
+    "facing=north,part=1,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part1"
+    },
+    "facing=north,part=1,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part1"
+    },
+    "facing=north,part=1,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part1"
+    },
+    "facing=north,part=2,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part2"
+    },
+    "facing=north,part=2,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part2"
+    },
+    "facing=north,part=2,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part2"
+    },
+    "facing=north,part=2,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part2"
+    },
+    "facing=north,part=2,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part2"
+    },
+    "facing=north,part=2,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part2"
+    },
+    "facing=north,part=2,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part2"
+    },
+    "facing=north,part=2,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part2"
+    },
+    "facing=north,part=2,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part2"
+    },
+    "facing=north,part=2,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part2"
+    },
+    "facing=north,part=2,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part2"
+    },
+    "facing=north,part=3,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part3"
+    },
+    "facing=north,part=3,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part3"
+    },
+    "facing=north,part=3,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part3"
+    },
+    "facing=north,part=3,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part3"
+    },
+    "facing=north,part=3,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part3"
+    },
+    "facing=north,part=3,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part3"
+    },
+    "facing=north,part=3,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part3"
+    },
+    "facing=north,part=3,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part3"
+    },
+    "facing=north,part=3,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part3"
+    },
+    "facing=north,part=3,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part3"
+    },
+    "facing=north,part=3,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part3"
+    },
+    "facing=north,part=4,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part4"
+    },
+    "facing=north,part=4,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part4"
+    },
+    "facing=north,part=4,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part4"
+    },
+    "facing=north,part=4,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part4"
+    },
+    "facing=north,part=4,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part4"
+    },
+    "facing=north,part=4,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part4"
+    },
+    "facing=north,part=4,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part4"
+    },
+    "facing=north,part=4,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part4"
+    },
+    "facing=north,part=4,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part4"
+    },
+    "facing=north,part=4,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part4"
+    },
+    "facing=north,part=4,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part4"
+    },
+    "facing=north,part=5,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part5"
+    },
+    "facing=north,part=5,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part5"
+    },
+    "facing=north,part=5,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part5"
+    },
+    "facing=north,part=5,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part5"
+    },
+    "facing=north,part=5,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part5"
+    },
+    "facing=north,part=5,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part5"
+    },
+    "facing=north,part=5,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part5"
+    },
+    "facing=north,part=5,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part5"
+    },
+    "facing=north,part=5,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part5"
+    },
+    "facing=north,part=5,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part5"
+    },
+    "facing=north,part=5,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part5"
+    },
+    "facing=east,part=0,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part0",
+      "y": 90
+    },
+    "facing=east,part=0,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part0",
+      "y": 90
+    },
+    "facing=east,part=0,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part0",
+      "y": 90
+    },
+    "facing=east,part=0,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part0",
+      "y": 90
+    },
+    "facing=east,part=0,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part0",
+      "y": 90
+    },
+    "facing=east,part=0,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part0",
+      "y": 90
+    },
+    "facing=east,part=0,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part0",
+      "y": 90
+    },
+    "facing=east,part=0,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part0",
+      "y": 90
+    },
+    "facing=east,part=0,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part0",
+      "y": 90
+    },
+    "facing=east,part=0,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part0",
+      "y": 90
+    },
+    "facing=east,part=0,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part0",
+      "y": 90
+    },
+    "facing=east,part=1,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part1",
+      "y": 90
+    },
+    "facing=east,part=1,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part1",
+      "y": 90
+    },
+    "facing=east,part=1,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part1",
+      "y": 90
+    },
+    "facing=east,part=1,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part1",
+      "y": 90
+    },
+    "facing=east,part=1,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part1",
+      "y": 90
+    },
+    "facing=east,part=1,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part1",
+      "y": 90
+    },
+    "facing=east,part=1,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part1",
+      "y": 90
+    },
+    "facing=east,part=1,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part1",
+      "y": 90
+    },
+    "facing=east,part=1,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part1",
+      "y": 90
+    },
+    "facing=east,part=1,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part1",
+      "y": 90
+    },
+    "facing=east,part=1,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part1",
+      "y": 90
+    },
+    "facing=east,part=2,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part2",
+      "y": 90
+    },
+    "facing=east,part=2,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part2",
+      "y": 90
+    },
+    "facing=east,part=2,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part2",
+      "y": 90
+    },
+    "facing=east,part=2,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part2",
+      "y": 90
+    },
+    "facing=east,part=2,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part2",
+      "y": 90
+    },
+    "facing=east,part=2,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part2",
+      "y": 90
+    },
+    "facing=east,part=2,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part2",
+      "y": 90
+    },
+    "facing=east,part=2,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part2",
+      "y": 90
+    },
+    "facing=east,part=2,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part2",
+      "y": 90
+    },
+    "facing=east,part=2,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part2",
+      "y": 90
+    },
+    "facing=east,part=2,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part2",
+      "y": 90
+    },
+    "facing=east,part=3,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part3",
+      "y": 90
+    },
+    "facing=east,part=3,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part3",
+      "y": 90
+    },
+    "facing=east,part=3,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part3",
+      "y": 90
+    },
+    "facing=east,part=3,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part3",
+      "y": 90
+    },
+    "facing=east,part=3,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part3",
+      "y": 90
+    },
+    "facing=east,part=3,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part3",
+      "y": 90
+    },
+    "facing=east,part=3,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part3",
+      "y": 90
+    },
+    "facing=east,part=3,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part3",
+      "y": 90
+    },
+    "facing=east,part=3,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part3",
+      "y": 90
+    },
+    "facing=east,part=3,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part3",
+      "y": 90
+    },
+    "facing=east,part=3,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part3",
+      "y": 90
+    },
+    "facing=east,part=4,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part4",
+      "y": 90
+    },
+    "facing=east,part=4,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part4",
+      "y": 90
+    },
+    "facing=east,part=4,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part4",
+      "y": 90
+    },
+    "facing=east,part=4,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part4",
+      "y": 90
+    },
+    "facing=east,part=4,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part4",
+      "y": 90
+    },
+    "facing=east,part=4,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part4",
+      "y": 90
+    },
+    "facing=east,part=4,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part4",
+      "y": 90
+    },
+    "facing=east,part=4,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part4",
+      "y": 90
+    },
+    "facing=east,part=4,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part4",
+      "y": 90
+    },
+    "facing=east,part=4,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part4",
+      "y": 90
+    },
+    "facing=east,part=4,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part4",
+      "y": 90
+    },
+    "facing=east,part=5,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part5",
+      "y": 90
+    },
+    "facing=east,part=5,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part5",
+      "y": 90
+    },
+    "facing=east,part=5,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part5",
+      "y": 90
+    },
+    "facing=east,part=5,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part5",
+      "y": 90
+    },
+    "facing=east,part=5,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part5",
+      "y": 90
+    },
+    "facing=east,part=5,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part5",
+      "y": 90
+    },
+    "facing=east,part=5,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part5",
+      "y": 90
+    },
+    "facing=east,part=5,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part5",
+      "y": 90
+    },
+    "facing=east,part=5,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part5",
+      "y": 90
+    },
+    "facing=east,part=5,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part5",
+      "y": 90
+    },
+    "facing=east,part=5,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part5",
+      "y": 90
+    },
+    "facing=south,part=0,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part0",
+      "y": 180
+    },
+    "facing=south,part=0,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part0",
+      "y": 180
+    },
+    "facing=south,part=0,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part0",
+      "y": 180
+    },
+    "facing=south,part=0,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part0",
+      "y": 180
+    },
+    "facing=south,part=0,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part0",
+      "y": 180
+    },
+    "facing=south,part=0,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part0",
+      "y": 180
+    },
+    "facing=south,part=0,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part0",
+      "y": 180
+    },
+    "facing=south,part=0,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part0",
+      "y": 180
+    },
+    "facing=south,part=0,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part0",
+      "y": 180
+    },
+    "facing=south,part=0,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part0",
+      "y": 180
+    },
+    "facing=south,part=0,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part0",
+      "y": 180
+    },
+    "facing=south,part=1,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part1",
+      "y": 180
+    },
+    "facing=south,part=1,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part1",
+      "y": 180
+    },
+    "facing=south,part=1,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part1",
+      "y": 180
+    },
+    "facing=south,part=1,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part1",
+      "y": 180
+    },
+    "facing=south,part=1,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part1",
+      "y": 180
+    },
+    "facing=south,part=1,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part1",
+      "y": 180
+    },
+    "facing=south,part=1,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part1",
+      "y": 180
+    },
+    "facing=south,part=1,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part1",
+      "y": 180
+    },
+    "facing=south,part=1,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part1",
+      "y": 180
+    },
+    "facing=south,part=1,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part1",
+      "y": 180
+    },
+    "facing=south,part=1,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part1",
+      "y": 180
+    },
+    "facing=south,part=2,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part2",
+      "y": 180
+    },
+    "facing=south,part=2,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part2",
+      "y": 180
+    },
+    "facing=south,part=2,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part2",
+      "y": 180
+    },
+    "facing=south,part=2,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part2",
+      "y": 180
+    },
+    "facing=south,part=2,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part2",
+      "y": 180
+    },
+    "facing=south,part=2,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part2",
+      "y": 180
+    },
+    "facing=south,part=2,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part2",
+      "y": 180
+    },
+    "facing=south,part=2,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part2",
+      "y": 180
+    },
+    "facing=south,part=2,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part2",
+      "y": 180
+    },
+    "facing=south,part=2,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part2",
+      "y": 180
+    },
+    "facing=south,part=2,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part2",
+      "y": 180
+    },
+    "facing=south,part=3,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part3",
+      "y": 180
+    },
+    "facing=south,part=3,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part3",
+      "y": 180
+    },
+    "facing=south,part=3,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part3",
+      "y": 180
+    },
+    "facing=south,part=3,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part3",
+      "y": 180
+    },
+    "facing=south,part=3,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part3",
+      "y": 180
+    },
+    "facing=south,part=3,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part3",
+      "y": 180
+    },
+    "facing=south,part=3,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part3",
+      "y": 180
+    },
+    "facing=south,part=3,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part3",
+      "y": 180
+    },
+    "facing=south,part=3,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part3",
+      "y": 180
+    },
+    "facing=south,part=3,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part3",
+      "y": 180
+    },
+    "facing=south,part=3,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part3",
+      "y": 180
+    },
+    "facing=south,part=4,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part4",
+      "y": 180
+    },
+    "facing=south,part=4,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part4",
+      "y": 180
+    },
+    "facing=south,part=4,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part4",
+      "y": 180
+    },
+    "facing=south,part=4,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part4",
+      "y": 180
+    },
+    "facing=south,part=4,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part4",
+      "y": 180
+    },
+    "facing=south,part=4,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part4",
+      "y": 180
+    },
+    "facing=south,part=4,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part4",
+      "y": 180
+    },
+    "facing=south,part=4,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part4",
+      "y": 180
+    },
+    "facing=south,part=4,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part4",
+      "y": 180
+    },
+    "facing=south,part=4,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part4",
+      "y": 180
+    },
+    "facing=south,part=4,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part4",
+      "y": 180
+    },
+    "facing=south,part=5,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part5",
+      "y": 180
+    },
+    "facing=south,part=5,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part5",
+      "y": 180
+    },
+    "facing=south,part=5,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part5",
+      "y": 180
+    },
+    "facing=south,part=5,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part5",
+      "y": 180
+    },
+    "facing=south,part=5,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part5",
+      "y": 180
+    },
+    "facing=south,part=5,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part5",
+      "y": 180
+    },
+    "facing=south,part=5,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part5",
+      "y": 180
+    },
+    "facing=south,part=5,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part5",
+      "y": 180
+    },
+    "facing=south,part=5,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part5",
+      "y": 180
+    },
+    "facing=south,part=5,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part5",
+      "y": 180
+    },
+    "facing=south,part=5,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part5",
+      "y": 180
+    },
+    "facing=west,part=0,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part0",
+      "y": 270
+    },
+    "facing=west,part=0,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part0",
+      "y": 270
+    },
+    "facing=west,part=0,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part0",
+      "y": 270
+    },
+    "facing=west,part=0,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part0",
+      "y": 270
+    },
+    "facing=west,part=0,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part0",
+      "y": 270
+    },
+    "facing=west,part=0,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part0",
+      "y": 270
+    },
+    "facing=west,part=0,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part0",
+      "y": 270
+    },
+    "facing=west,part=0,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part0",
+      "y": 270
+    },
+    "facing=west,part=0,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part0",
+      "y": 270
+    },
+    "facing=west,part=0,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part0",
+      "y": 270
+    },
+    "facing=west,part=0,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part0",
+      "y": 270
+    },
+    "facing=west,part=1,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part1",
+      "y": 270
+    },
+    "facing=west,part=1,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part1",
+      "y": 270
+    },
+    "facing=west,part=1,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part1",
+      "y": 270
+    },
+    "facing=west,part=1,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part1",
+      "y": 270
+    },
+    "facing=west,part=1,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part1",
+      "y": 270
+    },
+    "facing=west,part=1,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part1",
+      "y": 270
+    },
+    "facing=west,part=1,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part1",
+      "y": 270
+    },
+    "facing=west,part=1,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part1",
+      "y": 270
+    },
+    "facing=west,part=1,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part1",
+      "y": 270
+    },
+    "facing=west,part=1,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part1",
+      "y": 270
+    },
+    "facing=west,part=1,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part1",
+      "y": 270
+    },
+    "facing=west,part=2,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part2",
+      "y": 270
+    },
+    "facing=west,part=2,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part2",
+      "y": 270
+    },
+    "facing=west,part=2,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part2",
+      "y": 270
+    },
+    "facing=west,part=2,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part2",
+      "y": 270
+    },
+    "facing=west,part=2,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part2",
+      "y": 270
+    },
+    "facing=west,part=2,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part2",
+      "y": 270
+    },
+    "facing=west,part=2,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part2",
+      "y": 270
+    },
+    "facing=west,part=2,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part2",
+      "y": 270
+    },
+    "facing=west,part=2,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part2",
+      "y": 270
+    },
+    "facing=west,part=2,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part2",
+      "y": 270
+    },
+    "facing=west,part=2,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part2",
+      "y": 270
+    },
+    "facing=west,part=3,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part3",
+      "y": 270
+    },
+    "facing=west,part=3,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part3",
+      "y": 270
+    },
+    "facing=west,part=3,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part3",
+      "y": 270
+    },
+    "facing=west,part=3,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part3",
+      "y": 270
+    },
+    "facing=west,part=3,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part3",
+      "y": 270
+    },
+    "facing=west,part=3,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part3",
+      "y": 270
+    },
+    "facing=west,part=3,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part3",
+      "y": 270
+    },
+    "facing=west,part=3,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part3",
+      "y": 270
+    },
+    "facing=west,part=3,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part3",
+      "y": 270
+    },
+    "facing=west,part=3,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part3",
+      "y": 270
+    },
+    "facing=west,part=3,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part3",
+      "y": 270
+    },
+    "facing=west,part=4,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part4",
+      "y": 270
+    },
+    "facing=west,part=4,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part4",
+      "y": 270
+    },
+    "facing=west,part=4,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part4",
+      "y": 270
+    },
+    "facing=west,part=4,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part4",
+      "y": 270
+    },
+    "facing=west,part=4,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part4",
+      "y": 270
+    },
+    "facing=west,part=4,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part4",
+      "y": 270
+    },
+    "facing=west,part=4,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part4",
+      "y": 270
+    },
+    "facing=west,part=4,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part4",
+      "y": 270
+    },
+    "facing=west,part=4,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part4",
+      "y": 270
+    },
+    "facing=west,part=4,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part4",
+      "y": 270
+    },
+    "facing=west,part=4,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part4",
+      "y": 270
+    },
+    "facing=west,part=5,wood=oak": {
+      "model": "lnbeconomy:block/counter_oak_part5",
+      "y": 270
+    },
+    "facing=west,part=5,wood=spruce": {
+      "model": "lnbeconomy:block/counter_spruce_part5",
+      "y": 270
+    },
+    "facing=west,part=5,wood=birch": {
+      "model": "lnbeconomy:block/counter_birch_part5",
+      "y": 270
+    },
+    "facing=west,part=5,wood=jungle": {
+      "model": "lnbeconomy:block/counter_jungle_part5",
+      "y": 270
+    },
+    "facing=west,part=5,wood=acacia": {
+      "model": "lnbeconomy:block/counter_acacia_part5",
+      "y": 270
+    },
+    "facing=west,part=5,wood=dark_oak": {
+      "model": "lnbeconomy:block/counter_dark_oak_part5",
+      "y": 270
+    },
+    "facing=west,part=5,wood=mangrove": {
+      "model": "lnbeconomy:block/counter_mangrove_part5",
+      "y": 270
+    },
+    "facing=west,part=5,wood=cherry": {
+      "model": "lnbeconomy:block/counter_cherry_part5",
+      "y": 270
+    },
+    "facing=west,part=5,wood=bamboo": {
+      "model": "lnbeconomy:block/counter_bamboo_part5",
+      "y": 270
+    },
+    "facing=west,part=5,wood=crimson": {
+      "model": "lnbeconomy:block/counter_crimson_part5",
+      "y": 270
+    },
+    "facing=west,part=5,wood=warped": {
+      "model": "lnbeconomy:block/counter_warped_part5",
+      "y": 270
+    }
   }
 }

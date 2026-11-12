@@ -7,6 +7,7 @@ import fr.bde_teknantes.lnb.economy.casino.LinkToolItem
 import fr.bde_teknantes.lnb.economy.chip.ChipItem
 import fr.bde_teknantes.lnb.economy.chip.Denominations
 import fr.bde_teknantes.lnb.economy.counter.CounterBlock
+import fr.bde_teknantes.lnb.economy.counter.CounterBlockEntity
 import fr.bde_teknantes.lnb.economy.shop.ShopBlock
 import fr.bde_teknantes.lnb.economy.shop.ShopBlockEntity
 import fr.bde_teknantes.lnb.economy.shop.ShopMenu
@@ -53,10 +54,16 @@ object ModContent {
         ITEMS.registerItem("chip_$value", { properties -> ChipItem(value, properties) }, Item.Properties())
     }
 
+    /** A 3 x 2 wall (see CounterBlock): light passes around it, and pistons can't push it apart. */
     val COUNTER: DeferredBlock<CounterBlock> = BLOCKS.registerBlock("counter", ::CounterBlock,
-        BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED).strength(2.5f, 1200f).sound(SoundType.WOOD))
+        BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(2.5f, 1200f).sound(SoundType.WOOD).noOcclusion()
+            .pushReaction(PushReaction.BLOCK))
 
     val COUNTER_ITEM: DeferredItem<BlockItem> = ITEMS.registerSimpleBlockItem(COUNTER)
+
+    val COUNTER_ENTITY: Supplier<BlockEntityType<CounterBlockEntity>> = BLOCK_ENTITIES.register("counter", Supplier {
+        BlockEntityType.Builder.of(::CounterBlockEntity, COUNTER.get()).build(null)
+    })
 
     /** Breaking takes a while, explosions do nothing, and pistons can't push it. Only its owners break it (see Shops). */
     val SHOP: DeferredBlock<ShopBlock> = BLOCKS.registerBlock("shop", ::ShopBlock,

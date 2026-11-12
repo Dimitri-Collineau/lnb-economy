@@ -1,0 +1,140 @@
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "minecraft:block/dark_oak_planks",
+    "wood": "minecraft:block/dark_oak_planks",
+    "front": "lnbeconomy:block/counter_front",
+    "front_wolf": "lnbeconomy:block/counter_front_wolf",
+    "panel": "lnbeconomy:block/counter_panel",
+    "felt": "lnbeconomy:block/counter_felt",
+    "trim": "lnbeconomy:block/counter_trim"
+  },
+  "elements": [
+    {
+      "name": "cabinet_trim_-16",
+      "from": [
+        0,
+        0,
+        -0.02
+      ],
+      "to": [
+        16,
+        15,
+        -0.02
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.0,
+            1.0,
+            16.0,
+            16.0
+          ],
+          "texture": "#front"
+        }
+      }
+    },
+    {
+      "name": "cabinet_-16",
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        15,
+        4
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.0,
+            1.0,
+            16.0,
+            16.0
+          ],
+          "texture": "#wood"
+        },
+        "south": {
+          "uv": [
+            0.0,
+            1.0,
+            16.0,
+            16.0
+          ],
+          "texture": "#wood"
+        },
+        "down": {
+          "uv": [
+            0.0,
+            0.0,
+            16.0,
+            4.0
+          ],
+          "texture": "#wood"
+        },
+        "west": {
+          "uv": [
+            0.0,
+            1.0,
+            4.0,
+            16.0
+          ],
+          "texture": "#wood"
+        }
+      }
+    },
+    {
+      "name": "ledge_-16",
+      "from": [
+        0,
+        15,
+        -1
+      ],
+      "to": [
+        16,
+        16,
+        7
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.0,
+            12.5,
+            16.0,
+            13.5
+          ],
+          "texture": "#trim"
+        },
+        "south": {
+          "uv": [
+            0.0,
+            12.5,
+            16.0,
+            13.5
+          ],
+          "texture": "#trim"
+        },
+        "down": {
+          "uv": [
+            0.0,
+            0.0,
+            16.0,
+            8.0
+          ],
+          "texture": "#wood"
+        },
+        "west": {
+          "uv": [
+            0.0,
+            12.5,
+            8.0,
+            13.5
+          ],
+          "texture": "#trim"
+        }
+      }
+    }
+  ]
+}

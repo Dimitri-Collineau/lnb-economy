@@ -75,6 +75,7 @@ data class LinkOption(val handle: String, val name: String)
 /**
  * Server -> client: open the link screen for the machine or counter at [pos].
  * [game] is the machine's game, or null for a counter (which has no maximum bet).
+ * [wood] is a counter's current wood when the player may change it, else null.
  */
 data class OpenLinkPayload(
     val pos: BlockPos,
@@ -83,6 +84,7 @@ data class OpenLinkPayload(
     val maxBet: Long?,
     val mayUnlink: Boolean,
     val options: List<LinkOption>,
+    val wood: String?,
 ) : CustomPacketPayload {
     override fun type() = TYPE
 
@@ -99,6 +101,7 @@ data class OpenLinkPayload(
                     b.writeUtf(o.handle, 32)
                     b.writeUtf(o.name, 128)
                 }
+                buf.writeNullable(p.wood) { b, v -> b.writeUtf(v, 32) }
             },
             { buf ->
                 OpenLinkPayload(
@@ -108,6 +111,7 @@ data class OpenLinkPayload(
                     buf.readNullable { it.readVarLong() },
                     buf.readBoolean(),
                     buf.readCollection({ ArrayList(minOf(it, 256)) }) { b -> LinkOption(b.readUtf(32), b.readUtf(128)) },
+                    buf.readNullable { it.readUtf(32) },
                 )
             },
         )
@@ -127,6 +131,22 @@ data class LinkPayload(val pos: BlockPos, val handle: String?, val maxBet: Long?
                 buf.writeNullable(p.maxBet) { b, v -> b.writeVarLong(v) }
             },
             { buf -> LinkPayload(buf.readBlockPos(), buf.readNullable { it.readUtf(32) }, buf.readNullable { it.readVarLong() }) },
+        )
+    }
+}
+
+/** Client -> server: build the counter whose master is at [pos] in [wood] (a [fr.bde_teknantes.lnb.economy.counter.CounterWood] id). */
+data class CounterWoodPayload(val pos: BlockPos, val wood: String) : CustomPacketPayload {
+    override fun type() = TYPE
+
+    companion object {
+        val TYPE = CustomPacketPayload.Type<CounterWoodPayload>(LnbEconomy.id("counter_wood"))
+        val STREAM_CODEC: StreamCodec<FriendlyByteBuf, CounterWoodPayload> = StreamCodec.of(
+            { buf, p ->
+                buf.writeBlockPos(p.pos)
+                buf.writeUtf(p.wood, 32)
+            },
+            { buf -> CounterWoodPayload(buf.readBlockPos(), buf.readUtf(32)) },
         )
     }
 }

@@ -58,6 +58,7 @@ object Counters {
         PlayerAccounts.refresh(player.server, player.uuid, force = false)
         Casinos.refresh(player.server, link.handle)
         PacketDistributor.sendToPlayer(player, OpenCounterPayload(pos, link.handle, Casinos.name(link.handle)))
+        teller(player, pos)?.greet()
     }
 
     fun handleBuy(payload: CounterBuyPayload, context: IPayloadContext) {
@@ -70,6 +71,7 @@ object Counters {
             error(player, Component.translatable("economy.lnbeconomy.problem.notAllowed"))
             return
         }
+        teller(player, payload.pos)?.count()
         TransferJournal.submit(
             from = Party(player = player.uuid.toString(), account = payload.accountId),
             to = Party(account = handle),
@@ -90,6 +92,7 @@ object Counters {
             error(player, Component.translatable("economy.lnbeconomy.counter.no_chips", Handles.display(handle)))
             return
         }
+        teller(player, payload.pos)?.count()
         // The chips are gone from now on; they come back if the site refuses.
         ChipLedger.get(player.server).add(handle, -value)
         TransferJournal.submit(
@@ -112,6 +115,7 @@ object Counters {
             error(player, Component.translatable("economy.lnbeconomy.counter.no_chips", Handles.display(handle)))
             return
         }
+        teller(player, payload.pos)?.count()
         ItemMailbox.deliver(player.server, player.uuid, Chips.make(handle, value, payload.largest))
         player.sendSystemMessage(Component.translatable("economy.lnbeconomy.counter.changed", Texts.amount(value, player)))
     }
@@ -160,6 +164,9 @@ object Counters {
             }
         }
     }
+
+    /** The teller of the counter whose master is at [pos], to animate. */
+    private fun teller(player: ServerPlayer, pos: BlockPos): CounterBlockEntity? = player.serverLevel().getBlockEntity(pos) as? CounterBlockEntity
 
     /** The casino of the counter at [pos], if the player can reach it. */
     private fun casinoAt(player: ServerPlayer, pos: BlockPos): String? {

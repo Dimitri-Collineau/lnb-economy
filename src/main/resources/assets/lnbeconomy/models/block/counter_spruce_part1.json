@@ -1,0 +1,7 @@
+{
+  "parent": "lnbeconomy:block/counter_part1",
+  "textures": {
+    "wood": "minecraft:block/spruce_planks",
+    "particle": "minecraft:block/spruce_planks"
+  }
+}

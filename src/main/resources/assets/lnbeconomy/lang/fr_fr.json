@@ -117,6 +117,7 @@
   "gui.lnbeconomy.link.max_bet.none": "Pas d’autre limite que le solde libre du casino",
   "gui.lnbeconomy.link.none": "Non liée : elle refuse toute partie.",
   "gui.lnbeconomy.link.save": "Lier",
+  "gui.lnbeconomy.link.wood": "Bois du guichet",
   "gui.lnbeconomy.link.unlink": "Délier",
   "item.lnbeconomy.casino_link_tool": "Baguette de liaison du casino",
   "item.lnbeconomy.casino_link_tool.usage": "Clic droit sur une machine ou un guichet pour choisir son casino.",
