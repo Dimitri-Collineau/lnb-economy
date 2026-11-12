@@ -1,1 +1,8 @@
-{ "variants": { "": { "model": "lnbeconomy:block/auction_house" } } }
+{
+  "variants": {
+    "facing=north": { "model": "lnbeconomy:block/auction_house" },
+    "facing=east": { "model": "lnbeconomy:block/auction_house", "y": 90 },
+    "facing=south": { "model": "lnbeconomy:block/auction_house", "y": 180 },
+    "facing=west": { "model": "lnbeconomy:block/auction_house", "y": 270 }
+  }
+}
