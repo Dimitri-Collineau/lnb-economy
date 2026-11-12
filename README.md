@@ -85,6 +85,16 @@ Push a tag `vX.Y.Z` and the CI builds the mod as version `X.Y.Z`, then publishes
 release. Players download that jar instead of building the mod. The release holds only this mod: LNB Warden, MineVegas
 Casino, Kotlin for Forge and GeckoLib are installed separately. A tag fails the CI when `MINEVEGAS_JAR_URL` is not set.
 
+## Not done yet
+
+- **Shared accounts in game.** They are created, joined and closed on the site only. The mod can't do it, because the
+  Minecraft server's routes (`/api/economy/server`) have no account creation or invitation. It needs new routes in
+  `lnb-website` and a command or screen here (for example `/account create <handle> <name>`, with a clickable invitation
+  message).
+- **The auctioneer's look.** The NPC still wears the plain vanilla villager texture. The plan is a clothing overlay on
+  top of it, like the counter's teller: dark suit, waistcoat, crimson bow tie, gold monocle. A gavel in its hand would
+  need GeckoLib.
+
 ## License
 
 AGPL-3.0-or-later, like LNB Warden and the site.
