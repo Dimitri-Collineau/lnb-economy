@@ -23,6 +23,9 @@ object CasinoUi {
     val TEXT_FIELD = sprite("text_field")
     val TEXT_FIELD_HIGHLIGHTED = sprite("text_field_highlighted")
     val PAGE_FORWARD = sprite("page_forward")
+    val SLOT = sprite("slot")
+    val LIGHT_ON = sprite("light_on")
+    val LIGHT_OFF = sprite("light_off")
 
     /** Normal, highlighted (hovered or focused) and disabled sprites of a button family. */
     class ButtonSprites(name: String) {

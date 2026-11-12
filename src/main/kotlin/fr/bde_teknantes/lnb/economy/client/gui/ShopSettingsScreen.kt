@@ -1,16 +1,14 @@
 package fr.bde_teknantes.lnb.economy.client.gui
 
 import fr.bde_teknantes.lnb.economy.client.ClientEconomy
-import fr.bde_teknantes.lnb.economy.network.AccountEntry
 import fr.bde_teknantes.lnb.economy.network.ShopSavePayload
 import fr.bde_teknantes.lnb.economy.shop.ShopBlockEntity
 import fr.bde_teknantes.lnb.economy.shop.ShopMenu
 import fr.bde_teknantes.lnb.economy.shop.ShopSettings
-import net.minecraft.ChatFormatting
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.Button
-import net.minecraft.client.gui.components.CycleButton
 import net.minecraft.client.gui.components.EditBox
+import net.minecraft.client.gui.components.Tooltip
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
@@ -18,67 +16,81 @@ import net.minecraft.world.entity.player.Inventory
 import net.neoforged.neoforge.network.PacketDistributor
 
 /**
- * A shop as its owners see it: the stock, the item it sells (click the template slot with an item to pick it), and its
- * prices and account. Saving sends everything to the site. Its look is temporary.
+ * A shop as its owners see it: the stock and their inventory on the left, laid out like a chest, and on the right the
+ * item it sells (click the template slot with an item to pick it), its prices and the account that cashes the sales.
+ * Saving sends everything to the site.
  */
 class ShopSettingsScreen(menu: ShopMenu, inventory: Inventory, title: Component) :
     AbstractContainerScreen<ShopMenu>(menu, inventory, title) {
     private companion object {
-        val CHEST: ResourceLocation = ResourceLocation.withDefaultNamespace("textures/gui/container/generic_54.png")
-        const val CHEST_WIDTH = 176
-        const val PANEL_WIDTH = 132
-        const val FIELD_X = CHEST_WIDTH + 6
-        const val FIELD_WIDTH = PANEL_WIDTH - 12
+        const val CHEST_WIDTH = 182
+        const val SIDE_WIDTH = 128
+        const val SIDE_X = CHEST_WIDTH
+        const val SIDE_Y = 10
+        const val FIELD_X = SIDE_X + 6
+        const val FIELD_WIDTH = SIDE_WIDTH - 22
+        const val FIELD_HEIGHT = 14
+        const val FIRST_LABEL_Y = 50
+        const val LABEL_STEP = 26
+        const val ACCOUNT_Y = 153
+        const val SAVE_Y = 173
         const val DEFAULT_CAP = ShopBlockEntity.SLOTS * 64
+        const val GREEN = 0xFF78E68C.toInt()
+        const val RED = 0xFFFF6060.toInt()
     }
+
+    /** The status light, its text and the text's color. */
+    private data class Status(val light: ResourceLocation, val text: Component, val color: Int)
 
     private lateinit var lotSize: EditBox
     private lateinit var sellPrice: EditBox
     private lateinit var buyPrice: EditBox
     private lateinit var buyCap: EditBox
-    private var account: CycleButton<AccountEntry>? = null
+    private val fields = mutableListOf<EditBox>()
+    private var account: AccountSelector? = null
     private lateinit var save: Button
 
-    private val language: String get() = minecraft?.options?.languageCode ?: "en_us"
-
     init {
-        imageWidth = CHEST_WIDTH + PANEL_WIDTH
-        imageHeight = 166
-        inventoryLabelY = imageHeight - 94
+        imageWidth = CHEST_WIDTH + SIDE_WIDTH
+        imageHeight = 206
     }
 
     override fun init() {
         super.init()
+        fields.clear()
         val settings = menu.setup.settings
-        lotSize = field(44, settings?.lotSize?.toString() ?: "1", 2)
-        sellPrice = field(70, settings?.sellPrice?.toString().orEmpty(), 13)
-        buyPrice = field(96, settings?.buyPrice?.toString().orEmpty(), 13)
-        buyCap = field(122, (settings?.buyCap ?: DEFAULT_CAP).toString(), 5)
+        lotSize = field(0, settings?.lotSize?.toString() ?: "1", 2)
+        sellPrice = field(1, settings?.sellPrice?.toString().orEmpty(), 13)
+        buyPrice = field(2, settings?.buyPrice?.toString().orEmpty(), 13)
+        buyPrice.setHint(Component.translatable("gui.lnbeconomy.shop.buy_price.none").withColor(CasinoUi.HINT))
+        buyCap = field(3, (settings?.buyCap ?: DEFAULT_CAP).toString(), 5)
+        buyCap.setTooltip(Tooltip.create(Component.translatable("gui.lnbeconomy.shop.buy_cap.hint")))
 
         val spendable = ClientEconomy.snapshot.accounts.filter { it.canSpend }
         val initial = spendable.firstOrNull { it.id == menu.setup.accountId }
             ?: ClientEconomy.snapshot.defaultAccount?.takeIf { it in spendable }
             ?: spendable.firstOrNull()
         account = initial?.let {
-            addRenderableWidget(
-                CycleButton.builder<AccountEntry> { entry -> accountLabel(entry) }
-                    .withValues(spendable)
-                    .withInitialValue(it)
-                    .displayOnlyValue()
-                    .create(leftPos + FIELD_X, topPos + 146, FIELD_WIDTH, 16, Component.translatable("gui.lnbeconomy.shop.sells_for")),
-            )
+            val selector = AccountSelector(leftPos + FIELD_X, topPos + ACCOUNT_Y, FIELD_WIDTH, 16, spendable, it, AccountSelector::name, showBalance = false)
+            selector.setTooltip(Tooltip.create(Component.translatable("gui.lnbeconomy.shop.sells_for")))
+            addRenderableWidget(selector)
         }
         save = addRenderableWidget(
-            Button.builder(Component.translatable("gui.lnbeconomy.shop.save")) { save() }
-                .bounds(leftPos + FIELD_X, topPos + 166, FIELD_WIDTH, 18).build(),
+            CasinoButton.primary(Component.translatable("gui.lnbeconomy.shop.save")) { save() }
+                .bounds(leftPos + FIELD_X, topPos + SAVE_Y, FIELD_WIDTH, 18).build(),
         )
     }
 
-    private fun field(y: Int, value: String, maxLength: Int): EditBox {
-        val box = EditBox(font, leftPos + FIELD_X, topPos + y, FIELD_WIDTH, 14, Component.empty())
+    /** The [index]th setting: a borderless box on the sunken field sprite drawn by [renderBg]. */
+    private fun field(index: Int, value: String, maxLength: Int): EditBox {
+        val y = FIRST_LABEL_Y + index * LABEL_STEP + 10
+        val box = EditBox(font, leftPos + FIELD_X + 4, topPos + y + 3, FIELD_WIDTH - 8, 10, Component.empty())
+        box.setBordered(false)
+        box.setTextColor(CasinoUi.IVORY)
         box.setMaxLength(maxLength)
         box.setFilter { text -> text.all(Char::isDigit) }
         box.value = value
+        fields += box
         return addRenderableWidget(box)
     }
 
@@ -112,40 +124,41 @@ class ShopSettingsScreen(menu: ShopMenu, inventory: Inventory, title: Component)
     }
 
     override fun renderBg(graphics: GuiGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
-        val rows = 3
-        graphics.blit(CHEST, leftPos, topPos, 0, 0, CHEST_WIDTH, rows * 18 + 17)
-        graphics.blit(CHEST, leftPos, topPos + rows * 18 + 17, 0, 126, CHEST_WIDTH, 96)
-        graphics.fill(leftPos + CHEST_WIDTH, topPos, leftPos + imageWidth, topPos + 190, 0xE0202020.toInt())
-        // The template slot's frame.
-        graphics.fill(leftPos + ShopMenu.TEMPLATE_X - 1, topPos + ShopMenu.TEMPLATE_Y - 1, leftPos + ShopMenu.TEMPLATE_X + 17, topPos + ShopMenu.TEMPLATE_Y + 17, 0xFF8B8B8B.toInt())
-        graphics.fill(leftPos + ShopMenu.TEMPLATE_X, topPos + ShopMenu.TEMPLATE_Y, leftPos + ShopMenu.TEMPLATE_X + 16, topPos + ShopMenu.TEMPLATE_Y + 16, 0xFF373737.toInt())
+        CasinoUi.panel(graphics, leftPos, topPos, imageWidth, imageHeight)
+        for (slot in menu.slots) {
+            if (slot.index == ShopMenu.TEMPLATE_SLOT) continue
+            graphics.blitSprite(CasinoUi.SLOT, leftPos + slot.x - 1, topPos + slot.y - 1, 18, 18)
+        }
+        graphics.blitSprite(CasinoUi.PANEL_INSET, leftPos + SIDE_X, topPos + SIDE_Y, SIDE_WIDTH - 12, imageHeight - 22)
+        // The template slot is framed in gold: it holds a copy, not a real item.
+        graphics.blitSprite(CasinoUi.SECONDARY.highlighted, leftPos + ShopMenu.TEMPLATE_X - 2, topPos + ShopMenu.TEMPLATE_Y - 2, 20, 20)
+        for (box in fields) {
+            val sprite = if (box.isFocused) CasinoUi.TEXT_FIELD_HIGHLIGHTED else CasinoUi.TEXT_FIELD
+            graphics.blitSprite(sprite, leftPos + FIELD_X, box.y - 3, FIELD_WIDTH, FIELD_HEIGHT)
+        }
+        graphics.blitSprite(status().light, leftPos + ShopMenu.TEMPLATE_X + 24, topPos + ShopMenu.TEMPLATE_Y + 5, 7, 7)
     }
 
     override fun renderLabels(graphics: GuiGraphics, mouseX: Int, mouseY: Int) {
-        super.renderLabels(graphics, mouseX, mouseY)
-        val x = FIELD_X
-        graphics.drawString(font, Component.translatable("gui.lnbeconomy.shop.item"), x, 6, 0xFFFFFF, false)
-        graphics.drawString(font, status(), ShopMenu.TEMPLATE_X + 22, ShopMenu.TEMPLATE_Y + 4, 0xA0A0A0, false)
-        graphics.drawString(font, Component.translatable("gui.lnbeconomy.shop.lot_size"), x, 35, 0xFFFFFF, false)
-        graphics.drawString(font, Component.translatable("gui.lnbeconomy.shop.sell_price"), x, 61, 0xFFFFFF, false)
-        graphics.drawString(font, Component.translatable("gui.lnbeconomy.shop.buy_price"), x, 87, 0xFFFFFF, false)
-        graphics.drawString(font, Component.translatable("gui.lnbeconomy.shop.buy_cap"), x, 113, 0xFFFFFF, false)
-        graphics.drawString(font, Component.translatable("gui.lnbeconomy.shop.sells_for"), x, 137, 0xFFFFFF, false)
+        val stockTitle = Component.translatable("gui.lnbeconomy.shop.stock_title")
+        CasinoUi.title(graphics, font, stockTitle, 12 + font.width(stockTitle) / 2, 9)
+        graphics.drawString(font, playerInventoryTitle, 12, 89, CasinoUi.DIM, true)
+        graphics.drawString(font, Component.translatable("gui.lnbeconomy.shop.item"), FIELD_X, 13, CasinoUi.GOLD_TEXT, true)
+        val status = status()
+        graphics.drawString(font, status.text, ShopMenu.TEMPLATE_X + 34, ShopMenu.TEMPLATE_Y + 4, status.color, true)
+        listOf("lot_size", "sell_price", "buy_price", "buy_cap").forEachIndexed { i, key ->
+            graphics.drawString(font, Component.translatable("gui.lnbeconomy.shop.$key"), FIELD_X, FIRST_LABEL_Y + i * LABEL_STEP, CasinoUi.DIM, true)
+        }
     }
 
-    private fun status(): Component = when {
-        menu.setup.offOnSite -> Component.translatable("gui.lnbeconomy.shop.status.off").withStyle(ChatFormatting.RED)
-        !menu.setup.registered -> Component.translatable("gui.lnbeconomy.shop.status.unsaved").withStyle(ChatFormatting.GOLD)
-        else -> Component.translatable("gui.lnbeconomy.shop.status.open").withStyle(ChatFormatting.GREEN)
+    private fun status(): Status = when {
+        menu.setup.offOnSite -> Status(CasinoUi.LIGHT_OFF, Component.translatable("gui.lnbeconomy.shop.status.off"), RED)
+        !menu.setup.registered -> Status(CasinoUi.LIGHT_OFF, Component.translatable("gui.lnbeconomy.shop.status.unsaved"), CasinoUi.GOLD_TEXT)
+        else -> Status(CasinoUi.LIGHT_ON, Component.translatable("gui.lnbeconomy.shop.status.open"), GREEN)
     }
 
     override fun render(graphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
         super.render(graphics, mouseX, mouseY, partialTick)
         renderTooltip(graphics, mouseX, mouseY)
-    }
-
-    private fun accountLabel(account: AccountEntry): Component {
-        val name = if (account.isPersonal) Component.translatable("gui.lnbeconomy.accounts.personal").string else "#${account.handle}"
-        return Component.literal("$name  ").append(Lnbit.compact(account.balance, language))
     }
 }

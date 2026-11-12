@@ -74,15 +74,15 @@ class ShopMenu(
         })
         for (row in 0 until 3) {
             for (column in 0 until 9) {
-                addSlot(object : Slot(stock, column + row * 9, 8 + column * 18, 18 + row * 18) {
+                addSlot(object : Slot(stock, column + row * 9, SLOTS_X + column * 18, STOCK_Y + row * 18) {
                     override fun mayPlace(stack: ItemStack): Boolean = Stock.matches(template.getItem(0), stack)
                 })
             }
         }
         for (row in 0 until 3) {
-            for (column in 0 until 9) addSlot(Slot(playerInventory, column + row * 9 + 9, 8 + column * 18, 84 + row * 18))
+            for (column in 0 until 9) addSlot(Slot(playerInventory, column + row * 9 + 9, SLOTS_X + column * 18, INVENTORY_Y + row * 18))
         }
-        for (column in 0 until 9) addSlot(Slot(playerInventory, column, 8 + column * 18, 142))
+        for (column in 0 until 9) addSlot(Slot(playerInventory, column, SLOTS_X + column * 18, HOTBAR_Y))
     }
 
     val templateItem: ItemStack get() = template.getItem(0)
@@ -126,7 +126,12 @@ class ShopMenu(
         const val FIRST_PLAYER_SLOT = FIRST_STOCK_SLOT + ShopBlockEntity.SLOTS
 
         /** The template slot sits in the settings panel, right of the chest. */
-        const val TEMPLATE_X = 186
-        const val TEMPLATE_Y = 18
+        // Where the slots sit in the owner's screen (see ShopSettingsScreen).
+        const val SLOTS_X = 11
+        const val STOCK_Y = 22
+        const val INVENTORY_Y = 100
+        const val HOTBAR_Y = 159
+        const val TEMPLATE_X = 190
+        const val TEMPLATE_Y = 26
     }
 }
