@@ -43,6 +43,24 @@ the mod on a player's computer only talks to the server. The contract is `docs/e
 - **Reliability.** Every money move is written to `<world>/data/lnbeconomy_journal.json` before it is sent, and sent
   again with the same idempotency key until the site answers, after a restart too.
 
+## Installing (Prism Launcher)
+
+Create an instance with **Minecraft 1.21.1** and the **NeoForge 21.1.264 or newer** loader (tested on 21.1.265), with
+Java 21. Then put these jars in the instance's `mods/` folder. The same mods go on the server, except where noted.
+
+| Mod                    | Version                          | Needed                                                        |
+|------------------------|----------------------------------|---------------------------------------------------------------|
+| LNB Economy            | this mod, from the [releases][r] | required, on the server and on the players' computers         |
+| LNB Warden             | 0.1.0 or newer                   | required, on the server and on the players' computers         |
+| Kotlin for Forge       | 5.12 or newer                    | required                                                      |
+| GeckoLib               | 4.9 or newer (tested on 4.9.3)   | required: the counter's teller is animated with it            |
+| MineVegas Casino       | 1.1.1 up to, not including, 1.2  | optional: its machines then take only the chips of their casino |
+
+[r]: https://github.com/Dimitri-Collineau/lnb-economy/releases
+
+The server also needs LNB Warden's `api.url` and `api.token` (see Configuration). Without a linked LNB account, a
+player has no economy.
+
 ## Configuration
 
 The site's URL and the server's token are LNB Warden's: `api.url` and `api.token` in `config/lnbwarden-server.toml`.
