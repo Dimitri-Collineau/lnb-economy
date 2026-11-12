@@ -10,7 +10,8 @@ import net.minecraft.world.level.saveddata.SavedData
 import java.util.UUID
 
 /**
- * Players who turned off the chat message sent to a shop's owners and members at each sale (`/economy notify off`).
+ * Players who turned off the chat messages about their sales (`/economy notify off`): the one sent to a shop's owners
+ * and members at each order, and the one sent to the seller of an auction house listing.
  * Stored in the overworld's data folder as `lnbeconomy_notices.dat`.
  */
 class ShopNotices private constructor() : SavedData() {

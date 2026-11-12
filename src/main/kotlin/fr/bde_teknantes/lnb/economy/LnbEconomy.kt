@@ -71,6 +71,7 @@ class LnbEconomy(modBus: IEventBus, container: ModContainer) {
         NeoForge.EVENT_BUS.addListener(ItemMailbox::registerCommands)
         NeoForge.EVENT_BUS.addListener(Trades::registerCommands)
         NeoForge.EVENT_BUS.addListener(Auctions::registerCommands)
+        NeoForge.EVENT_BUS.addListener(Auctions::onLoggedIn)
         NeoForge.EVENT_BUS.addListener(Auctions::onLoggedOut)
         NeoForge.EVENT_BUS.addListener(Trades::onServerTick)
         NeoForge.EVENT_BUS.addListener(Trades::onLoggedOut)

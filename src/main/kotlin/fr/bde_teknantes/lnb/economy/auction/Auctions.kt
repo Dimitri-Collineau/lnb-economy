@@ -11,8 +11,10 @@ import fr.bde_teknantes.lnb.economy.api.ListingBuyBody
 import fr.bde_teknantes.lnb.economy.api.ListingBuyResult
 import fr.bde_teknantes.lnb.economy.api.MailboxView
 import fr.bde_teknantes.lnb.economy.api.Problems
+import fr.bde_teknantes.lnb.economy.api.SaleView
 import fr.bde_teknantes.lnb.economy.api.ServerListing
 import fr.bde_teknantes.lnb.economy.api.ShopItem
+import fr.bde_teknantes.lnb.economy.api.ShopItemView
 import fr.bde_teknantes.lnb.economy.item.Escrow
 import fr.bde_teknantes.lnb.economy.item.ItemStacks
 import fr.bde_teknantes.lnb.economy.ledger.JournalEntry
@@ -29,6 +31,7 @@ import fr.bde_teknantes.lnb.economy.network.AuctionMailboxPayload
 import fr.bde_teknantes.lnb.economy.network.AuctionRequestPayload
 import fr.bde_teknantes.lnb.economy.network.AuctionSellPayload
 import fr.bde_teknantes.lnb.economy.network.OpenAuctionPayload
+import fr.bde_teknantes.lnb.economy.shop.ShopNotices
 import fr.bde_teknantes.lnb.warden.common.api.ApiResult
 import net.minecraft.ChatFormatting
 import net.minecraft.commands.Commands
@@ -272,7 +275,43 @@ object Auctions {
                         .withStyle(ChatFormatting.GREEN),
                 )
                 claim(uuid, bought.mailboxItem.id)
+                bought.sellerUserId?.let { seller ->
+                    val buyer = player?.gameProfile?.name ?: server.profileCache?.get(uuid)?.orElse(null)?.name
+                    val sale = SaleView(bought.listingId, ShopItemView(bought.mailboxItem.item.id, bought.mailboxItem.item.name), bought.mailboxItem.count, result.amount, bought.tax, buyer, null)
+                    PlayerAccounts.onlineOf(server, seller).firstOrNull()?.let { tellSales(it, listOf(sale)) }
+                }
             }
+        }
+    }
+
+    /**
+     * Tells [seller] about listings of theirs that sold, then marks them as told on the site, so each sale is
+     * announced once: right away when the seller is on, else when they next join. Players who turned notices off
+     * (`/economy notify off`) get no message, and the sales still count as told.
+     */
+    private fun tellSales(seller: ServerPlayer, sales: List<SaleView>) {
+        if (sales.isEmpty()) return
+        if (ShopNotices.get(seller.server).wants(seller.uuid)) {
+            for (sale in sales) {
+                val buyer = sale.buyer?.takeIf { it.isNotBlank() }
+                val earned = Texts.amount(sale.price - sale.tax, seller)
+                val message = if (buyer != null) Component.translatable("economy.lnbeconomy.auction.sold", buyer, sale.count, sale.item.name, earned)
+                else Component.translatable("economy.lnbeconomy.auction.sold.anonymous", sale.count, sale.item.name, earned)
+                if (sale.tax > 0) message.append(" ").append(Component.translatable("economy.lnbeconomy.auction.sold.tax", Texts.amount(sale.tax, seller)).withStyle(ChatFormatting.GRAY))
+                seller.sendSystemMessage(message.withStyle(ChatFormatting.GOLD))
+            }
+            seller.playNotifySound(SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.6f, 0.8f)
+        }
+        EconomyApi.salesSeen(seller.uuid, sales.map { it.listingId })
+    }
+
+    /** Sales made while the seller was away are announced when they join. */
+    fun onLoggedIn(event: PlayerEvent.PlayerLoggedInEvent) {
+        val player = event.entity as? ServerPlayer ?: return
+        val server = player.server
+        EconomyApi.unseenSales(player.uuid).thenAccept { result ->
+            if (result !is ApiResult.Ok) return@thenAccept
+            server.execute { if (!player.hasDisconnected()) tellSales(player, result.body.items) }
         }
     }
 

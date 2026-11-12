@@ -188,8 +188,8 @@
   "economy.lnbeconomy.problem.shopDisabled": "Ce shop a été fermé par un admin.",
   "economy.lnbeconomy.problem.priceChanged": "Le prix a changé : regarde à nouveau avant de commander.",
   "economy.lnbeconomy.problem.noBuyBack": "Ce shop ne rachète pas.",
-  "commands.lnbeconomy.notify.on": "Tu recevras un message quand quelqu’un achète dans tes shops ou leur vend.",
-  "commands.lnbeconomy.notify.off": "Tu ne recevras plus de message sur les ventes de tes shops.",
+  "commands.lnbeconomy.notify.on": "Tu recevras un message quand quelqu’un achète ou vend à tes boutiques, et quand une de tes annonces de l’hôtel des ventes se vend.",
+  "commands.lnbeconomy.notify.off": "Tu ne recevras plus de messages sur les ventes de tes boutiques et de l’hôtel des ventes.",
   "key.lnbeconomy.trade": "Échanger avec le joueur en face",
   "key.categories.lnbeconomy": "LNB Economy",
   "gui.lnbeconomy.trade.title": "Échange avec %s",
@@ -332,5 +332,8 @@
   "gui.lnbeconomy.members.invite": "Inviter un joueur",
   "gui.lnbeconomy.members.invite.online": "en ligne",
   "gui.lnbeconomy.members.invite.away": "absent",
-  "economy.lnbeconomy.casino.not_casino": "%s n’est pas un casino : son compte n’a pas de licence de casino."
+  "economy.lnbeconomy.casino.not_casino": "%s n’est pas un casino : son compte n’a pas de licence de casino.",
+  "economy.lnbeconomy.auction.sold": "%s a acheté tes %s × %s à l’hôtel des ventes : +%s.",
+  "economy.lnbeconomy.auction.sold.anonymous": "Tes %s × %s se sont vendus à l’hôtel des ventes : +%s.",
+  "economy.lnbeconomy.auction.sold.tax": "(taxe : %s)"
 }

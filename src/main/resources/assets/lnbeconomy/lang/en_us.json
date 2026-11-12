@@ -188,8 +188,8 @@
   "economy.lnbeconomy.problem.shopDisabled": "This shop was turned off by an admin.",
   "economy.lnbeconomy.problem.priceChanged": "The price changed: look again before ordering.",
   "economy.lnbeconomy.problem.noBuyBack": "This shop doesn’t buy back.",
-  "commands.lnbeconomy.notify.on": "You’ll get a message when someone buys from or sells to your shops.",
-  "commands.lnbeconomy.notify.off": "You won’t get messages about your shops’ sales any more.",
+  "commands.lnbeconomy.notify.on": "You’ll get a message when someone buys from or sells to your shops, and when one of your auction house listings sells.",
+  "commands.lnbeconomy.notify.off": "You won’t get messages about your shops’ and your auction house sales any more.",
   "key.lnbeconomy.trade": "Trade with the player in front of you",
   "key.categories.lnbeconomy": "LNB Economy",
   "gui.lnbeconomy.trade.title": "Trade with %s",
@@ -332,5 +332,8 @@
   "gui.lnbeconomy.members.invite": "Invite a player",
   "gui.lnbeconomy.members.invite.online": "online",
   "gui.lnbeconomy.members.invite.away": "away",
-  "economy.lnbeconomy.casino.not_casino": "%s isn’t a casino: its account has no casino licence."
+  "economy.lnbeconomy.casino.not_casino": "%s isn’t a casino: its account has no casino licence.",
+  "economy.lnbeconomy.auction.sold": "%s bought your %s × %s at the auction house: +%s.",
+  "economy.lnbeconomy.auction.sold.anonymous": "Your %s × %s sold at the auction house: +%s.",
+  "economy.lnbeconomy.auction.sold.tax": "(tax: %s)"
 }
