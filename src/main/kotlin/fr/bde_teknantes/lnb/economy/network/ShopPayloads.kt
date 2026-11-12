@@ -10,7 +10,8 @@ import net.minecraft.world.item.ItemStack
 
 /**
  * Server -> client: a shop as a customer sees it. [buyPrice] 0 means it doesn't buy back; [room] is how many items it
- * would still buy. With [refresh], only updates a shop screen already open.
+ * would still buy. With [refresh], only updates a shop screen already open. A [buying] shop sells nothing: customers
+ * only bring it items.
  */
 data class OpenShopPayload(
     val pos: BlockPos,
@@ -22,6 +23,7 @@ data class OpenShopPayload(
     val room: Int,
     val seller: String,
     val refresh: Boolean,
+    val buying: Boolean = false,
 ) : CustomPacketPayload {
     override fun type() = TYPE
 
@@ -38,11 +40,12 @@ data class OpenShopPayload(
                 buf.writeVarInt(p.room)
                 buf.writeUtf(p.seller, 64)
                 buf.writeBoolean(p.refresh)
+                buf.writeBoolean(p.buying)
             },
             { buf ->
                 OpenShopPayload(
                     buf.readBlockPos(), ItemStack.STREAM_CODEC.decode(buf), buf.readVarInt(), buf.readVarLong(), buf.readVarLong(),
-                    buf.readVarInt(), buf.readVarInt(), buf.readUtf(64), buf.readBoolean(),
+                    buf.readVarInt(), buf.readVarInt(), buf.readUtf(64), buf.readBoolean(), buf.readBoolean(),
                 )
             },
         )
@@ -77,7 +80,10 @@ data class ShopOrderPayload(
     }
 }
 
-/** Client -> server: save the settings of the shop at [pos], with the item in its template slot. [buyPrice] 0: no buy-back. */
+/**
+ * Client -> server: save the settings of the shop at [pos], with the item in its template slot. [buyPrice] 0: no
+ * buy-back. With [buying], the shop only buys, at [buyPrice] per lot, and [sellPrice] is ignored.
+ */
 data class ShopSavePayload(
     val pos: BlockPos,
     val lotSize: Int,
@@ -85,6 +91,7 @@ data class ShopSavePayload(
     val buyPrice: Long,
     val buyCap: Int,
     val accountId: String,
+    val buying: Boolean = false,
 ) : CustomPacketPayload {
     override fun type() = TYPE
 
@@ -98,8 +105,29 @@ data class ShopSavePayload(
                 buf.writeVarLong(p.buyPrice)
                 buf.writeVarInt(p.buyCap)
                 buf.writeUtf(p.accountId, 64)
+                buf.writeBoolean(p.buying)
             },
-            { buf -> ShopSavePayload(buf.readBlockPos(), buf.readVarInt(), buf.readVarLong(), buf.readVarLong(), buf.readVarInt(), buf.readUtf(64)) },
+            { buf -> ShopSavePayload(buf.readBlockPos(), buf.readVarInt(), buf.readVarLong(), buf.readVarLong(), buf.readVarInt(), buf.readUtf(64), buf.readBoolean()) },
+        )
+    }
+}
+
+/**
+ * Client -> server: make [item] (an item ID, such as `minecraft:diamond`) the item of the shop at [pos], picked from
+ * the item search of the owner's screen. The plain item: for one with a name or enchantments, the owner clicks the
+ * item slot with it instead.
+ */
+data class ShopItemPayload(val pos: BlockPos, val item: String) : CustomPacketPayload {
+    override fun type() = TYPE
+
+    companion object {
+        val TYPE = CustomPacketPayload.Type<ShopItemPayload>(LnbEconomy.id("shop_item"))
+        val STREAM_CODEC: StreamCodec<FriendlyByteBuf, ShopItemPayload> = StreamCodec.of(
+            { buf, p ->
+                buf.writeBlockPos(p.pos)
+                buf.writeUtf(p.item, 128)
+            },
+            { buf -> ShopItemPayload(buf.readBlockPos(), buf.readUtf(128)) },
         )
     }
 }

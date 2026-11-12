@@ -42,7 +42,9 @@ object ClientPayloadHandler {
         val minecraft = Minecraft.getInstance()
         val current = minecraft.screen as? ShopScreen
         when {
-            current != null && current.pos == payload.pos -> current.update(payload)
+            // A shop that changed from selling to buying (or back) gets its other screen.
+            current != null && current.pos == payload.pos && current.buying == payload.buying -> current.update(payload)
+            current != null && current.pos == payload.pos -> minecraft.setScreen(ShopScreen(payload))
             !payload.refresh -> minecraft.setScreen(ShopScreen(payload))
         }
     }

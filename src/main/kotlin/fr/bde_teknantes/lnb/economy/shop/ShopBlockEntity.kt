@@ -117,13 +117,18 @@ class ShopBlockEntity(pos: BlockPos, state: BlockState) : BlockEntity(ModContent
 /**
  * A shop's prices: [sellPrice] for one lot of [lotSize] items, [buyPrice] for one lot bought back (null: the shop
  * doesn't buy), and [buyCap], the most items the shop holds before it stops buying.
+ *
+ * A shop either sells (and may buy the same item back), or, with [buying], only buys: players bring it the item and
+ * it pays [buyPrice] per lot until it holds [buyCap]. The site knows one kind of shop, so a buying shop is saved there
+ * with a [sellPrice] equal to its [buyPrice], and the server never lets anyone buy from it.
  */
-data class ShopSettings(val lotSize: Int, val sellPrice: Long, val buyPrice: Long?, val buyCap: Int) {
+data class ShopSettings(val lotSize: Int, val sellPrice: Long, val buyPrice: Long?, val buyCap: Int, val buying: Boolean = false) {
     fun toTag(): CompoundTag = CompoundTag().apply {
         putInt("lotSize", lotSize)
         putLong("sellPrice", sellPrice)
         buyPrice?.let { putLong("buyPrice", it) }
         putInt("buyCap", buyCap)
+        putBoolean("buying", buying)
     }
 
     /** What is wrong with these settings for [template], or null when they are fine. */
@@ -131,8 +136,9 @@ data class ShopSettings(val lotSize: Int, val sellPrice: Long, val buyPrice: Lon
         template.isEmpty -> "no_item"
         lotSize !in 1..minOf(MAX_LOT, template.maxStackSize) -> "lot_size"
         sellPrice !in 1..MAX_PRICE -> "sell_price"
+        buying && buyPrice == null -> "buying_price"
         buyPrice != null && buyPrice !in 1..sellPrice -> "buy_price"
-        buyCap < 0 -> "buy_cap"
+        buyCap < 0 || (buying && buyCap < lotSize) -> "buy_cap"
         else -> null
     }
 
@@ -145,6 +151,10 @@ data class ShopSettings(val lotSize: Int, val sellPrice: Long, val buyPrice: Lon
             sellPrice = tag.getLong("sellPrice"),
             buyPrice = if (tag.contains("buyPrice")) tag.getLong("buyPrice") else null,
             buyCap = tag.getInt("buyCap"),
+            buying = tag.getBoolean("buying"),
         )
+
+        /** A shop that only buys, at [price] per lot. */
+        fun buying(lotSize: Int, price: Long, buyCap: Int) = ShopSettings(lotSize, price, price.takeIf { it > 0 }, buyCap, buying = true)
     }
 }

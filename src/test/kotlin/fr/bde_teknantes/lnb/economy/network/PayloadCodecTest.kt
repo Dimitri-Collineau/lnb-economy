@@ -41,7 +41,7 @@ class PayloadCodecTest {
         assertTrue(ItemStack.matches(item, decoded.item))
         assertEquals(shop.copy(item = ItemStack.EMPTY), decoded.copy(item = ItemStack.EMPTY))
 
-        for (setup in listOf(ShopSetup(pos, ShopSettings(16, 40, 25, 1728), "a", true, false), ShopSetup(pos, ShopSettings(1, 5, null, 0), null, false, true), ShopSetup(pos, null, null, false, false))) {
+        for (setup in listOf(ShopSetup(pos, ShopSettings(16, 40, 25, 1728), "a", true, false), ShopSetup(pos, ShopSettings(1, 5, null, 0), null, false, true), ShopSetup(pos, ShopSettings.buying(8, 30, 640), "b", true, false), ShopSetup(pos, null, null, false, false))) {
             val setupBuf = registryBuf()
             setup.write(setupBuf)
             assertEquals(setup, ShopSetup.read(setupBuf))

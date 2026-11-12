@@ -65,6 +65,7 @@ object EconomyNetwork {
         registrar.playToServer(CounterChangePayload.TYPE, CounterChangePayload.STREAM_CODEC, Counters::handleChange)
         registrar.playToServer(ShopOrderPayload.TYPE, ShopOrderPayload.STREAM_CODEC, Shops::handleOrder)
         registrar.playToServer(ShopSavePayload.TYPE, ShopSavePayload.STREAM_CODEC, Shops::handleSave)
+        registrar.playToServer(ShopItemPayload.TYPE, ShopItemPayload.STREAM_CODEC, Shops::handleItem)
         registrar.playToServer(ShopMaterialPayload.TYPE, ShopMaterialPayload.STREAM_CODEC, Shops::handleMaterial)
         registrar.playToServer(TradeRequestPayload.TYPE, TradeRequestPayload.STREAM_CODEC, Trades::handleRequest)
         registrar.playToServer(TradeMoneyPayload.TYPE, TradeMoneyPayload.STREAM_CODEC, Trades::handleMoney)

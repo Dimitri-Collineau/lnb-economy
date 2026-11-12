@@ -15,11 +15,13 @@ import net.minecraft.network.chat.Component
 import net.neoforged.neoforge.network.PacketDistributor
 
 /**
- * A shop as a customer sees it: the item, big, with its price per lot, stock and buyback; the account and the number of
- * lots; then buying them, or selling them back when the shop buys. The numbers come from [ShopQuote]; this screen only
- * draws them and sends the order.
+ * A shop as a customer sees it. One that sells shows its item, big, with its price per lot, stock and buyback, then the
+ * account, the number of lots and "Buy" (and "Sell" when it buys back). One that only buys shows what it pays per lot,
+ * how many lots it still takes and how many the customer carries, and its only button sells. The numbers come from
+ * [ShopQuote]; this screen only draws them and sends the order.
  */
-class ShopScreen(private var shop: OpenShopPayload) : Screen(Component.translatable("gui.lnbeconomy.shop.title")) {
+class ShopScreen(private var shop: OpenShopPayload) :
+    Screen(Component.translatable(if (shop.buying) "gui.lnbeconomy.shop.title.buying" else "gui.lnbeconomy.shop.title")) {
     private companion object {
         const val PANEL_WIDTH = 268
         const val PANEL_HEIGHT = 214
@@ -39,10 +41,11 @@ class ShopScreen(private var shop: OpenShopPayload) : Screen(Component.translata
     }
 
     val pos: BlockPos get() = shop.pos
+    val buying: Boolean get() = shop.buying
 
     private var account: AccountSelector? = null
     private lateinit var lots: EditBox
-    private lateinit var buy: Button
+    private var buy: Button? = null
     private var sell: Button? = null
     private var shownRevision = -1
     private var panelX = 0
@@ -55,7 +58,7 @@ class ShopScreen(private var shop: OpenShopPayload) : Screen(Component.translata
         get() = minecraft?.player?.inventory?.let { Stock.count(it, shop.item, 0 until 36) } ?: 0
 
     private val quote: ShopQuote
-        get() = ShopQuote(shop.lotSize, shop.sellPrice, shop.buyPrice, shop.stock, shop.room, carried)
+        get() = ShopQuote(shop.lotSize, shop.sellPrice, shop.buyPrice, if (shop.buying) 0 else shop.stock, shop.room, carried)
 
     private val chosenLots: Int get() = lots.value.toIntOrNull() ?: 0
 
@@ -95,12 +98,17 @@ class ShopScreen(private var shop: OpenShopPayload) : Screen(Component.translata
         val buttonsY = panelY + BUTTONS_TOP
         val sectionX = panelX + SECTION_LEFT
         val half = (SECTION_WIDTH - 4) / 2
-        val buyWidth = if (shop.buyPrice > 0) half else SECTION_WIDTH
-        buy = addRenderableWidget(CasinoButton.primary(Component.empty()) { order(buy = true) }.bounds(sectionX, buttonsY, buyWidth, 20).build())
-        sell = if (shop.buyPrice > 0) {
-            addRenderableWidget(CasinoButton.primary(Component.empty()) { order(buy = false) }.bounds(sectionX + half + 4, buttonsY, half, 20).build())
+        if (shop.buying) {
+            buy = null
+            sell = addRenderableWidget(CasinoButton.primary(Component.empty()) { order(buy = false) }.bounds(sectionX, buttonsY, SECTION_WIDTH, 20).build())
         } else {
-            null
+            val buyWidth = if (shop.buyPrice > 0) half else SECTION_WIDTH
+            buy = addRenderableWidget(CasinoButton.primary(Component.empty()) { order(buy = true) }.bounds(sectionX, buttonsY, buyWidth, 20).build())
+            sell = if (shop.buyPrice > 0) {
+                addRenderableWidget(CasinoButton.primary(Component.empty()) { order(buy = false) }.bounds(sectionX + half + 4, buttonsY, half, 20).build())
+            } else {
+                null
+            }
         }
         addRenderableWidget(
             CasinoButton.secondary(CommonComponents.GUI_DONE) { onClose() }
@@ -122,8 +130,10 @@ class ShopScreen(private var shop: OpenShopPayload) : Screen(Component.translata
         if (!::lots.isInitialized) return
         val quote = quote
         val n = chosenLots
-        buy.message = Component.translatable("gui.lnbeconomy.shop.buy", Lnbit.compact(quote.buyTotal(n), language))
-        buy.active = account != null && n in 1..quote.maxBuyLots
+        buy?.let {
+            it.message = Component.translatable("gui.lnbeconomy.shop.buy", Lnbit.compact(quote.buyTotal(n), language))
+            it.active = account != null && n in 1..quote.maxBuyLots
+        }
         sell?.let {
             it.message = Component.translatable("gui.lnbeconomy.shop.sell", Lnbit.compact(quote.sellTotal(n), language))
             it.active = account != null && n in 1..quote.maxSellLots
@@ -155,7 +165,8 @@ class ShopScreen(private var shop: OpenShopPayload) : Screen(Component.translata
         super.render(graphics, mouseX, mouseY, partialTick)
         CasinoUi.title(graphics, font, title, width / 2, panelY + 11)
         if (shop.seller.isNotEmpty()) {
-            graphics.drawCenteredString(font, Component.translatable("gui.lnbeconomy.shop.seller", shop.seller), width / 2, panelY + 25, CasinoUi.DIM)
+            val by = Component.translatable(if (shop.buying) "gui.lnbeconomy.shop.buyer" else "gui.lnbeconomy.shop.seller", shop.seller)
+            graphics.drawCenteredString(font, by, width / 2, panelY + 25, CasinoUi.DIM)
         }
 
         // The item, twice its size, and what it costs.
@@ -168,14 +179,21 @@ class ShopScreen(private var shop: OpenShopPayload) : Screen(Component.translata
         val textX = innerX + 46
         val quote = quote
         graphics.drawString(font, shop.item.hoverName, textX, itemY + 6, WHITE, true)
-        graphics.drawString(font, Component.translatable("gui.lnbeconomy.shop.price", Lnbit.compact(shop.sellPrice, language), shop.lotSize), textX, itemY + 17, CasinoUi.GOLD_TEXT, true)
-        graphics.drawString(font, Component.translatable("gui.lnbeconomy.shop.stock", quote.maxBuyLots, shop.stock), textX, itemY + 28, CasinoUi.DIM, true)
-        val buyBack = if (quote.buysBack) {
-            Component.translatable("gui.lnbeconomy.shop.buyback", Lnbit.compact(shop.buyPrice, language), quote.maxSellLots)
+        if (shop.buying) {
+            graphics.drawString(font, Component.translatable("gui.lnbeconomy.shop.pays", Lnbit.compact(shop.buyPrice, language), shop.lotSize), textX, itemY + 17, CasinoUi.GOLD_TEXT, true)
+            val takes = if (shop.lotSize > 0) shop.room / shop.lotSize else 0
+            graphics.drawString(font, Component.translatable("gui.lnbeconomy.shop.takes", takes, shop.room), textX, itemY + 28, CasinoUi.DIM, true)
+            graphics.drawString(font, Component.translatable("gui.lnbeconomy.shop.carried", carried), textX, itemY + 39, if (carried >= shop.lotSize) CasinoUi.DIM else RED, true)
         } else {
-            Component.translatable("gui.lnbeconomy.shop.no_buyback")
+            graphics.drawString(font, Component.translatable("gui.lnbeconomy.shop.price", Lnbit.compact(shop.sellPrice, language), shop.lotSize), textX, itemY + 17, CasinoUi.GOLD_TEXT, true)
+            graphics.drawString(font, Component.translatable("gui.lnbeconomy.shop.stock", quote.maxBuyLots, shop.stock), textX, itemY + 28, CasinoUi.DIM, true)
+            val buyBack = if (quote.buysBack) {
+                Component.translatable("gui.lnbeconomy.shop.buyback", Lnbit.compact(shop.buyPrice, language), quote.maxSellLots)
+            } else {
+                Component.translatable("gui.lnbeconomy.shop.no_buyback")
+            }
+            graphics.drawString(font, buyBack, textX, itemY + 39, CasinoUi.DIM, true)
         }
-        graphics.drawString(font, buyBack, textX, itemY + 39, CasinoUi.DIM, true)
 
         // The number of lots, and how many items that makes.
         val lotsY = panelY + ORDER_TOP + 26

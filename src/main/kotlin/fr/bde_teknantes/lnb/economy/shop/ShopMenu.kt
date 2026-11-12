@@ -32,6 +32,7 @@ data class ShopSetup(
             b.writeVarLong(s.sellPrice)
             b.writeVarLong(s.buyPrice ?: 0)
             b.writeVarInt(s.buyCap)
+            b.writeBoolean(s.buying)
         }
         buf.writeNullable(accountId) { b, v -> b.writeUtf(v, 64) }
         buf.writeBoolean(registered)
@@ -42,7 +43,7 @@ data class ShopSetup(
         fun read(buf: RegistryFriendlyByteBuf) = ShopSetup(
             pos = buf.readBlockPos(),
             settings = buf.readNullable { b ->
-                ShopSettings(b.readVarInt(), b.readVarLong(), b.readVarLong().takeIf { it > 0 }, b.readVarInt())
+                ShopSettings(b.readVarInt(), b.readVarLong(), b.readVarLong().takeIf { it > 0 }, b.readVarInt(), b.readBoolean())
             },
             accountId = buf.readNullable { it.readUtf(64) },
             registered = buf.readBoolean(),
@@ -93,13 +94,20 @@ class ShopMenu(
             return
         }
         if (clickType != ClickType.PICKUP) return
-        val carried = carried
+        choose(carried, player)
+    }
+
+    /**
+     * Makes [item] the shop's item (a copy of one: nothing is taken), or clears it when [item] is empty. From a click
+     * on the template slot with an item, or from the item search of a shop that buys.
+     */
+    fun choose(item: ItemStack, player: Player) {
         // The stock must hold only the new item: change it once the stock is empty of the old one.
-        if (!carried.isEmpty && (0 until stock.containerSize).any { !stock.getItem(it).isEmpty && !ItemStack.isSameItemSameComponents(stock.getItem(it), carried) }) {
+        if (!item.isEmpty && (0 until stock.containerSize).any { !stock.getItem(it).isEmpty && !ItemStack.isSameItemSameComponents(stock.getItem(it), item) }) {
             if (!player.level().isClientSide) player.displayClientMessage(Component.translatable("gui.lnbeconomy.shop.empty_stock_first"), true)
             return
         }
-        template.setItem(0, if (carried.isEmpty) ItemStack.EMPTY else carried.copyWithCount(1))
+        template.setItem(0, if (item.isEmpty) ItemStack.EMPTY else item.copyWithCount(1))
         broadcastChanges()
     }
 

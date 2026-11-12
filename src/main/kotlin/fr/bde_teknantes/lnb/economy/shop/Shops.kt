@@ -20,6 +20,7 @@ import fr.bde_teknantes.lnb.economy.ledger.TransferJournal
 import fr.bde_teknantes.lnb.economy.mail.ItemMailbox
 import fr.bde_teknantes.lnb.economy.money.Texts
 import fr.bde_teknantes.lnb.economy.network.OpenShopPayload
+import fr.bde_teknantes.lnb.economy.network.ShopItemPayload
 import fr.bde_teknantes.lnb.economy.network.ShopMaterialPayload
 import fr.bde_teknantes.lnb.economy.network.ShopOrderPayload
 import fr.bde_teknantes.lnb.economy.network.ShopSavePayload
@@ -134,7 +135,7 @@ object Shops {
         val seller = shop.accountHandle?.let(Handles::display) ?: shop.placedBy?.let { nameOf(player.server, it) }.orEmpty()
         PacketDistributor.sendToPlayer(
             player,
-            OpenShopPayload(shop.blockPos, shop.template, settings.lotSize, settings.sellPrice, settings.buyPrice ?: 0, inStock, room, seller, refresh),
+            OpenShopPayload(shop.blockPos, shop.template, settings.lotSize, settings.sellPrice, settings.buyPrice ?: 0, inStock, room, seller, refresh, settings.buying),
         )
         if (!refresh) checkOnSite(player.server, shop)
     }
@@ -158,7 +159,8 @@ object Shops {
         val player = context.player() as? ServerPlayer ?: return
         val shop = shopAt(player, payload.pos) ?: return
         if (!canManage(player, shop)) return
-        val settings = ShopSettings(payload.lotSize, payload.sellPrice, payload.buyPrice.takeIf { it > 0 }, payload.buyCap)
+        val settings = if (payload.buying) ShopSettings.buying(payload.lotSize, payload.buyPrice, payload.buyCap)
+        else ShopSettings(payload.lotSize, payload.sellPrice, payload.buyPrice.takeIf { it > 0 }, payload.buyCap)
         settings.problem(shop.template)?.let {
             tell(player, Component.translatable("economy.lnbeconomy.shop.invalid.$it"))
             return
@@ -222,6 +224,10 @@ object Shops {
         if (payload.lots !in 1..MAX_LOTS) return
         PlayerAccounts.noEconomyMessage(player.uuid)?.let {
             tell(player, it)
+            return
+        }
+        if (payload.buy && settings.buying) {
+            tell(player, Component.translatable("economy.lnbeconomy.shop.only_buys"))
             return
         }
         val lotPrice = if (payload.buy) settings.sellPrice else settings.buyPrice
@@ -382,6 +388,17 @@ object Shops {
             val state = level.getBlockState(p)
             if (state.block is ShopBlock) level.setBlock(p, state.setValue(ShopBlock.MATERIAL, material), Block.UPDATE_CLIENTS)
         }
+    }
+
+    /** The item search of the owner's screen: the shop's item becomes the plain item picked there. */
+    fun handleItem(payload: ShopItemPayload, context: IPayloadContext) {
+        val player = context.player() as? ServerPlayer ?: return
+        val menu = player.containerMenu as? ShopMenu ?: return
+        val shop = shopAt(player, payload.pos) ?: return
+        if (menu.setup.pos != payload.pos || !canManage(player, shop)) return
+        val id = ResourceLocation.tryParse(payload.item) ?: return
+        val item = BuiltInRegistries.ITEM.getOptional(id).orElse(null) ?: return
+        menu.choose(ItemStack(item), player)
     }
 
     private fun shopAt(player: ServerPlayer, pos: BlockPos): ShopBlockEntity? {
