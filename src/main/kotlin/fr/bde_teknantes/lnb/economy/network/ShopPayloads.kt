@@ -103,3 +103,19 @@ data class ShopSavePayload(
         )
     }
 }
+
+/** Client -> server: build the pedestal of the shop at [pos] in [material] (a [fr.bde_teknantes.lnb.economy.shop.ShopMaterial] id). */
+data class ShopMaterialPayload(val pos: BlockPos, val material: String) : CustomPacketPayload {
+    override fun type() = TYPE
+
+    companion object {
+        val TYPE = CustomPacketPayload.Type<ShopMaterialPayload>(LnbEconomy.id("shop_material"))
+        val STREAM_CODEC: StreamCodec<FriendlyByteBuf, ShopMaterialPayload> = StreamCodec.of(
+            { buf, p ->
+                buf.writeBlockPos(p.pos)
+                buf.writeUtf(p.material, 32)
+            },
+            { buf -> ShopMaterialPayload(buf.readBlockPos(), buf.readUtf(32)) },
+        )
+    }
+}

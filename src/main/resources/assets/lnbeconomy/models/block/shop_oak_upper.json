@@ -1,0 +1,7 @@
+{
+  "parent": "lnbeconomy:block/shop_upper",
+  "textures": {
+    "material": "minecraft:block/oak_planks",
+    "particle": "minecraft:block/oak_planks"
+  }
+}

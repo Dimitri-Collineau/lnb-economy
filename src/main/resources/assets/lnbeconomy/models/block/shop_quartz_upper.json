@@ -1,0 +1,7 @@
+{
+  "parent": "lnbeconomy:block/shop_upper",
+  "textures": {
+    "material": "minecraft:block/quartz_block_side",
+    "particle": "minecraft:block/quartz_block_side"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "lnbeconomy:block/shop_lower",
+  "textures": {
+    "material": "minecraft:block/jungle_planks",
+    "particle": "minecraft:block/jungle_planks"
+  }
+}

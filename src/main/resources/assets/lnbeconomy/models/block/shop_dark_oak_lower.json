@@ -1,0 +1,7 @@
+{
+  "parent": "lnbeconomy:block/shop_lower",
+  "textures": {
+    "material": "minecraft:block/dark_oak_planks",
+    "particle": "minecraft:block/dark_oak_planks"
+  }
+}

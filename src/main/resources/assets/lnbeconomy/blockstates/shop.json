@@ -1,1 +1,694 @@
-{ "variants": { "": { "model": "lnbeconomy:block/shop" } } }
+{
+  "variants": {
+    "facing=north,half=lower,material=oak": {
+      "model": "lnbeconomy:block/shop_oak_lower"
+    },
+    "facing=north,half=lower,material=spruce": {
+      "model": "lnbeconomy:block/shop_spruce_lower"
+    },
+    "facing=north,half=lower,material=birch": {
+      "model": "lnbeconomy:block/shop_birch_lower"
+    },
+    "facing=north,half=lower,material=jungle": {
+      "model": "lnbeconomy:block/shop_jungle_lower"
+    },
+    "facing=north,half=lower,material=acacia": {
+      "model": "lnbeconomy:block/shop_acacia_lower"
+    },
+    "facing=north,half=lower,material=dark_oak": {
+      "model": "lnbeconomy:block/shop_dark_oak_lower"
+    },
+    "facing=north,half=lower,material=mangrove": {
+      "model": "lnbeconomy:block/shop_mangrove_lower"
+    },
+    "facing=north,half=lower,material=cherry": {
+      "model": "lnbeconomy:block/shop_cherry_lower"
+    },
+    "facing=north,half=lower,material=bamboo": {
+      "model": "lnbeconomy:block/shop_bamboo_lower"
+    },
+    "facing=north,half=lower,material=crimson": {
+      "model": "lnbeconomy:block/shop_crimson_lower"
+    },
+    "facing=north,half=lower,material=warped": {
+      "model": "lnbeconomy:block/shop_warped_lower"
+    },
+    "facing=north,half=lower,material=quartz": {
+      "model": "lnbeconomy:block/shop_quartz_lower"
+    },
+    "facing=north,half=lower,material=calcite": {
+      "model": "lnbeconomy:block/shop_calcite_lower"
+    },
+    "facing=north,half=lower,material=diorite": {
+      "model": "lnbeconomy:block/shop_diorite_lower"
+    },
+    "facing=north,half=lower,material=andesite": {
+      "model": "lnbeconomy:block/shop_andesite_lower"
+    },
+    "facing=north,half=lower,material=granite": {
+      "model": "lnbeconomy:block/shop_granite_lower"
+    },
+    "facing=north,half=lower,material=deepslate": {
+      "model": "lnbeconomy:block/shop_deepslate_lower"
+    },
+    "facing=north,half=lower,material=blackstone": {
+      "model": "lnbeconomy:block/shop_blackstone_lower"
+    },
+    "facing=north,half=lower,material=smooth_stone": {
+      "model": "lnbeconomy:block/shop_smooth_stone_lower"
+    },
+    "facing=north,half=lower,material=sandstone": {
+      "model": "lnbeconomy:block/shop_sandstone_lower"
+    },
+    "facing=north,half=lower,material=red_sandstone": {
+      "model": "lnbeconomy:block/shop_red_sandstone_lower"
+    },
+    "facing=north,half=lower,material=purpur": {
+      "model": "lnbeconomy:block/shop_purpur_lower"
+    },
+    "facing=north,half=lower,material=dark_prismarine": {
+      "model": "lnbeconomy:block/shop_dark_prismarine_lower"
+    },
+    "facing=north,half=upper,material=oak": {
+      "model": "lnbeconomy:block/shop_oak_upper"
+    },
+    "facing=north,half=upper,material=spruce": {
+      "model": "lnbeconomy:block/shop_spruce_upper"
+    },
+    "facing=north,half=upper,material=birch": {
+      "model": "lnbeconomy:block/shop_birch_upper"
+    },
+    "facing=north,half=upper,material=jungle": {
+      "model": "lnbeconomy:block/shop_jungle_upper"
+    },
+    "facing=north,half=upper,material=acacia": {
+      "model": "lnbeconomy:block/shop_acacia_upper"
+    },
+    "facing=north,half=upper,material=dark_oak": {
+      "model": "lnbeconomy:block/shop_dark_oak_upper"
+    },
+    "facing=north,half=upper,material=mangrove": {
+      "model": "lnbeconomy:block/shop_mangrove_upper"
+    },
+    "facing=north,half=upper,material=cherry": {
+      "model": "lnbeconomy:block/shop_cherry_upper"
+    },
+    "facing=north,half=upper,material=bamboo": {
+      "model": "lnbeconomy:block/shop_bamboo_upper"
+    },
+    "facing=north,half=upper,material=crimson": {
+      "model": "lnbeconomy:block/shop_crimson_upper"
+    },
+    "facing=north,half=upper,material=warped": {
+      "model": "lnbeconomy:block/shop_warped_upper"
+    },
+    "facing=north,half=upper,material=quartz": {
+      "model": "lnbeconomy:block/shop_quartz_upper"
+    },
+    "facing=north,half=upper,material=calcite": {
+      "model": "lnbeconomy:block/shop_calcite_upper"
+    },
+    "facing=north,half=upper,material=diorite": {
+      "model": "lnbeconomy:block/shop_diorite_upper"
+    },
+    "facing=north,half=upper,material=andesite": {
+      "model": "lnbeconomy:block/shop_andesite_upper"
+    },
+    "facing=north,half=upper,material=granite": {
+      "model": "lnbeconomy:block/shop_granite_upper"
+    },
+    "facing=north,half=upper,material=deepslate": {
+      "model": "lnbeconomy:block/shop_deepslate_upper"
+    },
+    "facing=north,half=upper,material=blackstone": {
+      "model": "lnbeconomy:block/shop_blackstone_upper"
+    },
+    "facing=north,half=upper,material=smooth_stone": {
+      "model": "lnbeconomy:block/shop_smooth_stone_upper"
+    },
+    "facing=north,half=upper,material=sandstone": {
+      "model": "lnbeconomy:block/shop_sandstone_upper"
+    },
+    "facing=north,half=upper,material=red_sandstone": {
+      "model": "lnbeconomy:block/shop_red_sandstone_upper"
+    },
+    "facing=north,half=upper,material=purpur": {
+      "model": "lnbeconomy:block/shop_purpur_upper"
+    },
+    "facing=north,half=upper,material=dark_prismarine": {
+      "model": "lnbeconomy:block/shop_dark_prismarine_upper"
+    },
+    "facing=east,half=lower,material=oak": {
+      "model": "lnbeconomy:block/shop_oak_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,material=spruce": {
+      "model": "lnbeconomy:block/shop_spruce_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,material=birch": {
+      "model": "lnbeconomy:block/shop_birch_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,material=jungle": {
+      "model": "lnbeconomy:block/shop_jungle_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,material=acacia": {
+      "model": "lnbeconomy:block/shop_acacia_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,material=dark_oak": {
+      "model": "lnbeconomy:block/shop_dark_oak_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,material=mangrove": {
+      "model": "lnbeconomy:block/shop_mangrove_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,material=cherry": {
+      "model": "lnbeconomy:block/shop_cherry_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,material=bamboo": {
+      "model": "lnbeconomy:block/shop_bamboo_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,material=crimson": {
+      "model": "lnbeconomy:block/shop_crimson_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,material=warped": {
+      "model": "lnbeconomy:block/shop_warped_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,material=quartz": {
+      "model": "lnbeconomy:block/shop_quartz_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,material=calcite": {
+      "model": "lnbeconomy:block/shop_calcite_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,material=diorite": {
+      "model": "lnbeconomy:block/shop_diorite_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,material=andesite": {
+      "model": "lnbeconomy:block/shop_andesite_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,material=granite": {
+      "model": "lnbeconomy:block/shop_granite_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,material=deepslate": {
+      "model": "lnbeconomy:block/shop_deepslate_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,material=blackstone": {
+      "model": "lnbeconomy:block/shop_blackstone_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,material=smooth_stone": {
+      "model": "lnbeconomy:block/shop_smooth_stone_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,material=sandstone": {
+      "model": "lnbeconomy:block/shop_sandstone_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,material=red_sandstone": {
+      "model": "lnbeconomy:block/shop_red_sandstone_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,material=purpur": {
+      "model": "lnbeconomy:block/shop_purpur_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,material=dark_prismarine": {
+      "model": "lnbeconomy:block/shop_dark_prismarine_lower",
+      "y": 90
+    },
+    "facing=east,half=upper,material=oak": {
+      "model": "lnbeconomy:block/shop_oak_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,material=spruce": {
+      "model": "lnbeconomy:block/shop_spruce_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,material=birch": {
+      "model": "lnbeconomy:block/shop_birch_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,material=jungle": {
+      "model": "lnbeconomy:block/shop_jungle_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,material=acacia": {
+      "model": "lnbeconomy:block/shop_acacia_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,material=dark_oak": {
+      "model": "lnbeconomy:block/shop_dark_oak_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,material=mangrove": {
+      "model": "lnbeconomy:block/shop_mangrove_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,material=cherry": {
+      "model": "lnbeconomy:block/shop_cherry_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,material=bamboo": {
+      "model": "lnbeconomy:block/shop_bamboo_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,material=crimson": {
+      "model": "lnbeconomy:block/shop_crimson_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,material=warped": {
+      "model": "lnbeconomy:block/shop_warped_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,material=quartz": {
+      "model": "lnbeconomy:block/shop_quartz_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,material=calcite": {
+      "model": "lnbeconomy:block/shop_calcite_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,material=diorite": {
+      "model": "lnbeconomy:block/shop_diorite_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,material=andesite": {
+      "model": "lnbeconomy:block/shop_andesite_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,material=granite": {
+      "model": "lnbeconomy:block/shop_granite_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,material=deepslate": {
+      "model": "lnbeconomy:block/shop_deepslate_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,material=blackstone": {
+      "model": "lnbeconomy:block/shop_blackstone_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,material=smooth_stone": {
+      "model": "lnbeconomy:block/shop_smooth_stone_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,material=sandstone": {
+      "model": "lnbeconomy:block/shop_sandstone_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,material=red_sandstone": {
+      "model": "lnbeconomy:block/shop_red_sandstone_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,material=purpur": {
+      "model": "lnbeconomy:block/shop_purpur_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,material=dark_prismarine": {
+      "model": "lnbeconomy:block/shop_dark_prismarine_upper",
+      "y": 90
+    },
+    "facing=south,half=lower,material=oak": {
+      "model": "lnbeconomy:block/shop_oak_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,material=spruce": {
+      "model": "lnbeconomy:block/shop_spruce_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,material=birch": {
+      "model": "lnbeconomy:block/shop_birch_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,material=jungle": {
+      "model": "lnbeconomy:block/shop_jungle_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,material=acacia": {
+      "model": "lnbeconomy:block/shop_acacia_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,material=dark_oak": {
+      "model": "lnbeconomy:block/shop_dark_oak_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,material=mangrove": {
+      "model": "lnbeconomy:block/shop_mangrove_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,material=cherry": {
+      "model": "lnbeconomy:block/shop_cherry_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,material=bamboo": {
+      "model": "lnbeconomy:block/shop_bamboo_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,material=crimson": {
+      "model": "lnbeconomy:block/shop_crimson_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,material=warped": {
+      "model": "lnbeconomy:block/shop_warped_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,material=quartz": {
+      "model": "lnbeconomy:block/shop_quartz_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,material=calcite": {
+      "model": "lnbeconomy:block/shop_calcite_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,material=diorite": {
+      "model": "lnbeconomy:block/shop_diorite_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,material=andesite": {
+      "model": "lnbeconomy:block/shop_andesite_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,material=granite": {
+      "model": "lnbeconomy:block/shop_granite_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,material=deepslate": {
+      "model": "lnbeconomy:block/shop_deepslate_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,material=blackstone": {
+      "model": "lnbeconomy:block/shop_blackstone_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,material=smooth_stone": {
+      "model": "lnbeconomy:block/shop_smooth_stone_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,material=sandstone": {
+      "model": "lnbeconomy:block/shop_sandstone_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,material=red_sandstone": {
+      "model": "lnbeconomy:block/shop_red_sandstone_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,material=purpur": {
+      "model": "lnbeconomy:block/shop_purpur_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,material=dark_prismarine": {
+      "model": "lnbeconomy:block/shop_dark_prismarine_lower",
+      "y": 180
+    },
+    "facing=south,half=upper,material=oak": {
+      "model": "lnbeconomy:block/shop_oak_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,material=spruce": {
+      "model": "lnbeconomy:block/shop_spruce_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,material=birch": {
+      "model": "lnbeconomy:block/shop_birch_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,material=jungle": {
+      "model": "lnbeconomy:block/shop_jungle_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,material=acacia": {
+      "model": "lnbeconomy:block/shop_acacia_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,material=dark_oak": {
+      "model": "lnbeconomy:block/shop_dark_oak_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,material=mangrove": {
+      "model": "lnbeconomy:block/shop_mangrove_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,material=cherry": {
+      "model": "lnbeconomy:block/shop_cherry_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,material=bamboo": {
+      "model": "lnbeconomy:block/shop_bamboo_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,material=crimson": {
+      "model": "lnbeconomy:block/shop_crimson_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,material=warped": {
+      "model": "lnbeconomy:block/shop_warped_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,material=quartz": {
+      "model": "lnbeconomy:block/shop_quartz_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,material=calcite": {
+      "model": "lnbeconomy:block/shop_calcite_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,material=diorite": {
+      "model": "lnbeconomy:block/shop_diorite_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,material=andesite": {
+      "model": "lnbeconomy:block/shop_andesite_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,material=granite": {
+      "model": "lnbeconomy:block/shop_granite_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,material=deepslate": {
+      "model": "lnbeconomy:block/shop_deepslate_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,material=blackstone": {
+      "model": "lnbeconomy:block/shop_blackstone_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,material=smooth_stone": {
+      "model": "lnbeconomy:block/shop_smooth_stone_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,material=sandstone": {
+      "model": "lnbeconomy:block/shop_sandstone_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,material=red_sandstone": {
+      "model": "lnbeconomy:block/shop_red_sandstone_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,material=purpur": {
+      "model": "lnbeconomy:block/shop_purpur_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,material=dark_prismarine": {
+      "model": "lnbeconomy:block/shop_dark_prismarine_upper",
+      "y": 180
+    },
+    "facing=west,half=lower,material=oak": {
+      "model": "lnbeconomy:block/shop_oak_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,material=spruce": {
+      "model": "lnbeconomy:block/shop_spruce_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,material=birch": {
+      "model": "lnbeconomy:block/shop_birch_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,material=jungle": {
+      "model": "lnbeconomy:block/shop_jungle_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,material=acacia": {
+      "model": "lnbeconomy:block/shop_acacia_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,material=dark_oak": {
+      "model": "lnbeconomy:block/shop_dark_oak_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,material=mangrove": {
+      "model": "lnbeconomy:block/shop_mangrove_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,material=cherry": {
+      "model": "lnbeconomy:block/shop_cherry_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,material=bamboo": {
+      "model": "lnbeconomy:block/shop_bamboo_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,material=crimson": {
+      "model": "lnbeconomy:block/shop_crimson_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,material=warped": {
+      "model": "lnbeconomy:block/shop_warped_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,material=quartz": {
+      "model": "lnbeconomy:block/shop_quartz_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,material=calcite": {
+      "model": "lnbeconomy:block/shop_calcite_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,material=diorite": {
+      "model": "lnbeconomy:block/shop_diorite_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,material=andesite": {
+      "model": "lnbeconomy:block/shop_andesite_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,material=granite": {
+      "model": "lnbeconomy:block/shop_granite_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,material=deepslate": {
+      "model": "lnbeconomy:block/shop_deepslate_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,material=blackstone": {
+      "model": "lnbeconomy:block/shop_blackstone_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,material=smooth_stone": {
+      "model": "lnbeconomy:block/shop_smooth_stone_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,material=sandstone": {
+      "model": "lnbeconomy:block/shop_sandstone_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,material=red_sandstone": {
+      "model": "lnbeconomy:block/shop_red_sandstone_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,material=purpur": {
+      "model": "lnbeconomy:block/shop_purpur_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,material=dark_prismarine": {
+      "model": "lnbeconomy:block/shop_dark_prismarine_lower",
+      "y": 270
+    },
+    "facing=west,half=upper,material=oak": {
+      "model": "lnbeconomy:block/shop_oak_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,material=spruce": {
+      "model": "lnbeconomy:block/shop_spruce_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,material=birch": {
+      "model": "lnbeconomy:block/shop_birch_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,material=jungle": {
+      "model": "lnbeconomy:block/shop_jungle_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,material=acacia": {
+      "model": "lnbeconomy:block/shop_acacia_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,material=dark_oak": {
+      "model": "lnbeconomy:block/shop_dark_oak_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,material=mangrove": {
+      "model": "lnbeconomy:block/shop_mangrove_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,material=cherry": {
+      "model": "lnbeconomy:block/shop_cherry_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,material=bamboo": {
+      "model": "lnbeconomy:block/shop_bamboo_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,material=crimson": {
+      "model": "lnbeconomy:block/shop_crimson_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,material=warped": {
+      "model": "lnbeconomy:block/shop_warped_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,material=quartz": {
+      "model": "lnbeconomy:block/shop_quartz_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,material=calcite": {
+      "model": "lnbeconomy:block/shop_calcite_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,material=diorite": {
+      "model": "lnbeconomy:block/shop_diorite_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,material=andesite": {
+      "model": "lnbeconomy:block/shop_andesite_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,material=granite": {
+      "model": "lnbeconomy:block/shop_granite_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,material=deepslate": {
+      "model": "lnbeconomy:block/shop_deepslate_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,material=blackstone": {
+      "model": "lnbeconomy:block/shop_blackstone_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,material=smooth_stone": {
+      "model": "lnbeconomy:block/shop_smooth_stone_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,material=sandstone": {
+      "model": "lnbeconomy:block/shop_sandstone_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,material=red_sandstone": {
+      "model": "lnbeconomy:block/shop_red_sandstone_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,material=purpur": {
+      "model": "lnbeconomy:block/shop_purpur_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,material=dark_prismarine": {
+      "model": "lnbeconomy:block/shop_dark_prismarine_upper",
+      "y": 270
+    }
+  }
+}

@@ -67,7 +67,7 @@ object ModContent {
 
     /** Breaking takes a while, explosions do nothing, and pistons can't push it. Only its owners break it (see Shops). */
     val SHOP: DeferredBlock<ShopBlock> = BLOCKS.registerBlock("shop", ::ShopBlock,
-        BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(2.5f, 3_600_000f).sound(SoundType.WOOD)
+        BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(2.5f, 3_600_000f).sound(SoundType.WOOD).noOcclusion()
             .pushReaction(PushReaction.BLOCK))
 
     val SHOP_ITEM: DeferredItem<BlockItem> = ITEMS.registerSimpleBlockItem(SHOP)

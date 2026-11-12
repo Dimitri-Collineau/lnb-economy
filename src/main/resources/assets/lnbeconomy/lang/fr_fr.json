@@ -161,6 +161,7 @@
   "gui.lnbeconomy.shop.account": "Compte",
   "gui.lnbeconomy.shop.account.value": "Compte : %s",
   "gui.lnbeconomy.shop.lots": "Lots",
+  "gui.lnbeconomy.shop.material": "Matériau du socle",
   "gui.lnbeconomy.shop.items_total": "soit %s objets",
   "gui.lnbeconomy.shop.buy": "Acheter %s",
   "gui.lnbeconomy.shop.sell": "Vendre %s",

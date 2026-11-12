@@ -1,0 +1,7 @@
+{
+  "parent": "lnbeconomy:block/shop_lower",
+  "textures": {
+    "material": "minecraft:block/sandstone_top",
+    "particle": "minecraft:block/sandstone_top"
+  }
+}

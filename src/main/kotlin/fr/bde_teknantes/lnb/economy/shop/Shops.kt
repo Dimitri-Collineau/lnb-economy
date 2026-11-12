@@ -20,11 +20,13 @@ import fr.bde_teknantes.lnb.economy.ledger.TransferJournal
 import fr.bde_teknantes.lnb.economy.mail.ItemMailbox
 import fr.bde_teknantes.lnb.economy.money.Texts
 import fr.bde_teknantes.lnb.economy.network.OpenShopPayload
+import fr.bde_teknantes.lnb.economy.network.ShopMaterialPayload
 import fr.bde_teknantes.lnb.economy.network.ShopOrderPayload
 import fr.bde_teknantes.lnb.economy.network.ShopSavePayload
 import fr.bde_teknantes.lnb.warden.common.api.ApiResult
 import net.minecraft.ChatFormatting
 import net.minecraft.core.BlockPos
+import net.minecraft.world.level.block.Block
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.chat.Component
@@ -106,7 +108,7 @@ object Shops {
             override fun setChanged() {
                 super.setChanged()
                 shop.template = getItem(0).copy()
-                shop.setChanged()
+                shop.showcaseChanged()
             }
         }
         player.openMenu(
@@ -359,11 +361,26 @@ object Shops {
     /** Only a shop's owners and members break it. */
     fun onBreak(event: BlockEvent.BreakEvent) {
         val level = event.level as? ServerLevel ?: return
-        val shop = level.getBlockEntity(event.pos) as? ShopBlockEntity ?: return
+        // The cloche (upper half) has no block entity: the shop is the pedestal under it.
+        val shop = level.getBlockEntity(if (event.state.block is ShopBlock) ShopBlock.lowerPos(event.state, event.pos) else event.pos)
+            as? ShopBlockEntity ?: return
         val player = event.player as? ServerPlayer
         if (player == null || !RealPlayers.isReal(player) || !canManage(player, shop)) {
             event.isCanceled = true
             player?.let { tell(it, Component.translatable("economy.lnbeconomy.shop.not_yours")) }
+        }
+    }
+
+    /** Rebuilds a shop's pedestal in another material. Only those who may manage the shop do. */
+    fun handleMaterial(payload: ShopMaterialPayload, context: IPayloadContext) {
+        val player = context.player() as? ServerPlayer ?: return
+        val material = ShopMaterial.byId(payload.material) ?: return
+        val shop = shopAt(player, payload.pos) ?: return
+        if (!canManage(player, shop)) return
+        val level = player.serverLevel()
+        for (p in listOf(payload.pos, payload.pos.above())) {
+            val state = level.getBlockState(p)
+            if (state.block is ShopBlock) level.setBlock(p, state.setValue(ShopBlock.MATERIAL, material), Block.UPDATE_CLIENTS)
         }
     }
 

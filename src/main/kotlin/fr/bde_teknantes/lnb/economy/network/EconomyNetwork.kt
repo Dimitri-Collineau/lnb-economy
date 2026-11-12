@@ -13,7 +13,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent
  * Bump [PROTOCOL_VERSION] whenever a payload changes, so mismatched client and server versions refuse to connect.
  */
 object EconomyNetwork {
-    private const val PROTOCOL_VERSION = "5"
+    private const val PROTOCOL_VERSION = "6"
 
     fun register(event: RegisterPayloadHandlersEvent) {
         val registrar = event.registrar(PROTOCOL_VERSION)
@@ -52,6 +52,7 @@ object EconomyNetwork {
         registrar.playToServer(CounterChangePayload.TYPE, CounterChangePayload.STREAM_CODEC, Counters::handleChange)
         registrar.playToServer(ShopOrderPayload.TYPE, ShopOrderPayload.STREAM_CODEC, Shops::handleOrder)
         registrar.playToServer(ShopSavePayload.TYPE, ShopSavePayload.STREAM_CODEC, Shops::handleSave)
+        registrar.playToServer(ShopMaterialPayload.TYPE, ShopMaterialPayload.STREAM_CODEC, Shops::handleMaterial)
         registrar.playToServer(TradeRequestPayload.TYPE, TradeRequestPayload.STREAM_CODEC, Trades::handleRequest)
         registrar.playToServer(TradeMoneyPayload.TYPE, TradeMoneyPayload.STREAM_CODEC, Trades::handleMoney)
         registrar.playToServer(TradeReadyPayload.TYPE, TradeReadyPayload.STREAM_CODEC, Trades::handleReady)

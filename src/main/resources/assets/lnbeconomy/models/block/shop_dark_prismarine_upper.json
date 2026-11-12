@@ -1,0 +1,7 @@
+{
+  "parent": "lnbeconomy:block/shop_upper",
+  "textures": {
+    "material": "minecraft:block/dark_prismarine",
+    "particle": "minecraft:block/dark_prismarine"
+  }
+}

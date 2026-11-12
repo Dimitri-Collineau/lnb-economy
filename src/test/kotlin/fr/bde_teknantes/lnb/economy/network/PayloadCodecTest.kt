@@ -118,6 +118,7 @@ class PayloadCodecTest {
         assertEquals(LinkPayload(pos, "casino", 100), roundTrip(LinkPayload.STREAM_CODEC, LinkPayload(pos, "casino", 100)))
         assertEquals(LinkPayload(pos, null, null), roundTrip(LinkPayload.STREAM_CODEC, LinkPayload(pos, null, null)))
         assertEquals(CounterWoodPayload(pos, "cherry"), roundTrip(CounterWoodPayload.STREAM_CODEC, CounterWoodPayload(pos, "cherry")))
+        assertEquals(ShopMaterialPayload(pos, "calcite"), roundTrip(ShopMaterialPayload.STREAM_CODEC, ShopMaterialPayload(pos, "calcite")))
         listOf(ShopOrderPayload(pos, true, 3, null, 40), ShopOrderPayload(pos, false, 1, "a", 25)).forEach {
             assertEquals(it, roundTrip(ShopOrderPayload.STREAM_CODEC, it))
         }

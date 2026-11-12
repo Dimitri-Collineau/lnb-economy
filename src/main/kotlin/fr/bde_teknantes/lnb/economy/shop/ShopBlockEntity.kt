@@ -7,7 +7,11 @@ import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.Tag
+import net.minecraft.network.protocol.Packet
+import net.minecraft.network.protocol.game.ClientGamePacketListener
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
 import net.minecraft.world.SimpleContainer
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
@@ -71,6 +75,18 @@ class ShopBlockEntity(pos: BlockPos, state: BlockState) : BlockEntity(ModContent
         placedBy = if (tag.hasUUID(PLACED_BY)) tag.getUUID(PLACED_BY) else null
         offOnSite = tag.getBoolean(OFF_ON_SITE)
     }
+
+    /** The item sold changed: show it under the cloche on every client that sees the shop. */
+    fun showcaseChanged() {
+        setChanged()
+        level?.sendBlockUpdated(blockPos, blockState, blockState, Block.UPDATE_CLIENTS)
+    }
+
+    /** Clients get the item sold only, to show it: never the stock, the prices or the account. */
+    override fun getUpdateTag(registries: HolderLookup.Provider): CompoundTag =
+        CompoundTag().apply { ItemStacks.toTag(template, registries)?.let { put(TEMPLATE, it) } }
+
+    override fun getUpdatePacket(): Packet<ClientGamePacketListener> = ClientboundBlockEntityDataPacket.create(this)
 
     private fun stockTags(registries: HolderLookup.Provider): List<CompoundTag> =
         (0 until SLOTS).mapNotNull { slot ->

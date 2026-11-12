@@ -1,0 +1,7 @@
+{
+  "parent": "lnbeconomy:block/shop_upper",
+  "textures": {
+    "material": "minecraft:block/polished_andesite",
+    "particle": "minecraft:block/polished_andesite"
+  }
+}

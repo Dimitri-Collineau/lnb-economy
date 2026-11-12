@@ -3,7 +3,14 @@
   "pools": [
     {
       "rolls": 1,
-      "entries": [{ "type": "minecraft:item", "name": "lnbeconomy:shop" }]
+      "entries": [{ "type": "minecraft:item", "name": "lnbeconomy:shop" }],
+      "conditions": [
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "lnbeconomy:shop",
+          "properties": { "half": "lower" }
+        }
+      ]
     }
   ]
 }

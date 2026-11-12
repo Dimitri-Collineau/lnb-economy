@@ -161,6 +161,7 @@
   "gui.lnbeconomy.shop.account": "Account",
   "gui.lnbeconomy.shop.account.value": "Account: %s",
   "gui.lnbeconomy.shop.lots": "Lots",
+  "gui.lnbeconomy.shop.material": "Pedestal material",
   "gui.lnbeconomy.shop.items_total": "that is %s items",
   "gui.lnbeconomy.shop.buy": "Buy %s",
   "gui.lnbeconomy.shop.sell": "Sell %s",

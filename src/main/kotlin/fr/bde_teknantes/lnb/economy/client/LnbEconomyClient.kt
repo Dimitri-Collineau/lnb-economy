@@ -5,6 +5,7 @@ import fr.bde_teknantes.lnb.economy.ModContent
 import fr.bde_teknantes.lnb.economy.client.gui.AuctioneerRenderer
 import fr.bde_teknantes.lnb.economy.client.gui.CounterTellerRenderer
 import fr.bde_teknantes.lnb.economy.client.gui.InventoryBalance
+import fr.bde_teknantes.lnb.economy.client.gui.ShopShowcaseRenderer
 import fr.bde_teknantes.lnb.economy.client.gui.ShopSettingsScreen
 import fr.bde_teknantes.lnb.economy.client.gui.TradeScreen
 import net.neoforged.api.distmarker.Dist
@@ -27,6 +28,7 @@ class LnbEconomyClient(modBus: IEventBus, container: ModContainer) {
         modBus.addListener<EntityRenderersEvent.RegisterRenderers> {
             it.registerEntityRenderer(ModContent.AUCTIONEER.get(), ::AuctioneerRenderer)
             it.registerBlockEntityRenderer(ModContent.COUNTER_ENTITY.get(), ::CounterTellerRenderer)
+            it.registerBlockEntityRenderer(ModContent.SHOP_ENTITY.get(), ::ShopShowcaseRenderer)
         }
         NeoForge.EVENT_BUS.addListener(ClientTrade::onClientTick)
         NeoForge.EVENT_BUS.addListener(ClientEconomy::onLoggingOut)
