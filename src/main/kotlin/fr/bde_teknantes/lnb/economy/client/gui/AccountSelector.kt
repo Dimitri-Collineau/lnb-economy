@@ -11,7 +11,7 @@ import net.minecraft.network.chat.Component
  * An account picker in the casino look: the account's icon, a label, and its balance with the LNBit coin. A click moves
  * to the next of [choices]; the arrow shows only when there is more than one.
  */
-class AccountSelector(
+open class AccountSelector(
     x: Int, y: Int, width: Int, height: Int,
     private val choices: List<AccountEntry>,
     initial: AccountEntry,
@@ -45,7 +45,7 @@ class AccountSelector(
             val balance = Lnbit.compact(value.balance, minecraft.options.languageCode)
             graphics.drawString(font, balance, right - font.width(balance), textY, CasinoUi.GOLD_TEXT, true)
         }
-        if (cycles) graphics.blitSprite(CasinoUi.PAGE_FORWARD, x + width - 9, textY - 1, 7, 11)
+        if (cycles) graphics.blitSprite(CasinoUi.PAGE_FORWARD, x + width - 9, y + (height - 11) / 2, 7, 11)
     }
 
     override fun updateWidgetNarration(output: NarrationElementOutput) = defaultButtonNarrationText(output)

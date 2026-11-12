@@ -89,10 +89,10 @@ class TradeMenu(
         const val SLOTS = 12
         const val FIRST_INVENTORY_SLOT = SLOTS * 2
 
-        const val MINE_X = 8
-        const val THEIRS_X = 98
-        const val OFFER_Y = 18
-        const val INVENTORY_X = 8
-        const val INVENTORY_Y = 120
+        const val MINE_X = 16
+        const val THEIRS_X = 110
+        const val OFFER_Y = 39
+        const val INVENTORY_X = 18
+        const val INVENTORY_Y = 155
     }
 }

@@ -3,15 +3,12 @@ package fr.bde_teknantes.lnb.economy.client.gui
 import fr.bde_teknantes.lnb.economy.client.ClientEconomy
 import fr.bde_teknantes.lnb.economy.client.ClientTrade
 import fr.bde_teknantes.lnb.economy.money.Amounts
-import fr.bde_teknantes.lnb.economy.network.AccountEntry
 import fr.bde_teknantes.lnb.economy.network.TradeMoneyPayload
 import fr.bde_teknantes.lnb.economy.network.TradeReadyPayload
 import fr.bde_teknantes.lnb.economy.trade.TradeMenu
 import fr.bde_teknantes.lnb.economy.trade.TradeTerms
-import net.minecraft.ChatFormatting
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.Button
-import net.minecraft.client.gui.components.CycleButton
 import net.minecraft.client.gui.components.EditBox
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.chat.Component
@@ -19,32 +16,57 @@ import net.minecraft.world.entity.player.Inventory
 import net.neoforged.neoforge.network.PacketDistributor
 
 /**
- * A trade as one player sees it: their offer and the other's, the LNBits each gives, and the Ready button. What is
- * shown comes from the menu's slots and [ClientTrade.state]; this screen only draws it and sends changes. Its look is
- * temporary.
+ * A trade as one player sees it: their offer and the other's side by side, each with its LNBits and a ready light; the
+ * account and the Ready button; a banner with the countdown, big, or the warning when the player no longer holds their
+ * offer; then their inventory. What is shown comes from the menu's slots and [ClientTrade.state]; this screen only
+ * draws it and sends changes. Slot positions are in [TradeMenu].
  */
 class TradeScreen(menu: TradeMenu, inventory: Inventory, title: Component) :
     AbstractContainerScreen<TradeMenu>(menu, inventory, title) {
+    private companion object {
+        const val WIDTH = 196
+        const val HEIGHT = 240
+        const val TITLE_Y = 12
+        const val OFFER_Y = 22
+        const val OFFER_WIDTH = 86
+        const val OFFER_HEIGHT = 88
+        const val MINE_X = 8
+        const val THEIRS_X = 102
+        /** The money line, 2 px under the offer's slots. */
+        const val MONEY_Y = OFFER_Y + 72
+        const val FIELD_WIDTH = 60
+        const val ROW_Y = OFFER_Y + OFFER_HEIGHT + 2
+        const val ACCOUNT_WIDTH = 124
+        const val READY_X = 136
+        const val READY_WIDTH = 52
+        const val BANNER_Y = ROW_Y + 19
+        const val BANNER_HEIGHT = 20
+        const val GREEN = 0xFF78E68C.toInt()
+        const val RED = 0xFFFF6060.toInt()
+        const val OUTLINE = 0xFF0C1813.toInt()
+    }
+
     private lateinit var amount: EditBox
-    private var account: CycleButton<AccountEntry>? = null
+    private var account: AccountSelector? = null
     private lateinit var ready: Button
 
     private val language: String get() = minecraft?.options?.languageCode ?: "en_us"
 
     init {
-        imageWidth = 176
-        imageHeight = 202
-        inventoryLabelY = TradeMenu.INVENTORY_Y - 10
+        imageWidth = WIDTH
+        imageHeight = HEIGHT
     }
 
     override fun init() {
         super.init()
         val state = ClientTrade.state
-        amount = EditBox(font, leftPos + TradeMenu.MINE_X, topPos + 78, 72, 14, Component.translatable("gui.lnbeconomy.trade.amount"))
+        amount = EditBox(font, leftPos + MINE_X + 11, topPos + MONEY_Y + 3, FIELD_WIDTH - 8, 10, Component.translatable("gui.lnbeconomy.trade.amount"))
+        amount.setBordered(false)
+        amount.setTextColor(CasinoUi.IVORY)
         amount.setMaxLength(13)
         amount.setFilter { text -> text.all(Char::isDigit) }
         amount.value = if (state.myAmount > 0) state.myAmount.toString() else ""
-        amount.setHint(Component.literal("0").withStyle(ChatFormatting.DARK_GRAY))
+        amount.setHint(Component.literal("0").withColor(CasinoUi.HINT))
         amount.setResponder { sendMoney() }
         addRenderableWidget(amount)
 
@@ -53,18 +75,18 @@ class TradeScreen(menu: TradeMenu, inventory: Inventory, title: Component) :
             ?: ClientEconomy.snapshot.defaultAccount?.takeIf { it in spendable }
             ?: spendable.firstOrNull()
         account = initial?.let {
-            addRenderableWidget(
-                CycleButton.builder<AccountEntry> { entry -> accountLabel(entry) }
-                    .withValues(spendable)
-                    .withInitialValue(it)
-                    .displayOnlyValue()
-                    .create(leftPos + TradeMenu.MINE_X, topPos + 96, 80, 16, Component.translatable("gui.lnbeconomy.trade.account")) { _, _ -> sendMoney() },
-            )
+            addRenderableWidget(object : AccountSelector(leftPos + MINE_X, topPos + ROW_Y, ACCOUNT_WIDTH, 16, spendable, it, AccountSelector::name) {
+                override fun onPress() {
+                    super.onPress()
+                    sendMoney()
+                }
+            })
         }
         ready = addRenderableWidget(
-            Button.builder(Component.empty()) { PacketDistributor.sendToServer(TradeReadyPayload(!ClientTrade.state.myReady)) }
-                .bounds(leftPos + TradeMenu.THEIRS_X, topPos + 96, 72, 16).build(),
+            CasinoButton.primary(Component.empty()) { PacketDistributor.sendToServer(TradeReadyPayload(!ClientTrade.state.myReady)) }
+                .bounds(leftPos + READY_X, topPos + ROW_Y, READY_WIDTH, 16).build(),
         )
+        updateReady()
     }
 
     private fun sendMoney() {
@@ -75,6 +97,10 @@ class TradeScreen(menu: TradeMenu, inventory: Inventory, title: Component) :
 
     override fun containerTick() {
         super.containerTick()
+        updateReady()
+    }
+
+    private fun updateReady() {
         ready.message = Component.translatable(if (ClientTrade.state.myReady) "gui.lnbeconomy.trade.not_ready" else "gui.lnbeconomy.trade.ready")
     }
 
@@ -85,33 +111,65 @@ class TradeScreen(menu: TradeMenu, inventory: Inventory, title: Component) :
     }
 
     override fun renderBg(graphics: GuiGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
-        graphics.fill(leftPos, topPos, leftPos + imageWidth, topPos + imageHeight, 0xFFC6C6C6.toInt())
-        for (slot in menu.slots) {
-            val x = leftPos + slot.x
-            val y = topPos + slot.y
-            graphics.fill(x - 1, y - 1, x + 17, y + 17, 0xFF8B8B8B.toInt())
-            graphics.fill(x, y, x + 16, y + 16, 0xFF373737.toInt())
+        val state = ClientTrade.state
+        CasinoUi.panel(graphics, leftPos, topPos, imageWidth, imageHeight)
+        for ((x, isReady) in listOf(MINE_X to state.myReady, THEIRS_X to state.theirReady)) {
+            graphics.blitSprite(CasinoUi.PANEL_INSET, leftPos + x, topPos + OFFER_Y, OFFER_WIDTH, OFFER_HEIGHT)
+            graphics.blitSprite(if (isReady) CasinoUi.LIGHT_ON else CasinoUi.LIGHT_OFF, leftPos + x + OFFER_WIDTH - 13, topPos + OFFER_Y + 5, 7, 7)
         }
+        for (slot in menu.slots) graphics.blitSprite(CasinoUi.SLOT, leftPos + slot.x - 1, topPos + slot.y - 1, 18, 18)
+        val field = if (amount.isFocused) CasinoUi.TEXT_FIELD_HIGHLIGHTED else CasinoUi.TEXT_FIELD
+        graphics.blitSprite(field, leftPos + MINE_X + 7, topPos + MONEY_Y, FIELD_WIDTH, 14)
+        if (banner() != null) graphics.blitSprite(CasinoUi.PANEL_INSET, leftPos + 8, topPos + BANNER_Y, imageWidth - 16, BANNER_HEIGHT)
     }
 
     override fun renderLabels(graphics: GuiGraphics, mouseX: Int, mouseY: Int) {
         val state = ClientTrade.state
-        graphics.drawString(font, Component.translatable("gui.lnbeconomy.trade.you"), TradeMenu.MINE_X, 6, 0x404040, false)
-        graphics.drawString(font, Component.literal(menu.partner), TradeMenu.THEIRS_X, 6, 0x404040, false)
-        graphics.drawString(font, Component.translatable("gui.lnbeconomy.trade.gives", Amounts.format(state.theirAmount, language)), TradeMenu.THEIRS_X, 81, 0x404040, false)
-        graphics.drawString(font, mark(state.myReady), TradeMenu.MINE_X + 74, 81, 0xFFFFFF, false)
-        graphics.drawString(font, mark(state.theirReady), TradeMenu.THEIRS_X + 74, 98, 0xFFFFFF, false)
-        val status = when {
-            state.countdown >= 0 -> Component.translatable("gui.lnbeconomy.trade.countdown", state.countdown).withStyle(ChatFormatting.DARK_GREEN)
-            !holdsOffer() -> Component.translatable("gui.lnbeconomy.trade.missing").withStyle(ChatFormatting.DARK_RED)
-            else -> null
+        CasinoUi.title(graphics, font, title, imageWidth / 2, TITLE_Y)
+        graphics.drawString(font, Component.translatable("gui.lnbeconomy.trade.you"), MINE_X + 6, OFFER_Y + 5, CasinoUi.GOLD_TEXT, true)
+        graphics.drawString(font, Component.literal(menu.partner), THEIRS_X + 6, OFFER_Y + 5, CasinoUi.GOLD_TEXT, true)
+
+        // My coin, after the field; their money, in gold. The coin sits one pixel above the digits.
+        graphics.drawString(font, Lnbit.symbol(), MINE_X + 70, MONEY_Y + 2, CasinoUi.GOLD_TEXT, true)
+        val plusX = THEIRS_X + 9
+        graphics.drawString(font, "+", plusX, MONEY_Y + 3, CasinoUi.GOLD_TEXT, true)
+        val coinX = plusX + font.width("+ ")
+        graphics.drawString(font, Lnbit.symbol(), coinX, MONEY_Y + 2, CasinoUi.GOLD_TEXT, true)
+        graphics.drawString(font, Amounts.format(state.theirAmount, language), coinX + font.width(Lnbit.symbol()) + font.width(" "), MONEY_Y + 3, CasinoUi.GOLD_TEXT, true)
+
+        when (banner()) {
+            Banner.COUNTDOWN -> countdown(graphics, state.countdown)
+            Banner.MISSING -> {
+                val text = Component.translatable("gui.lnbeconomy.trade.missing")
+                graphics.drawString(font, text, (imageWidth - font.width(text)) / 2, BANNER_Y + 6, RED, true)
+            }
+            null -> graphics.drawString(font, playerInventoryTitle, 18, BANNER_Y + 8, CasinoUi.DIM, true)
         }
-        status?.let { graphics.drawString(font, it, TradeMenu.MINE_X, inventoryLabelY, 0xFFFFFF, false) }
-            ?: graphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, 0x404040, false)
     }
 
-    private fun mark(ready: Boolean): Component =
-        if (ready) Component.literal("✔").withStyle(ChatFormatting.DARK_GREEN) else Component.literal("…").withStyle(ChatFormatting.GRAY)
+    /** "Trading in" and the seconds left, twice as big, side by side and centered in the banner. */
+    private fun countdown(graphics: GuiGraphics, seconds: Int) {
+        val label = Component.translatable("gui.lnbeconomy.trade.countdown").append(" ")
+        val digits = Component.literal(seconds.toString())
+        val bigWidth = font.width(digits) * 2
+        val x = (imageWidth - font.width(label) - bigWidth) / 2
+        graphics.drawString(font, label, x, BANNER_Y + 9, GREEN, true)
+        val pose = graphics.pose()
+        pose.pushPose()
+        pose.translate((x + font.width(label)).toFloat(), (BANNER_Y + 2).toFloat(), 0f)
+        pose.scale(2f, 2f, 1f)
+        font.drawInBatch8xOutline(digits.visualOrderText, 0f, 0f, GREEN, OUTLINE, pose.last().pose(), graphics.bufferSource(), 0xF000F0)
+        graphics.flush()
+        pose.popPose()
+    }
+
+    private enum class Banner { COUNTDOWN, MISSING }
+
+    private fun banner(): Banner? = when {
+        ClientTrade.state.countdown >= 0 -> Banner.COUNTDOWN
+        !holdsOffer() -> Banner.MISSING
+        else -> null
+    }
 
     /** Whether the player still has everything they offer: the trade fails otherwise. */
     private fun holdsOffer(): Boolean {
@@ -123,10 +181,5 @@ class TradeScreen(menu: TradeMenu, inventory: Inventory, title: Component) :
     override fun render(graphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
         super.render(graphics, mouseX, mouseY, partialTick)
         renderTooltip(graphics, mouseX, mouseY)
-    }
-
-    private fun accountLabel(account: AccountEntry): Component {
-        val name = if (account.isPersonal) Component.translatable("gui.lnbeconomy.accounts.personal").string else "#${account.handle}"
-        return Component.literal("$name  ").append(Lnbit.compact(account.balance, language))
     }
 }
