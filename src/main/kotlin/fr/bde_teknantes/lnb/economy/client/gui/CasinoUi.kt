@@ -20,6 +20,9 @@ object CasinoUi {
     val ACCOUNT_SHARED = sprite("account_shared")
     val STAR = sprite("star")
     val STAR_EMPTY = sprite("star_empty")
+    val TEXT_FIELD = sprite("text_field")
+    val TEXT_FIELD_HIGHLIGHTED = sprite("text_field_highlighted")
+    val PAGE_FORWARD = sprite("page_forward")
 
     /** Normal, highlighted (hovered or focused) and disabled sprites of a button family. */
     class ButtonSprites(name: String) {
@@ -41,6 +44,8 @@ object CasinoUi {
     const val IVORY = 0xFFF0E8D0.toInt()
     const val DIM = 0xFFB0BEAC.toInt()
     const val GREY = 0xFF808080.toInt()
+    /** Placeholder text inside an empty text field. */
+    const val HINT = 0xFF5A6E60.toInt()
     const val TITLE_OUTLINE = 0xFF140E06.toInt()
 
     /** Bracket sprites are 7x13; the container's top edge is their 9th row. */
