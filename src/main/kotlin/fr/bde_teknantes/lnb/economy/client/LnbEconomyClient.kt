@@ -6,6 +6,7 @@ import fr.bde_teknantes.lnb.economy.client.gui.AuctioneerRenderer
 import fr.bde_teknantes.lnb.economy.client.gui.CasinoDealerRenderer
 import fr.bde_teknantes.lnb.economy.client.gui.CounterTellerRenderer
 import fr.bde_teknantes.lnb.economy.client.gui.InventoryBalance
+import fr.bde_teknantes.lnb.economy.client.gui.PokerTableRenderer
 import fr.bde_teknantes.lnb.economy.client.gui.ShopShowcaseRenderer
 import fr.bde_teknantes.lnb.economy.client.gui.ShopSettingsScreen
 import fr.bde_teknantes.lnb.economy.client.gui.TradeScreen
@@ -31,6 +32,7 @@ class LnbEconomyClient(modBus: IEventBus, container: ModContainer) {
             it.registerEntityRenderer(ModContent.CASINO_DEALER.get(), ::CasinoDealerRenderer)
             it.registerBlockEntityRenderer(ModContent.COUNTER_ENTITY.get(), ::CounterTellerRenderer)
             it.registerBlockEntityRenderer(ModContent.SHOP_ENTITY.get(), ::ShopShowcaseRenderer)
+            it.registerBlockEntityRenderer(ModContent.POKER_ENTITY.get(), ::PokerTableRenderer)
         }
         NeoForge.EVENT_BUS.addListener(ClientTrade::onClientTick)
         NeoForge.EVENT_BUS.addListener(ClientEconomy::onLoggingOut)

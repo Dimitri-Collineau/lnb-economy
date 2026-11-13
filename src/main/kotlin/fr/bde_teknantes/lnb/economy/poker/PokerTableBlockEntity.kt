@@ -19,11 +19,15 @@ import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.Tag
+import net.minecraft.network.protocol.Packet
+import net.minecraft.network.protocol.game.ClientGamePacketListener
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
+import net.minecraft.world.level.block.Block.UPDATE_CLIENTS
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.neoforged.neoforge.network.PacketDistributor
@@ -52,6 +56,16 @@ class PokerTableBlockEntity(pos: BlockPos, state: BlockState) : BlockEntity(ModC
     private val viewers = HashSet<UUID>()
     private var refunds: List<Owed> = emptyList()
     private var sinceSync = 0
+
+    /** Game time when the round's script started, so clients play it at the same moment. */
+    private var scriptBase = 0L
+
+    /** What clients last got of the script: when it changes, they get it again. */
+    private var scriptSent = ""
+
+    /** The round as the client renders it: cards and gestures on the game clock. Null on the server. */
+    var view: PokerTableView? = null
+        private set
 
     private fun key(level: ServerLevel) = TableKey(level.dimension().location().toString(), blockPos.asLong())
 
@@ -148,13 +162,18 @@ class PokerTableBlockEntity(pos: BlockPos, state: BlockState) : BlockEntity(ModC
         }
         val phase = round.phase
         val settled = round.tick()
+        scriptBase = level.gameTime - round.now
         if (settled != null) settle(level, settled)
-        if (round.phase != phase) {
+        syncScript(level)
+        if (round.phase != phase || settled != null) {
             if (round.phase == HoldemRound.Phase.DECISION) level.playSound(null, blockPos, SoundEvents.BOOK_PAGE_TURN, SoundSource.BLOCKS, 1f, 1.3f)
             if (round.phase == HoldemRound.Phase.WAITING) roundCasino = null
             changed(level)
         } else if (++sinceSync >= 20 && round.phase != HoldemRound.Phase.WAITING) {
             sync(level) // the countdown
+        } else if (round.phase == HoldemRound.Phase.DEALING || round.phase == HoldemRound.Phase.SHOWDOWN) {
+            // Cards land one by one: the screen follows the table.
+            if (round.now % 11 == 0) sync(level)
         }
     }
 
@@ -204,6 +223,34 @@ class PokerTableBlockEntity(pos: BlockPos, state: BlockState) : BlockEntity(ModC
 
     // What players see
 
+    /** Sends the round's script to every client that sees the table when it changes: a deal, a showdown, a clear. */
+    private fun syncScript(level: ServerLevel) {
+        val script = round.script
+        val signature = "${round.phase}|${script.cards.size}|${script.gestures.size}|${script.watchSeat}|${script.watchTo}"
+        if (signature == scriptSent) return
+        scriptSent = signature
+        level.sendBlockUpdated(blockPos, blockState, blockState, UPDATE_CLIENTS)
+    }
+
+    override fun getUpdateTag(registries: HolderLookup.Provider): CompoundTag {
+        val script = round.script
+        val tag = CompoundTag()
+        tag.putLong(VIEW_BASE, scriptBase)
+        // The dealer's cards go out face down until the showdown has them turned.
+        tag.putIntArray(VIEW_CARDS, script.cards.flatMap { listOf(it.seat, it.index, if (it.seat == HoldemRound.DEALER && it.flipAt < 0) Cards.HIDDEN else it.value, it.dealtAt, it.flipAt) })
+        tag.putIntArray(VIEW_GESTURES, script.gestures.flatMap { listOf(it.gesture.ordinal, it.at, it.seat, it.index) })
+        tag.putIntArray(VIEW_TIMES, intArrayOf(script.clearAt, script.watchFrom, script.watchTo, script.watchSeat))
+        return tag
+    }
+
+    override fun getUpdatePacket(): Packet<ClientGamePacketListener> = ClientboundBlockEntityDataPacket.create(this)
+
+    /** On the client: the script the server sent with the block. */
+    private fun readView(tag: CompoundTag) {
+        val times = tag.getIntArray(VIEW_TIMES)
+        view = PokerTableView.read(tag.getLong(VIEW_BASE), tag.getIntArray(VIEW_CARDS), tag.getIntArray(VIEW_GESTURES), times)
+    }
+
     private fun changed(level: ServerLevel) {
         setChanged()
         sync(level)
@@ -229,18 +276,22 @@ class PokerTableBlockEntity(pos: BlockPos, state: BlockState) : BlockEntity(ModC
     private fun state(level: ServerLevel, open: Boolean): PokerStatePayload {
         val link = link(level)
         val casino = roundCasino ?: link?.handle.orEmpty()
-        val shown = round.phase == HoldemRound.Phase.SHOWDOWN
+        val shown = round.phase == HoldemRound.Phase.SHOWDOWN && round.resultsOut
         val seats = (0 until HoldemRound.SEATS).map { index ->
             round.seat(index)?.let { seat ->
+                // A seat's cards show once the dealer has put them down.
+                val dealt = round.script.cards.filter { it.seat == index && it.dealtAt + CARD_LANDS <= round.now }.sortedBy { it.index }.map { it.value }
                 PokerSeatView(
-                    seat.name, seat.ante, seat.cards, seat.choice.ordinal, if (shown) seat.result?.ordinal ?: -1 else -1, if (shown) seat.payout else 0,
-                    if (shown && seat.choice == HoldemRound.Choice.CALL) Hands.category(Hands.score(seat.cards + round.board)) else -1,
+                    seat.name, seat.ante, dealt, seat.choice.ordinal, if (shown) seat.result?.ordinal ?: -1 else -1, if (shown) seat.payout else 0,
+                    if (shown && seat.choice == HoldemRound.Choice.CALL) Hands.category(seat.score) else -1,
                 )
             }
         }
         return PokerStatePayload(
-            blockPos, casino, Casinos.name(casino), round.phase.ordinal, round.ticksLeft, round.board, round.dealerShown,
-            if (shown && round.dealer.isNotEmpty()) Hands.category(Hands.score(round.dealer + round.board)) else -1,
+            blockPos, casino, Casinos.name(casino), round.phase.ordinal, round.ticksLeft,
+            round.script.cards.filter { it.seat == HoldemRound.BOARD && it.dealtAt + CARD_LANDS <= round.now }.sortedBy { it.index }.map { it.value },
+            round.dealerShown.take(round.script.cards.count { it.seat == HoldemRound.DEALER && it.dealtAt + CARD_LANDS <= round.now }),
+            if (shown && round.board.size == 5) Hands.category(Hands.score(round.dealer + round.board)) else -1,
             seats, link?.maxBet ?: 0, open,
         )
     }
@@ -270,6 +321,10 @@ class PokerTableBlockEntity(pos: BlockPos, state: BlockState) : BlockEntity(ModC
 
     override fun loadAdditional(tag: CompoundTag, registries: HolderLookup.Provider) {
         super.loadAdditional(tag, registries)
+        if (tag.contains(VIEW_CARDS)) {
+            readView(tag)
+            return
+        }
         val list = tag.getList(OWED, Tag.TAG_COMPOUND.toInt())
         refunds = (0 until list.size).map(list::getCompound).filter { it.hasUUID("player") }
             .map { Owed(it.getUUID("player"), it.getLong("value"), it.getString("casino")) }
@@ -277,6 +332,13 @@ class PokerTableBlockEntity(pos: BlockPos, state: BlockState) : BlockEntity(ModC
 
     private companion object {
         const val OWED = "owed"
+        const val VIEW_BASE = "viewBase"
+        const val VIEW_CARDS = "viewCards"
+        const val VIEW_GESTURES = "viewGestures"
+        const val VIEW_TIMES = "viewTimes"
+
+        /** A dealt card flies for this long before it lies on the table (MineVegas's card motion). */
+        const val CARD_LANDS = 23
         const val WATCH_RANGE = 12.0
 
         /** A round lasts well under this; past it, a table that stopped ticking no longer holds the casino's money. */

@@ -276,10 +276,11 @@ to cover the antes (102 times each ante).
 | 12.4 | A: right click, ante 10, Sit on the middle seat | 10 in chips leave A's inventory (change comes back in smaller chips); A's face and name on the seat; "Cards in 10 s" |
 | 12.5 | B: right click before the countdown ends, ante 20, Sit | B sits beside A; both screens show both seats |
 | 12.6 | C: ante 5, Sit on the last seat | The cards come within 2 seconds: a full table doesn't wait |
-| 12.7 | Everyone looks | Two cards each, face up for all; the dealer's two face down; three board cards; "Call or fold: 25 s" |
+| 12.6b | Look at the table | A croupier behind it shuffles, then deals the cards one by one onto the felt, toward each seat; the seated players' cameras turn to him and their screen becomes a side panel without a dark veil |
+| 12.7 | Everyone looks | Two cards each, face up for all; the dealer's two face down; three board cards; "Call or fold: 25 s"; the croupier watches the seat that hasn't chosen |
 | 12.8 | A: Call (20). B: Fold. C: let the time run out | A's stake reads 30; B "Folded"; at the end C is folded too |
-| 12.9 | The showdown | Five board cards, the dealer's cards and hand; each seat's hand and result; chips paid; a chat line each ("you win", "the dealer doesn't play", "you folded") |
-| 12.10 | After about 8 seconds | The seats empty; "Waiting for an ante" |
+| 12.9 | The showdown | The croupier deals the last two cards, turns his two, then pays or collects; five board cards, the dealer's cards and hand; each seat's hand and result; chips paid; a chat line each ("you win", "the dealer doesn't play", "you folded") |
+| 12.10 | After about 4 seconds | The croupier sweeps the cards away; the seats empty; "Waiting for an ante" |
 | 12.11 | Ante 125 | "The largest bet at Test Casino is 100 LNBits.", in red with a low note |
 | 12.12 | Lower `#test-casino` on the site under 102 times the ante, wait for the refresh, ante | "Test Casino can't cover that bet right now."; no chip taken |
 | 12.13 | A: Call with fewer chips than twice the ante | "Call" is greyed; A can only fold |

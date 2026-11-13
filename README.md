@@ -33,7 +33,9 @@ the mod on a player's computer only talks to the server. The contract is `docs/e
   progress) can cover. Machines and counters are linked to a casino with the casino link wand, by an owner or member
   of its account. With MineVegas Casino installed, its machines take only chips of their casino.
 - **Poker table.** The mod's own table, craftable and 4 x 3 blocks, linked to a casino with the wand like a counter:
-  casino hold'em for up to three players at once against one dealer and one board. Each player antes in the casino's
+  casino hold'em for up to three players at once against one dealer and one board. A croupier stands behind it and
+  shuffles, deals each card onto the felt, turns his own and pays, with MineVegas's dealer and card animations; a
+  player's camera turns to him when the deal starts, and the screen steps aside into a side panel. Each player antes in the casino's
   chips and gets two cards; once the first three board cards are out, each calls for twice the ante or folds. The
   dealer plays from a pair of fours. Everyone at the table, and anyone watching, sees the same round. A round cut
   short by a broken table or a restart gives its stakes back. It works without MineVegas, and can be switched off
@@ -108,8 +110,6 @@ Casino, Kotlin for Forge and GeckoLib are installed separately. A tag fails the 
 
 - **Roles and closing in game.** Changing a member's role, removing a member and closing a shared account are done on
   the site.
-- **The poker table in the world.** Cards and stakes show in the table's screen only: nothing is drawn on the table
-  itself, and no dealer stands behind it.
 - **Several players at a MineVegas machine.** Duck Derby already races several players. MineVegas's own poker and
   blackjack seat one player: for poker, use this mod's table. Roulette with several bettors would take more mixins.
 - **The auctioneer's look.** The NPC still wears the plain vanilla villager texture. The plan is a clothing overlay on
@@ -118,11 +118,13 @@ Casino, Kotlin for Forge and GeckoLib are installed separately. A tag fails the 
 
 ## Credits
 
-The poker table's models and textures, and the playing cards of its screen, come from
+The poker table's models and textures, its croupier (model, animations and clothes) with the card motion, and the
+playing cards come from
 [MineVegas Casino](https://www.curseforge.com/minecraft/mc-mods/minevegas-casino) by byMehd, under its licence (MIT
 with an attribution condition), copied in `LICENSES/MineVegas-Casino.txt`. They are under
 `assets/lnbeconomy/models/block/poker_table_*.json`, `textures/block/poker/`, `textures/item/poker_table.png` and
-`textures/gui/cards.png`. Everything else is this project's own.
+`textures/gui/cards.png`, `textures/entity/poker_cards.png` and `textures/entity/poker_dealer/`, and the code in
+`src/main/java/fr/bde_teknantes/lnb/economy/poker/table/`. Everything else is this project's own.
 
 ## License
 
