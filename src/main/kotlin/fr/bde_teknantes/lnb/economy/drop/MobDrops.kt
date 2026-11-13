@@ -28,8 +28,9 @@ import java.util.UUID
 
 /**
  * Hostile mobs sometimes leave a few LNBits to the player who kills them. The money is new: the site mints it on the
- * player's personal account (reason `mobDrop`). Drops are added up per player and sent every `mobDrops.flushSeconds`,
- * so a mob farm doesn't call the site once per mob; mobs born from a spawner give nothing unless the config says so.
+ * player's personal account (reason `mobDrop`), right away, so the balance moves as the mob falls. With
+ * `mobDrops.flushSeconds` above 0, drops are added up per player and sent that often instead, so a mob farm doesn't
+ * call the site once per mob. Mobs born from a spawner give nothing unless the config says so.
  */
 object MobDrops {
     private const val PURPOSE = "mobDrop"
@@ -67,14 +68,14 @@ object MobDrops {
         val roll = MobDropRoll(EconomyConfig.MOB_DROPS_CHANCE.get(), EconomyConfig.MOB_DROPS_MIN.get(), EconomyConfig.MOB_DROPS_MAX.get())
         val amount = roll.amount(player.random.nextDouble(), player.random.nextDouble())
         if (amount <= 0) return
-        waiting.merge(player.uuid, amount, Long::plus)
+        if (EconomyConfig.MOB_DROPS_FLUSH_SECONDS.get() == 0) send(player.uuid, amount) else waiting.merge(player.uuid, amount, Long::plus)
         player.displayClientMessage(
             Component.translatable("economy.lnbeconomy.mob_drop", Texts.amount(amount, player)).withStyle(ChatFormatting.GOLD), true,
         )
     }
 
     fun onServerTick(event: ServerTickEvent.Post) {
-        if (++ticks < EconomyConfig.MOB_DROPS_FLUSH_SECONDS.get() * 20) return
+        if (waiting.isEmpty() || ++ticks < EconomyConfig.MOB_DROPS_FLUSH_SECONDS.get() * 20) return
         ticks = 0
         flush()
     }

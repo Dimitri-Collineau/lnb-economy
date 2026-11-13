@@ -78,8 +78,10 @@ object EconomyConfig {
         MOB_DROPS_MAX = BUILDER.comment("Most LNBits a drop gives.").defineInRange("max", 10, 1, 100_000)
         MOB_DROPS_SPAWNERS = BUILDER.comment("Whether mobs born from a spawner give LNBits too. Off, mob farms on spawners make no money.")
             .define("fromSpawners", false)
-        MOB_DROPS_FLUSH_SECONDS = BUILDER.comment("How often each player's drops are added up and sent to the site, in seconds.")
-            .defineInRange("flushSeconds", 30, 5, 600)
+        MOB_DROPS_FLUSH_SECONDS = BUILDER.comment(
+            "0 sends each drop to the site right away, so the money shows at once. Above 0, each player's drops are added",
+            "up and sent every that many seconds: fewer calls to the site when players farm mobs.",
+        ).defineInRange("flushSeconds", 0, 0, 600)
         SPEC = BUILDER.pop().build()
     }
 
