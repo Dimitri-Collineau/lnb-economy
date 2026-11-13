@@ -79,7 +79,7 @@ object ModContent {
         BlockEntityType.Builder.of(::ShopBlockEntity, SHOP.get()).build(null)
     })
 
-    /** One block; pistons can't push it, since its round and its link stay with its place. */
+    /** A 4 x 3 table (see PokerTableBlock): light passes around it, and pistons can't push it apart. */
     val POKER_TABLE: DeferredBlock<PokerTableBlock> = BLOCKS.registerBlock("poker_table", ::PokerTableBlock,
         BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_GREEN).strength(2.5f, 1200f).sound(SoundType.WOOD).noOcclusion()
             .pushReaction(PushReaction.BLOCK))

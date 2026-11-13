@@ -1,5 +1,6 @@
 package fr.bde_teknantes.lnb.economy.client.gui
 
+import fr.bde_teknantes.lnb.economy.LnbEconomy
 import fr.bde_teknantes.lnb.economy.chip.Chips
 import fr.bde_teknantes.lnb.economy.client.ClientPoker
 import fr.bde_teknantes.lnb.economy.network.PokerActionPayload
@@ -15,6 +16,7 @@ import net.minecraft.client.gui.screens.Screen
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.CommonComponents
 import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceLocation
 import net.neoforged.neoforge.network.PacketDistributor
 
 /**
@@ -27,23 +29,25 @@ class PokerScreen(val pos: BlockPos) : Screen(Component.translatable("gui.lnbeco
     private companion object {
         const val PANEL_WIDTH = 312
         const val PANEL_HEIGHT = 226
-        const val CARD_WIDTH = 20
-        const val CARD_HEIGHT = 28
-        const val CARD_GAP = 3
-        const val DEALER_Y = 24
-        const val BOARD_Y = 60
-        const val SEATS_Y = 98
+        const val CARD_WIDTH = 25
+        const val CARD_HEIGHT = 32
+        const val CARD_GAP = 2
+        const val DEALER_Y = 23
+        const val BOARD_Y = 58
+        const val SEATS_Y = 96
         const val SEAT_WIDTH = 92
-        const val SEAT_HEIGHT = 82
+        const val SEAT_HEIGHT = 86
         const val SEAT_GAP = 6
         const val CONTROLS_Y = 188
-        const val SUITS = "♠♥♦♣"
-        const val CARD_FACE = 0xFFF4EEDC.toInt()
-        const val CARD_EDGE = 0xFF2A2018.toInt()
-        const val CARD_BACK = 0xFF8E1F2B.toInt()
-        const val CARD_BACK_INNER = 0xFFB12C3A.toInt()
-        const val BLACK = 0xFF1C1C1C.toInt()
-        const val RED = 0xFFC22A2A.toInt()
+
+        /**
+         * MineVegas Casino's playing cards (see `LICENSES/MineVegas-Casino.txt`): 14 columns of 25 x 32, ace to king
+         * then the back, and one row per suit in [Cards]' order.
+         */
+        val CARDS: ResourceLocation = LnbEconomy.id("textures/gui/cards.png")
+        const val SHEET_WIDTH = 350
+        const val SHEET_HEIGHT = 128
+        const val BACK_COLUMN = 13
         const val GREEN = 0xFF78E68C.toInt()
         const val LOSS = 0xFFFF6060.toInt()
     }
@@ -97,7 +101,7 @@ class PokerScreen(val pos: BlockPos) : Screen(Component.translatable("gui.lnbeco
                     CasinoButton.primary(Component.translatable("gui.lnbeconomy.poker.sit")) {
                         val value = anteText.toLongOrNull() ?: 0
                         PacketDistributor.sendToServer(PokerActionPayload(pos, PokerActionPayload.SIT, index, value))
-                    }.bounds(x + 14, panelY + SEATS_Y + 34, SEAT_WIDTH - 28, 18).build(),
+                    }.bounds(x + 14, panelY + SEATS_Y + 36, SEAT_WIDTH - 28, 18).build(),
                 )
             }
         }
@@ -177,11 +181,11 @@ class PokerScreen(val pos: BlockPos) : Screen(Component.translatable("gui.lnbeco
         }
         Heads.draw(graphics, seat.name, x + 6, y + 5, 10)
         graphics.drawString(font, CasinoUi.fit(font, seat.name, SEAT_WIDTH - 26), x + 20, y + 6, if (seat.name == me) CasinoUi.GOLD_TEXT else CasinoUi.IVORY, true)
-        cards(graphics, seat.cards.ifEmpty { listOf(null, null) }, middle, y + 19)
+        cards(graphics, seat.cards.ifEmpty { listOf(null, null) }, middle, y + 20)
 
         val staked = if (seat.choice == HoldemRound.Choice.CALL.ordinal) seat.ante * (1 + HoldemRules.CALL_ANTES) else seat.ante
         val stake = Component.translatable("gui.lnbeconomy.poker.staked", Lnbit.compact(staked, language))
-        graphics.drawCenteredString(font, stake, middle, y + 51, CasinoUi.DIM)
+        graphics.drawCenteredString(font, stake, middle, y + 56, CasinoUi.DIM)
 
         val result = HoldemRules.Result.entries.getOrNull(seat.result)
         val (line, color) = when {
@@ -194,7 +198,7 @@ class PokerScreen(val pos: BlockPos) : Screen(Component.translatable("gui.lnbeco
             phase == HoldemRound.Phase.DECISION -> Component.translatable("gui.lnbeconomy.poker.choice.thinking") to CasinoUi.DIM
             else -> Component.translatable("gui.lnbeconomy.poker.choice.ready") to CasinoUi.DIM
         }
-        graphics.drawCenteredString(font, CasinoUi.fit(font, line.string, SEAT_WIDTH - 6), middle, y + 65, color)
+        graphics.drawCenteredString(font, CasinoUi.fit(font, line.string, SEAT_WIDTH - 6), middle, y + 69, color)
     }
 
     private fun hand(category: Int): Component = Component.translatable("gui.lnbeconomy.poker.hand.${category.coerceIn(0, 8)}")
@@ -210,19 +214,11 @@ class PokerScreen(val pos: BlockPos) : Screen(Component.translatable("gui.lnbeco
             graphics.renderOutline(x, y, CARD_WIDTH, CARD_HEIGHT, 0x60F0E8D0)
             return
         }
-        graphics.fill(x, y, x + CARD_WIDTH, y + CARD_HEIGHT, CARD_EDGE)
-        if (card == Cards.HIDDEN || card !in 0 until Cards.COUNT) {
-            graphics.fill(x + 1, y + 1, x + CARD_WIDTH - 1, y + CARD_HEIGHT - 1, CARD_BACK)
-            graphics.renderOutline(x + 3, y + 3, CARD_WIDTH - 6, CARD_HEIGHT - 6, CasinoUi.GOLD_TEXT)
-            graphics.fill(x + 5, y + 5, x + CARD_WIDTH - 5, y + CARD_HEIGHT - 5, CARD_BACK_INNER)
-            return
-        }
-        graphics.fill(x + 1, y + 1, x + CARD_WIDTH - 1, y + CARD_HEIGHT - 1, CARD_FACE)
-        val suit = Cards.suit(card)
-        val color = if (suit == 1 || suit == 2) RED else BLACK
-        graphics.drawString(font, Cards.rankLabel(card), x + 3, y + 3, color, false)
-        val glyph = SUITS[suit].toString()
-        graphics.drawString(font, glyph, x + CARD_WIDTH - 3 - font.width(glyph), y + CARD_HEIGHT - 11, color, false)
+        val shown = card in 0 until Cards.COUNT
+        // The sheet starts at the ace; ranks here start at the two.
+        val column = if (shown) (Cards.rank(card) + 1) % Cards.RANKS else BACK_COLUMN
+        val row = if (shown) Cards.suit(card) else 0
+        graphics.blit(CARDS, x, y, (column * CARD_WIDTH).toFloat(), (row * CARD_HEIGHT).toFloat(), CARD_WIDTH, CARD_HEIGHT, SHEET_WIDTH, SHEET_HEIGHT)
     }
 
     override fun onClose() {

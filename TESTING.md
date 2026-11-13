@@ -239,8 +239,8 @@ the site admin's economy settings.
 
 | # | Do | Expect |
 |---|----|--------|
-| 10.1 | Operator: `/economy npc licence Marcel` | A dishevelled dealer named Marcel, head hanging, who doesn't turn toward players; can't be hurt or pushed; hit in creative: gone |
-| 10.2 | A: right click him | His offer, the price, "Yours: 0 free of 0", the account that pays |
+| 10.1 | Operator: `/economy npc licence Marcel` | A dishevelled dealer named Marcel (visor askew, undone bow tie, a bottle held by its neck in his right fist), swaying, head hanging; every ten seconds he drinks from the bottle; he doesn't turn toward players; can't be hurt or pushed; hit in creative: gone |
+| 10.2 | A: right click him | He starts awake and waves; his offer, the price, "Yours: 0 free of 0", the account that pays |
 | 10.3 | A, with too little on the chosen account | "That account doesn't hold enough.", Buy greyed |
 | 10.4 | A: Buy, then Confirm | "Casino licence bought for …", a level-up sound, a signed book "Casino Licence" naming A; A −price; the site shows a burn with the reason casino licence; "Yours: 1 free of 1" |
 | 10.5 | A: My accounts, "+ New", Casino, Open | The account opens as a casino; free licences back to 0; Casino is locked again for a second account |
@@ -256,13 +256,41 @@ the site admin's economy settings.
 | # | Do | Expect |
 |---|----|--------|
 | 11.1 | A: kill a zombie | "+N from the mob" in gold above the hotbar, N from `min` to `max` |
-| 11.2 | Wait `flushSeconds` | A's personal balance went up by the total; one mint per flush on the site, reason mob drop |
+| 11.2 | Open the inventory right after | A's personal balance already went up by N; one mint on the site, reason mob drop |
+| 11.2b | `flushSeconds = 30`, restart, kill several zombies | The balance moves once, up to 30 seconds later, by the total; one mint for the batch |
 | 11.3 | Kill a cow; kill a zombie from a spawner | Nothing (with `fromSpawners = false`) |
-| 11.4 | Kill a zombie, log out before the flush | The drop is sent at once; the balance is right on the next login |
+| 11.4 | With `flushSeconds = 30`: kill a zombie, log out before the batch is sent | The drop is sent at once; the balance is right on the next login |
 | 11.5 | `enabled = false`, or the site flag off | Nothing drops; with the flag off, the server stops rolling for ten minutes after the refusal |
 | 11.6 | A guest (no linked account) kills a zombie | Nothing |
 
-## 12. Without MineVegas
+## 12. Poker table
 
-Remove MineVegas from the server and the client: the game starts, payments and counters work, the log has no mixin
-error.
+A, B and a third player C online, each with chips of `#test-casino` bought at a counter; `#test-casino` holds enough
+to cover the antes (102 times each ante).
+
+| # | Do | Expect |
+|---|----|--------|
+| 12.1 | Craft a poker table (gold ingot, green carpet, gold ingot; three dark oak planks; one plank under the middle) and place it | A 4 x 3 table, MineVegas's, facing the player; it needs the whole floor free |
+| 12.2 | Right click it | "This machine isn't linked to a casino." |
+| 12.3 | A: wand on any block of the table, link to `#test-casino`, largest bet 100 | Linked; the link screen says "poker table" |
+| 12.4 | A: right click, ante 10, Sit on the middle seat | 10 in chips leave A's inventory (change comes back in smaller chips); A's face and name on the seat; "Cards in 10 s" |
+| 12.5 | B: right click before the countdown ends, ante 20, Sit | B sits beside A; both screens show both seats |
+| 12.6 | C: ante 5, Sit on the last seat | The cards come within 2 seconds: a full table doesn't wait |
+| 12.7 | Everyone looks | Two cards each, face up for all; the dealer's two face down; three board cards; "Call or fold: 25 s" |
+| 12.8 | A: Call (20). B: Fold. C: let the time run out | A's stake reads 30; B "Folded"; at the end C is folded too |
+| 12.9 | The showdown | Five board cards, the dealer's cards and hand; each seat's hand and result; chips paid; a chat line each ("you win", "the dealer doesn't play", "you folded") |
+| 12.10 | After about 8 seconds | The seats empty; "Waiting for an ante" |
+| 12.11 | Ante 125 | "The largest bet at Test Casino is 100 LNBits.", in red with a low note |
+| 12.12 | Lower `#test-casino` on the site under 102 times the ante, wait for the refresh, ante | "Test Casino can't cover that bet right now."; no chip taken |
+| 12.13 | A: Call with fewer chips than twice the ante | "Call" is greyed; A can only fold |
+| 12.14 | A sits, a bystander opens the table | They see the round and can't act; walking 12 blocks away stops the updates |
+| 12.15 | A seated, closes the screen, walks off, comes back and opens it | A is still seated and can still call or fold |
+| 12.16 | Mid-round, break any block of the table | The whole table breaks, one item drops; "The poker round was interrupted: your … in chips are given back."; `/economy casino #test-casino`: chips in circulation as before the antes |
+| 12.17 | Mid-round, stop the server and start it again | Same message and chips for each seated player when the table's chunk loads |
+| 12.18 | `/economy casino #test-casino` during a round | "held for rounds" shows 102 times the antes until the showdown |
+| 12.19 | `casino.holdem = false` in the config, restart, ante | "This game is switched off on this server." |
+
+## 13. Without MineVegas
+
+Remove MineVegas from the server and the client: the game starts, payments, counters and the poker table work, the
+log has no mixin error.

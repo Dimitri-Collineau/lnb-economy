@@ -12,6 +12,13 @@
       "conditions": [
         {
           "condition": "minecraft:survives_explosion"
+        },
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "lnbeconomy:poker_table",
+          "properties": {
+            "part": "5"
+          }
         }
       ]
     }

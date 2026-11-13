@@ -39,7 +39,7 @@ object Links {
     fun targetAt(level: Level, pos: BlockPos): Target? {
         val state = level.getBlockState(pos)
         if (state.`is`(ModContent.COUNTER.get())) return Target(CounterBlock.masterPos(state, pos), null)
-        if (state.`is`(ModContent.POKER_TABLE.get())) return Target(pos, PokerTableBlock.GAME)
+        if (state.`is`(ModContent.POKER_TABLE.get())) return Target(PokerTableBlock.anchorOf(pos, state), PokerTableBlock.GAME)
         val support = Machines.support ?: return null
         val anchor = support.anchorAt(level, pos) ?: return null
         return Target(anchor, support.gameAt(level, anchor))

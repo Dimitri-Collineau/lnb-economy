@@ -32,6 +32,12 @@ the mod on a player's computer only talks to the server. The contract is `docs/e
   and a machine only starts a game the casino's **free balance** (balance − chips in circulation − rounds in
   progress) can cover. Machines and counters are linked to a casino with the casino link wand, by an owner or member
   of its account. With MineVegas Casino installed, its machines take only chips of their casino.
+- **Poker table.** The mod's own table, craftable and 4 x 3 blocks, linked to a casino with the wand like a counter:
+  casino hold'em for up to three players at once against one dealer and one board. Each player antes in the casino's
+  chips and gets two cards; once the first three board cards are out, each calls for twice the ante or folds. The
+  dealer plays from a pair of fours. Everyone at the table, and anyone watching, sees the same round. A round cut
+  short by a broken table or a restart gives its stakes back. It works without MineVegas, and can be switched off
+  with `casino.holdem` in the config.
 - **Shops.** A shop block sells one item, in lots, for an account its owner or a member chooses, and may buy it back
   at a lower or equal price. Or it only **buys**: the owner picks any item from a search, a price per lot and how many
   the shop holds at most, and players bring it the item; each kind has its own screen for customers. Its owners and members fill it (hoppers can fill it too, never empty it), set it up and
@@ -48,7 +54,8 @@ the mod on a player's computer only talks to the server. The contract is `docs/e
   operators' creative tab, unbreakable outside creative) or the auctioneer NPC (`/economy npc hdv [name]`, removed
   by an operator hitting it in creative).
 - **Mob drops.** A hostile mob killed by a player has a chance (10 %) to leave them a few LNBits (1 to 10), minted by
-  the site on their personal account. Chance, amounts and whether spawner mobs count are in the config.
+  the site on their personal account right away. Chance, amounts, whether spawner mobs count, and sending the drops
+  in batches instead (`mobDrops.flushSeconds`) are in the config.
 - **Mailbox.** Items owed to a player (bought chips or items, items handed back) go straight to the inventory; what
   doesn't fit waits for `/mailbox`. Nothing is dropped on the ground.
 - **Reliability.** Every money move is written to `<world>/data/lnbeconomy_journal.json` before it is sent, and sent
@@ -77,7 +84,7 @@ player has no economy.
 The site's URL and the server's token are LNB Warden's: `api.url` and `api.token` in `config/lnbwarden-server.toml`.
 LNB Economy's own settings are in `config/lnbeconomy-server.toml` (confirmation threshold, refresh times, games on or
 off, switches for shops, trades, the auction house and its `/hdv` command, and mob drops: on or off, chance, smallest
-and largest amount, spawner mobs, how often they are sent). Neither file is ever sent to players.
+and largest amount, spawner mobs, and whether they are sent one by one or in batches). Neither file is ever sent to players.
 
 ## Building
 
@@ -101,13 +108,21 @@ Casino, Kotlin for Forge and GeckoLib are installed separately. A tag fails the 
 
 - **Roles and closing in game.** Changing a member's role, removing a member and closing a shared account are done on
   the site.
-- **The licence dealer's look.** His clothes are a first pass drawn by script on the villager; a Blockbench pass is
-  planned.
-- **Several players at one MineVegas table.** Duck Derby already races several players. Roulette and "bet behind" at
-  blackjack would take more mixins into MineVegas; independent hands at one table would mean rewriting the game.
+- **The poker table in the world.** Cards and stakes show in the table's screen only: nothing is drawn on the table
+  itself, and no dealer stands behind it.
+- **Several players at a MineVegas machine.** Duck Derby already races several players. MineVegas's own poker and
+  blackjack seat one player: for poker, use this mod's table. Roulette with several bettors would take more mixins.
 - **The auctioneer's look.** The NPC still wears the plain vanilla villager texture. The plan is a clothing overlay on
   top of it, like the counter's teller: dark suit, waistcoat, crimson bow tie, gold monocle. A gavel in its hand would
   need GeckoLib.
+
+## Credits
+
+The poker table's models and textures, and the playing cards of its screen, come from
+[MineVegas Casino](https://www.curseforge.com/minecraft/mc-mods/minevegas-casino) by byMehd, under its licence (MIT
+with an attribution condition), copied in `LICENSES/MineVegas-Casino.txt`. They are under
+`assets/lnbeconomy/models/block/poker_table_*.json`, `textures/block/poker/`, `textures/item/poker_table.png` and
+`textures/gui/cards.png`. Everything else is this project's own.
 
 ## License
 
