@@ -134,7 +134,7 @@ object SharedAccounts {
                     player,
                     AccountMembersPayload(
                         handle,
-                        answer.members.map { MemberEntry(it.username ?: "?", it.role) },
+                        answer.members.map { MemberEntry(it.username?.ifBlank { null } ?: "?", it.role) },
                         answer.invitations.map { PendingEntry(it.id, it.username) },
                     ),
                 )
@@ -145,7 +145,7 @@ object SharedAccounts {
             )
             for (member in answer.members) {
                 player.sendSystemMessage(
-                    Component.translatable("economy.lnbeconomy.account.members.line", member.username ?: "?", Component.translatable("gui.lnbeconomy.accounts.role.${member.role}")),
+                    Component.translatable("economy.lnbeconomy.account.members.line", member.username?.ifBlank { null } ?: "?", Component.translatable("gui.lnbeconomy.accounts.role.${member.role}")),
                 )
             }
             for (invitation in answer.invitations) {
@@ -161,17 +161,27 @@ object SharedAccounts {
         if (!hasEconomy(reply)) return
         val player = reply.player
         val server = player.server
-        reply.handle(EconomyApi.invite(handle, InviteBody(player.uuid.toString(), username))) { invitation ->
+        val call = EconomyApi.invite(handle, InviteBody(player.uuid.toString(), username))
+        // Here "not eligible" is about the invited player, not the one asking.
+        val named = call.thenApply { result ->
+            if (result is ApiResult.Http && result.problem == Problems.NOT_ELIGIBLE) {
+                server.execute { reply.error("economy.lnbeconomy.pay.target_no_economy", username) }
+                null
+            } else {
+                result
+            }
+        }
+        named.thenAccept { result -> if (result != null) reply.handle(CompletableFuture.completedFuture(result)) { invitation ->
             reply.ok("economy.lnbeconomy.account.invited", invitation.username, invitation.account.name)
             if (reply.screen) members(reply, handle)
             // Tell the invited player on every Minecraft account of theirs that is on.
             for (uuid in invitation.inviteeUuids.orEmpty().mapNotNull { runCatching { UUID.fromString(it) }.getOrNull() }) {
                 val invited = server.playerList.getPlayer(uuid) ?: continue
                 PlayerAccounts.refresh(server, uuid)
-                invited.sendSystemMessage(invitationMessage(invitation.id, invitation.account.name, invitation.account.handle, invitation.invitedBy ?: player.gameProfile.name))
+                invited.sendSystemMessage(invitationMessage(invitation.id, invitation.account.name, invitation.account.handle, invitation.invitedBy?.ifBlank { null } ?: player.gameProfile.name))
                 invited.playNotifySound(SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.6f, 1.2f)
             }
-        }
+        } }
     }
 
     private fun cancel(reply: Reply, rawHandle: String, invitationId: String) {
@@ -221,7 +231,7 @@ object SharedAccounts {
             if (emptyMessage) player.sendSystemMessage(Component.translatable("economy.lnbeconomy.account.no_invitations"))
             return
         }
-        invitations.forEach { player.sendSystemMessage(invitationMessage(it.id, it.account.name, it.account.handle, it.invitedBy ?: "?")) }
+        invitations.forEach { player.sendSystemMessage(invitationMessage(it.id, it.account.name, it.account.handle, it.invitedBy?.ifBlank { null } ?: "?")) }
     }
 
     /** Invitations sent while the player was away are shown when they join. */

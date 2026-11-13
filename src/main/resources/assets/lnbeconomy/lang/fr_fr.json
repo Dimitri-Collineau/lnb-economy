@@ -369,5 +369,6 @@
   "gui.lnbeconomy.license.confirm": "Confirmer",
   "gui.lnbeconomy.license.warning": "L’argent est détruit, et une licence n’est jamais remboursée. Clique encore pour acheter.",
   "gui.lnbeconomy.license.too_poor": "Ce compte n’a pas assez.",
-  "gui.lnbeconomy.license.after": "Ensuite : Mes comptes, + Nouveau, type Casino."
+  "gui.lnbeconomy.license.after": "Ensuite : Mes comptes, + Nouveau, type Casino.",
+  "economy.lnbeconomy.problem.playerNotFound": "Aucun compte LNB n’a ce pseudo Minecraft lié. Les pseudos sont sensibles à la casse."
 }

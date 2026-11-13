@@ -28,7 +28,7 @@ object Problems {
         INSUFFICIENT_FUNDS, FROZEN, NOT_ALLOWED, NOT_LINKED, NOT_ELIGIBLE, NOT_FOUND, CLOSED, SAME_ACCOUNT, DISABLED,
         SHOP_DISABLED, PRICE_CHANGED, NO_BUY_BACK, TOO_MANY_LISTINGS, LISTING_GONE, NO_LICENSE, TYPE_LOCKED,
         "handleTaken", "handleReserved", "tooManyAccounts", "tooManyMembers", "alreadyMember", "alreadyInvited",
-        "invitationGone", "lastOwner",
+        "invitationGone", "lastOwner", "playerNotFound",
     )
 
     /** Players without an economy: no linked LNB account, or an LNB account without access. */

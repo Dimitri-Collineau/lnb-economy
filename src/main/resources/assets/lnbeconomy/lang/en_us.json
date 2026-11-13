@@ -369,5 +369,6 @@
   "gui.lnbeconomy.license.confirm": "Confirm",
   "gui.lnbeconomy.license.warning": "The money is destroyed, and a licence is never refunded. Click again to buy.",
   "gui.lnbeconomy.license.too_poor": "That account doesn’t hold enough.",
-  "gui.lnbeconomy.license.after": "Then: My accounts, + New, type Casino."
+  "gui.lnbeconomy.license.after": "Then: My accounts, + New, type Casino.",
+  "economy.lnbeconomy.problem.playerNotFound": "No LNB account has that Minecraft username linked. Usernames are case-sensitive."
 }
