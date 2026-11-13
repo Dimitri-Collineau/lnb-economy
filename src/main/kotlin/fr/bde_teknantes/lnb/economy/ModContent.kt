@@ -9,6 +9,8 @@ import fr.bde_teknantes.lnb.economy.chip.ChipItem
 import fr.bde_teknantes.lnb.economy.chip.Denominations
 import fr.bde_teknantes.lnb.economy.counter.CounterBlock
 import fr.bde_teknantes.lnb.economy.counter.CounterBlockEntity
+import fr.bde_teknantes.lnb.economy.poker.PokerTableBlock
+import fr.bde_teknantes.lnb.economy.poker.PokerTableBlockEntity
 import fr.bde_teknantes.lnb.economy.shop.ShopBlock
 import fr.bde_teknantes.lnb.economy.shop.ShopBlockEntity
 import fr.bde_teknantes.lnb.economy.shop.ShopMenu
@@ -77,6 +79,17 @@ object ModContent {
         BlockEntityType.Builder.of(::ShopBlockEntity, SHOP.get()).build(null)
     })
 
+    /** One block; pistons can't push it, since its round and its link stay with its place. */
+    val POKER_TABLE: DeferredBlock<PokerTableBlock> = BLOCKS.registerBlock("poker_table", ::PokerTableBlock,
+        BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_GREEN).strength(2.5f, 1200f).sound(SoundType.WOOD).noOcclusion()
+            .pushReaction(PushReaction.BLOCK))
+
+    val POKER_TABLE_ITEM: DeferredItem<BlockItem> = ITEMS.registerSimpleBlockItem(POKER_TABLE)
+
+    val POKER_ENTITY: Supplier<BlockEntityType<PokerTableBlockEntity>> = BLOCK_ENTITIES.register("poker_table", Supplier {
+        BlockEntityType.Builder.of(::PokerTableBlockEntity, POKER_TABLE.get()).build(null)
+    })
+
     val SHOP_MENU: Supplier<MenuType<ShopMenu>> = MENUS.register("shop", Supplier { IMenuTypeExtension.create(::ShopMenu) })
 
     val TRADE_MENU: Supplier<MenuType<TradeMenu>> = MENUS.register("trade", Supplier { IMenuTypeExtension.create(::TradeMenu) })
@@ -119,6 +132,7 @@ object ModContent {
             CreativeModeTabs.OP_BLOCKS -> if (event.hasPermissions()) event.accept(AUCTION_ITEM.get())
             CreativeModeTabs.FUNCTIONAL_BLOCKS -> {
                 event.accept(COUNTER_ITEM.get())
+                event.accept(POKER_TABLE_ITEM.get())
                 event.accept(SHOP_ITEM.get())
             }
         }

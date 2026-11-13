@@ -176,4 +176,15 @@ class PayloadCodecTest {
         val feedback = AccountFeedbackPayload(false, "economy.lnbeconomy.problem.other", listOf("handleTaken"))
         assertEquals(feedback, roundTrip(AccountFeedbackPayload.STREAM_CODEC, feedback))
     }
+
+    @Test
+    fun `poker table`() {
+        val seats = listOf(PokerSeatView("Branlouis", 10, listOf(51, 0), 1, 4, 60, 1), null, PokerSeatView("LnbTester", 25, emptyList(), 0, -1, 0, -1))
+        val state = PokerStatePayload(BlockPos(4, 70, -9), "royal", "Casino Royal", 2, 480, listOf(3, 17, 40), listOf(-1, -1), -1, seats, 500, open = true)
+        assertEquals(state, roundTrip(PokerStatePayload.STREAM_CODEC, state))
+        val empty = PokerStatePayload(BlockPos.ZERO, "", "", 0, 0, emptyList(), emptyList(), -1, listOf(null, null, null), 0, open = false)
+        assertEquals(empty, roundTrip(PokerStatePayload.STREAM_CODEC, empty))
+        val sit = PokerActionPayload(BlockPos(4, 70, -9), PokerActionPayload.SIT, 2, 1_000_000)
+        assertEquals(sit, roundTrip(PokerActionPayload.STREAM_CODEC, sit))
+    }
 }

@@ -12,6 +12,7 @@ import fr.bde_teknantes.lnb.economy.network.CounterWoodPayload
 import fr.bde_teknantes.lnb.economy.network.LinkOption
 import fr.bde_teknantes.lnb.economy.network.LinkPayload
 import fr.bde_teknantes.lnb.economy.network.OpenLinkPayload
+import fr.bde_teknantes.lnb.economy.poker.PokerTableBlock
 import net.minecraft.ChatFormatting
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
@@ -38,6 +39,7 @@ object Links {
     fun targetAt(level: Level, pos: BlockPos): Target? {
         val state = level.getBlockState(pos)
         if (state.`is`(ModContent.COUNTER.get())) return Target(CounterBlock.masterPos(state, pos), null)
+        if (state.`is`(ModContent.POKER_TABLE.get())) return Target(pos, PokerTableBlock.GAME)
         val support = Machines.support ?: return null
         val anchor = support.anchorAt(level, pos) ?: return null
         return Target(anchor, support.gameAt(level, anchor))

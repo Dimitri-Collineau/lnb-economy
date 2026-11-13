@@ -6,6 +6,7 @@ import fr.bde_teknantes.lnb.economy.casino.Licenses
 import fr.bde_teknantes.lnb.economy.casino.Links
 import fr.bde_teknantes.lnb.economy.client.ClientPayloadHandler
 import fr.bde_teknantes.lnb.economy.counter.Counters
+import fr.bde_teknantes.lnb.economy.poker.PokerTables
 import fr.bde_teknantes.lnb.economy.shop.Shops
 import fr.bde_teknantes.lnb.economy.trade.Trades
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent
@@ -58,6 +59,10 @@ object EconomyNetwork {
         registrar.playToClient(OpenLicensePayload.TYPE, OpenLicensePayload.STREAM_CODEC) { payload, context ->
             ClientPayloadHandler.handleOpenLicense(payload, context)
         }
+        registrar.playToClient(PokerStatePayload.TYPE, PokerStatePayload.STREAM_CODEC) { payload, context ->
+            ClientPayloadHandler.handlePokerState(payload, context)
+        }
+        registrar.playToServer(PokerActionPayload.TYPE, PokerActionPayload.STREAM_CODEC, PokerTables::handleAction)
         registrar.playToServer(LicenseBuyPayload.TYPE, LicenseBuyPayload.STREAM_CODEC, Licenses::handleBuy)
         registrar.playToServer(AccountCreatePayload.TYPE, AccountCreatePayload.STREAM_CODEC, SharedAccounts::handleCreate)
         registrar.playToServer(AccountEditPayload.TYPE, AccountEditPayload.STREAM_CODEC, SharedAccounts::handleEdit)

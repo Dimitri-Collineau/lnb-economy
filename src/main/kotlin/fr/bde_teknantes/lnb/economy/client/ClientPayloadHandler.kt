@@ -17,6 +17,7 @@ import fr.bde_teknantes.lnb.economy.network.OpenCounterPayload
 import fr.bde_teknantes.lnb.economy.network.OpenLicensePayload
 import fr.bde_teknantes.lnb.economy.network.OpenLinkPayload
 import fr.bde_teknantes.lnb.economy.network.OpenShopPayload
+import fr.bde_teknantes.lnb.economy.network.PokerStatePayload
 import fr.bde_teknantes.lnb.economy.network.TradeStatePayload
 import net.minecraft.client.Minecraft
 import net.neoforged.neoforge.network.handling.IPayloadContext
@@ -37,6 +38,10 @@ object ClientPayloadHandler {
 
     fun handleOpenLicense(payload: OpenLicensePayload, context: IPayloadContext) {
         Minecraft.getInstance().setScreen(LicenseScreen(payload.dealer))
+    }
+
+    fun handlePokerState(payload: PokerStatePayload, context: IPayloadContext) {
+        ClientPoker.update(payload)
     }
 
     fun handleOpenCounter(payload: OpenCounterPayload, context: IPayloadContext) {

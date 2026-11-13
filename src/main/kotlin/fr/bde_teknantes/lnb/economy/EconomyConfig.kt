@@ -7,8 +7,8 @@ import net.neoforged.neoforge.common.ModConfigSpec
  * The site's URL and the server's token come from LNB Warden's `lnbwarden-server.toml`.
  */
 object EconomyConfig {
-    /** MineVegas machine types, as `CasinoMachine.type` names them. */
-    val GAMES = listOf("slots", "roulette", "wheel", "plinko", "derby", "blackjack", "poker")
+    /** MineVegas machine types, as `CasinoMachine.type` names them, and `holdem`, this mod's own poker table. */
+    val GAMES = listOf("slots", "roulette", "wheel", "plinko", "derby", "blackjack", "poker", "holdem")
 
     private val BUILDER = ModConfigSpec.Builder()
 
