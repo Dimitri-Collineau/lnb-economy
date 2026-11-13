@@ -19,7 +19,9 @@ import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.world.item.BlockItem
-import net.minecraft.world.item.CreativeModeTabs
+import net.minecraft.network.chat.Component
+import net.minecraft.world.item.CreativeModeTab
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.MobCategory
 import net.minecraft.world.inventory.MenuType
@@ -31,7 +33,6 @@ import net.minecraft.world.level.material.MapColor
 import net.minecraft.world.level.material.PushReaction
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent
 import net.neoforged.neoforge.registries.DeferredBlock
 import net.neoforged.neoforge.registries.DeferredItem
@@ -46,6 +47,7 @@ object ModContent {
     private val BLOCK_ENTITIES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, LnbEconomy.ID)
     private val MENUS = DeferredRegister.create(Registries.MENU, LnbEconomy.ID)
     private val ENTITIES = DeferredRegister.create(Registries.ENTITY_TYPE, LnbEconomy.ID)
+    private val TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, LnbEconomy.ID)
 
     /** The casino a chip belongs to: its account's handle, without the `#`. */
     val CASINO: Supplier<DataComponentType<String>> = COMPONENTS.registerComponentType("casino") { builder ->
@@ -118,23 +120,29 @@ object ModContent {
         BLOCK_ENTITIES.register(modBus)
         MENUS.register(modBus)
         ENTITIES.register(modBus)
-        modBus.addListener(::addToCreativeTabs)
+        TABS.register(modBus)
         modBus.addListener<EntityAttributeCreationEvent> {
             it.put(AUCTIONEER.get(), Auctioneer.attributes().build())
             it.put(CASINO_DEALER.get(), CasinoDealer.attributes().build())
         }
     }
 
-    private fun addToCreativeTabs(event: BuildCreativeModeTabContentsEvent) {
-        // Chips are only made by counters: a chip without a casino is worth nothing, so none in the creative tabs.
-        when (event.tabKey) {
-            CreativeModeTabs.TOOLS_AND_UTILITIES -> event.accept(LINK_TOOL.get())
-            CreativeModeTabs.OP_BLOCKS -> if (event.hasPermissions()) event.accept(AUCTION_ITEM.get())
-            CreativeModeTabs.FUNCTIONAL_BLOCKS -> {
-                event.accept(COUNTER_ITEM.get())
-                event.accept(POKER_TABLE_ITEM.get())
-                event.accept(SHOP_ITEM.get())
+    /**
+     * Every item of the mod in its own "LNB Economy" tab: the link wand, then the counter, the poker table and the shop.
+     * The auction house is placed by operators only, so it shows for those who have the permissions. Chips are only made
+     * by counters: a chip without a casino is worth nothing, so none in the tab.
+     */
+    private val CREATIVE_TAB: Supplier<CreativeModeTab> = TABS.register("lnbeconomy", Supplier {
+        CreativeModeTab.builder()
+            .title(Component.translatable("itemGroup.lnbeconomy"))
+            .icon { ItemStack(COUNTER_ITEM.get()) }
+            .displayItems { parameters, output ->
+                output.accept(LINK_TOOL.get())
+                output.accept(COUNTER_ITEM.get())
+                output.accept(POKER_TABLE_ITEM.get())
+                output.accept(SHOP_ITEM.get())
+                if (parameters.hasPermissions()) output.accept(AUCTION_ITEM.get())
             }
-        }
-    }
+            .build()
+    })
 }

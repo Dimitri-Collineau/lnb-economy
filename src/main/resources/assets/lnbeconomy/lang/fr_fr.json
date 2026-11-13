@@ -416,5 +416,6 @@
   "economy.lnbeconomy.poker.result.push": "Poker : égalité, tes %s te reviennent.",
   "economy.lnbeconomy.poker.result.no_qualify": "Poker : le croupier ne joue pas. Tu reçois %s pour %s misés.",
   "economy.lnbeconomy.poker.result.win": "Poker : tu gagnes ! Tu reçois %s pour %s misés.",
-  "gui.lnbeconomy.poker.phase.dealing": "Le croupier distribue…"
+  "gui.lnbeconomy.poker.phase.dealing": "Le croupier distribue…",
+  "itemGroup.lnbeconomy": "LNB Economy"
 }

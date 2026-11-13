@@ -416,5 +416,6 @@
   "economy.lnbeconomy.poker.result.push": "Poker: a tie, your %s come back.",
   "economy.lnbeconomy.poker.result.no_qualify": "Poker: the dealer doesn’t play. You get %s for %s staked.",
   "economy.lnbeconomy.poker.result.win": "Poker: you win! You get %s for %s staked.",
-  "gui.lnbeconomy.poker.phase.dealing": "The dealer deals…"
+  "gui.lnbeconomy.poker.phase.dealing": "The dealer deals…",
+  "itemGroup.lnbeconomy": "LNB Economy"
 }
