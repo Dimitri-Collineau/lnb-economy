@@ -232,7 +232,7 @@ class PokerScreen(val pos: BlockPos) : Screen(Component.translatable("gui.lnbeco
             HoldemRound.Phase.DECISION -> Component.translatable("gui.lnbeconomy.poker.phase.decision", seconds)
             else -> Component.translatable("gui.lnbeconomy.poker.phase.showdown")
         }
-        graphics.drawCenteredString(font, status, panelX + PLAY_WIDTH / 2, panelY + 24, CasinoUi.GOLD_TEXT)
+        graphics.drawCenteredString(font, CasinoUi.fit(font, status.string, inner), panelX + PLAY_WIDTH / 2, panelY + 24, CasinoUi.GOLD_TEXT)
         if (phase == HoldemRound.Phase.DECISION) {
             // What is left of the time to decide.
             val left = ClientPoker.ticksLeft().toFloat() / HoldemRound.DECISION_TICKS
@@ -256,9 +256,10 @@ class PokerScreen(val pos: BlockPos) : Screen(Component.translatable("gui.lnbeco
                 return@forEachIndexed
             }
             Heads.draw(graphics, seat.name, x + 2, y + 3, 8)
-            graphics.drawString(font, CasinoUi.fit(font, seat.name, 70), x + 13, y + 1, if (seat.name == me) CasinoUi.GOLD_TEXT else CasinoUi.IVORY, true)
+            graphics.drawString(font, CasinoUi.fit(font, seat.name, inner - 16 - 30), x + 13, y + 1, if (seat.name == me) CasinoUi.GOLD_TEXT else CasinoUi.IVORY, true)
             val (line, color) = seatLine(seat, phase)
-            graphics.drawString(font, CasinoUi.fit(font, line.string, inner - 16), x + 13, y + 10, color, true)
+            // The seat's two little cards sit at the end of the row.
+            graphics.drawString(font, CasinoUi.fit(font, line.string, inner - 16 - 30), x + 13, y + 10, color, true)
             miniCards(graphics, seat.cards.ifEmpty { listOf(null, null) }, x + inner - 25, y + 1)
         }
     }
@@ -324,7 +325,9 @@ class PokerScreen(val pos: BlockPos) : Screen(Component.translatable("gui.lnbeco
         cards(graphics, state.dealer.ifEmpty { listOf(null, null) }, center, panelY + DEALER_Y)
         val dealerLabel = if (state.dealerHand >= 0) Component.translatable("gui.lnbeconomy.poker.dealer.hand", hand(state.dealerHand))
         else Component.translatable("gui.lnbeconomy.poker.dealer")
-        graphics.drawString(font, dealerLabel, panelX + 20, panelY + DEALER_Y + 10, CasinoUi.DIM, true)
+        // The dealer's cards take the middle: the label and the status keep to either side.
+        val side = (PANEL_WIDTH - 2 * CARD_WIDTH - CARD_GAP) / 2 - 20 - 6
+        graphics.drawString(font, CasinoUi.fit(font, dealerLabel.string, side), panelX + 20, panelY + DEALER_Y + 10, CasinoUi.DIM, true)
         // The board: five places, filled as the cards come.
         cards(graphics, (0 until 5).map { state.board.getOrNull(it) }, center, panelY + BOARD_Y)
 
@@ -338,14 +341,15 @@ class PokerScreen(val pos: BlockPos) : Screen(Component.translatable("gui.lnbeco
             HoldemRound.Phase.DECISION -> Component.translatable("gui.lnbeconomy.poker.phase.decision", seconds)
             HoldemRound.Phase.SHOWDOWN -> Component.translatable("gui.lnbeconomy.poker.phase.showdown")
         }
-        graphics.drawString(font, status, panelX + PANEL_WIDTH - 20 - font.width(status), panelY + DEALER_Y + 10, CasinoUi.GOLD_TEXT, true)
+        val shown = CasinoUi.fit(font, status.string, side)
+        graphics.drawString(font, shown, panelX + PANEL_WIDTH - 20 - font.width(shown), panelY + DEALER_Y + 10, CasinoUi.GOLD_TEXT, true)
 
         if (ante != null) {
             val carried = Component.translatable("gui.lnbeconomy.poker.chips", Lnbit.compact(chips(state), language))
             graphics.drawString(font, carried, panelX + 96, panelY + CONTROLS_Y + 5, CasinoUi.DIM, true)
         }
         val rules = Component.translatable(if (state.maxBet > 0) "gui.lnbeconomy.poker.rules.max" else "gui.lnbeconomy.poker.rules", Lnbit.compact(state.maxBet, language))
-        graphics.drawCenteredString(font, rules, center, panelY + CONTROLS_Y + 23, CasinoUi.DIM)
+        graphics.drawCenteredString(font, CasinoUi.fit(font, rules.string, PANEL_WIDTH - 24), center, panelY + CONTROLS_Y + 23, CasinoUi.DIM)
     }
 
     private fun seat(graphics: GuiGraphics, state: PokerStatePayload, phase: HoldemRound.Phase, index: Int, seat: PokerSeatView?) {

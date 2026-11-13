@@ -171,9 +171,11 @@ class LinkScreen(private val link: OpenLinkPayload) : Screen(
             val cycles = link.options.size > 1
             graphics.blitSprite(CasinoUi.SECONDARY.get(true, cycles && isHoveredOrFocused), x, y, width, height)
             graphics.blitSprite(CasinoUi.ACCOUNT_SHARED, x + 5, y + 5, 9, 9)
-            graphics.drawString(font, message, x + 18, y + 5, CasinoUi.IVORY, true)
-            val handle = Component.literal("#${chosen?.handle ?: ""}")
-            graphics.drawString(font, handle, x + width - (if (cycles) 14 else 6) - font.width(handle), y + 5, CasinoUi.DIM, true)
+            val right = x + width - (if (cycles) 14 else 6)
+            val handle = CasinoUi.fit(font, "#${chosen?.handle ?: ""}", (width - 24) / 2)
+            val handleX = right - font.width(handle)
+            graphics.drawString(font, CasinoUi.fit(font, message.string, handleX - 6 - (x + 18)), x + 18, y + 5, CasinoUi.IVORY, true)
+            graphics.drawString(font, handle, handleX, y + 5, CasinoUi.DIM, true)
             if (cycles) graphics.blitSprite(CasinoUi.PAGE_FORWARD, x + width - 9, y + 4, 7, 11)
         }
 

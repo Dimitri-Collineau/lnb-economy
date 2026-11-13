@@ -39,12 +39,12 @@ open class AccountSelector(
         val textY = y + (height - 8) / 2
         graphics.blitSprite(CasinoUi.SECONDARY.get(active, cycles && isHoveredOrFocused), x, y, width, height)
         graphics.blitSprite(if (value.isPersonal) CasinoUi.ACCOUNT_PERSONAL else CasinoUi.ACCOUNT_SHARED, x + 5, textY, 9, 9)
-        graphics.drawString(font, message, x + 18, textY, CasinoUi.IVORY, true)
         val right = x + width - if (cycles) 14 else 6
-        if (showBalance) {
-            val balance = Lnbit.compact(value.balance, minecraft.options.languageCode)
-            graphics.drawString(font, balance, right - font.width(balance), textY, CasinoUi.GOLD_TEXT, true)
-        }
+        val balance = if (showBalance) Lnbit.compact(value.balance, minecraft.options.languageCode) else null
+        // The name gives way to the balance: a long handle is cut, never drawn over it.
+        val room = (balance?.let { right - font.width(it) - 4 } ?: right) - (x + 18)
+        graphics.drawString(font, CasinoUi.fit(font, message.string, room), x + 18, textY, CasinoUi.IVORY, true)
+        if (balance != null) graphics.drawString(font, balance, right - font.width(balance), textY, CasinoUi.GOLD_TEXT, true)
         if (cycles) graphics.blitSprite(CasinoUi.PAGE_FORWARD, x + width - 9, y + (height - 11) / 2, 7, 11)
     }
 

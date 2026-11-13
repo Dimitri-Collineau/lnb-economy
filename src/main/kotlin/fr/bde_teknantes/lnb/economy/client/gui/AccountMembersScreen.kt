@@ -28,7 +28,7 @@ class AccountMembersScreen(private val parent: Screen?, private val account: Acc
     Screen(Component.translatable("gui.lnbeconomy.members.title", account.name ?: "")) {
     private companion object {
         const val PANEL_WIDTH = 268
-        const val PANEL_HEIGHT = 222
+        const val PANEL_HEIGHT = 258
         const val LEFT = 16
         const val INNER = PANEL_WIDTH - 2 * LEFT
         const val LIST_TOP = 28
@@ -95,7 +95,7 @@ class AccountMembersScreen(private val parent: Screen?, private val account: Acc
 
         addRenderableWidget(
             CasinoButton.secondary(CommonComponents.GUI_BACK) { onClose() }
-                .bounds(width / 2 - 45, panelY + PANEL_HEIGHT - 30, 90, 18).build(),
+                .bounds(width / 2 - 45, panelY + PANEL_HEIGHT - 28, 90, 18).build(),
         )
     }
 
@@ -188,8 +188,7 @@ class AccountMembersScreen(private val parent: Screen?, private val account: Acc
             graphics.drawString(font, Component.translatable("gui.lnbeconomy.members.invite"), x, inviteY - 11, CasinoUi.GOLD_TEXT, true)
             val feedback = ClientAccounts.feedback
             if (feedback != null) {
-                val line = font.split(feedback.second, INNER).firstOrNull()
-                if (line != null) graphics.drawString(font, line, x, inviteY + 20 + SUGGESTIONS * ROW + 2, if (feedback.first) GREEN else RED, true)
+                CasinoUi.wrapped(graphics, font, feedback.second, x, inviteY + 20 + SUGGESTIONS * ROW + 2, INNER, 2, if (feedback.first) GREEN else RED)
             }
         }
     }

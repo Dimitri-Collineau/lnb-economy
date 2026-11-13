@@ -67,6 +67,24 @@ object CasinoUi {
         graphics.blitSprite(PANEL, x, y, width, height)
     }
 
+    /**
+     * [text] wrapped to [width] pixels, at most [max] lines: the last one ends with an ellipsis when some is left out.
+     */
+    fun lines(font: Font, text: Component, width: Int, max: Int): List<net.minecraft.util.FormattedCharSequence> {
+        val all = font.split(text, width)
+        if (all.size <= max) return all
+        val kept = font.split(text, width).take(max - 1)
+        val rest = font.splitter.splitLines(text, width, net.minecraft.network.chat.Style.EMPTY).drop(max - 1).joinToString(" ") { it.string }
+        return kept + Component.literal(fit(font, rest, width)).visualOrderText
+    }
+
+    /** Draws [text] wrapped to [width] pixels from ([x], [y]), at most [max] lines of [step] pixels. Returns the lines drawn. */
+    fun wrapped(graphics: GuiGraphics, font: Font, text: Component, x: Int, y: Int, width: Int, max: Int, color: Int, step: Int = 10): Int {
+        val lines = lines(font, text, width, max)
+        lines.forEachIndexed { i, line -> graphics.drawString(font, line, x, y + i * step, color, true) }
+        return lines.size
+    }
+
     /** [text] cut with an ellipsis so it is at most [width] pixels wide. */
     fun fit(font: Font, text: String, width: Int): String =
         if (font.width(text) <= width) text else font.plainSubstrByWidth(text, maxOf(0, width - font.width("..."))) + "..."

@@ -149,7 +149,7 @@ class CounterScreen(private val counter: OpenCounterPayload) :
 
     override fun render(graphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
         super.render(graphics, mouseX, mouseY, partialTick)
-        CasinoUi.title(graphics, font, title, width / 2, panelY + 11)
+        CasinoUi.title(graphics, font, Component.literal(CasinoUi.fit(font, title.string, PANEL_WIDTH - 30)), width / 2, panelY + 11)
         graphics.drawString(font, Component.translatable("gui.lnbeconomy.counter.buy.title"), innerX, panelY + BUY_TOP + 5, CasinoUi.GOLD_TEXT, true)
         graphics.drawString(
             font, Component.translatable("gui.lnbeconomy.counter.cash.title", Lnbit.compact(chipsValue(), language)),
@@ -185,9 +185,10 @@ class CounterScreen(private val counter: OpenCounterPayload) :
         override fun renderWidget(graphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
             graphics.blitSprite(CasinoUi.SECONDARY.get(active, isHoveredOrFocused), x, y, width, height)
             graphics.blitSprite(if (value.isPersonal) CasinoUi.ACCOUNT_PERSONAL else CasinoUi.ACCOUNT_SHARED, x + 5, y + 5, 9, 9)
-            graphics.drawString(font, message, x + 18, y + 5, CasinoUi.IVORY, true)
             val balance = Lnbit.compact(value.balance, language)
-            graphics.drawString(font, balance, x + width - 14 - font.width(balance), y + 5, CasinoUi.GOLD_TEXT, true)
+            val balanceX = x + width - 14 - font.width(balance)
+            graphics.drawString(font, CasinoUi.fit(font, message.string, balanceX - 4 - (x + 18)), x + 18, y + 5, CasinoUi.IVORY, true)
+            graphics.drawString(font, balance, balanceX, y + 5, CasinoUi.GOLD_TEXT, true)
             if (choices.size > 1) graphics.blitSprite(CasinoUi.PAGE_FORWARD, x + width - 9, y + 4, 7, 11)
         }
 

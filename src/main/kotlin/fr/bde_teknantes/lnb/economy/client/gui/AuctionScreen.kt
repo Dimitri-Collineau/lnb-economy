@@ -356,13 +356,14 @@ class AuctionScreen : Screen(Component.translatable("gui.lnbeconomy.auction.titl
                 graphics.drawString(font, pageLabel, gridX + (GRID_WIDTH - font.width(pageLabel)) / 2, panelY + UNDER_GRID + 4, CasinoUi.DIM, true)
                 val entry = selectedEntry()
                 if (entry == null) {
-                    wrapped(graphics, Component.translatable("gui.lnbeconomy.auction.pick"), sideX + 6, gridY + 6, CasinoUi.DIM)
+                    CasinoUi.wrapped(graphics, font, Component.translatable("gui.lnbeconomy.auction.pick"), sideX + 6, gridY + 6, SIDE_INNER, 3, CasinoUi.DIM)
                     return
                 }
                 item(graphics, entry.stack, sideX + 8, gridY + 8)
                 graphics.drawString(font, fit("${entry.count} × ${entry.name}", 68), sideX + 30, gridY + 8, WHITE, true)
                 graphics.drawString(font, fit(entry.detail, 68), sideX + 30, gridY + 18, CasinoUi.DIM, true)
                 val total = Component.translatable("gui.lnbeconomy.auction.tooltip.price", Lnbit.compact(entry.price, language), entry.count)
+                    .takeIf { font.width(it) <= SIDE_INNER } ?: Lnbit.compact(entry.price, language)
                 graphics.drawString(font, total, sideX + 6, gridY + 34, CasinoUi.GOLD_TEXT, true)
                 if (entry.count > 1) {
                     val unit = Component.translatable("gui.lnbeconomy.auction.tooltip.unit", Lnbit.compact(entry.price / entry.count, language))
@@ -373,13 +374,14 @@ class AuctionScreen : Screen(Component.translatable("gui.lnbeconomy.auction.titl
             AuctionRequestPayload.MINE -> {
                 ClientAuction.mine?.let {
                     val limits = Component.translatable("gui.lnbeconomy.auction.limits", it.entries.size, it.max, it.taxPercent, it.days)
-                    graphics.drawString(font, limits, gridX, panelY + 12, CasinoUi.DIM, true)
+                    graphics.drawString(font, CasinoUi.fit(font, limits.string, SIDE_X - GRID_X - 4), gridX, panelY + 12, CasinoUi.DIM, true)
                 }
                 val sideY = panelY + 10
                 graphics.drawString(font, Component.translatable("gui.lnbeconomy.auction.sell_title"), sideX + 6, sideY + 5, CasinoUi.GOLD_TEXT, true)
                 val toSell = stackToSell()
                 if (toSell.isEmpty) {
-                    wrapped(graphics, Component.translatable("gui.lnbeconomy.auction.hand_empty"), sideX + 30, sideY + 17, CasinoUi.DIM, SIDE_WIDTH - 36)
+                    // Two lines at most: "How many" comes right under.
+                    CasinoUi.wrapped(graphics, font, Component.translatable("gui.lnbeconomy.auction.hand_empty"), sideX + 30, sideY + 17, SIDE_WIDTH - 34, 2, CasinoUi.DIM)
                 } else {
                     item(graphics, toSell, sideX + 8, sideY + 18)
                     graphics.drawString(font, Component.translatable("gui.lnbeconomy.auction.hand_label"), sideX + 30, sideY + 17, CasinoUi.DIM, true)
@@ -394,7 +396,7 @@ class AuctionScreen : Screen(Component.translatable("gui.lnbeconomy.auction.titl
                 val entry = selectedEntry() ?: return
                 item(graphics, entry.stack, sideX + 8, gridY + 8)
                 graphics.drawString(font, fit(entry.name, 68), sideX + 30, gridY + 8, WHITE, true)
-                graphics.drawString(font, Component.translatable("gui.lnbeconomy.auction.reason.${entry.detail}"), sideX + 6, gridY + 32, ORANGE, true)
+                CasinoUi.wrapped(graphics, font, Component.translatable("gui.lnbeconomy.auction.reason.${entry.detail}"), sideX + 6, gridY + 32, SIDE_INNER, 2, ORANGE)
             }
         }
     }

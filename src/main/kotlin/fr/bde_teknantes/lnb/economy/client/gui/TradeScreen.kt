@@ -127,7 +127,7 @@ class TradeScreen(menu: TradeMenu, inventory: Inventory, title: Component) :
         val state = ClientTrade.state
         CasinoUi.title(graphics, font, title, imageWidth / 2, TITLE_Y)
         graphics.drawString(font, Component.translatable("gui.lnbeconomy.trade.you"), MINE_X + 6, OFFER_Y + 5, CasinoUi.GOLD_TEXT, true)
-        graphics.drawString(font, Component.literal(menu.partner), THEIRS_X + 6, OFFER_Y + 5, CasinoUi.GOLD_TEXT, true)
+        graphics.drawString(font, CasinoUi.fit(font, menu.partner, OFFER_WIDTH - 12), THEIRS_X + 6, OFFER_Y + 5, CasinoUi.GOLD_TEXT, true)
 
         // My coin, after the field; their money, in gold. The coin sits one pixel above the digits.
         graphics.drawString(font, Lnbit.symbol(), MINE_X + 70, MONEY_Y + 2, CasinoUi.GOLD_TEXT, true)
@@ -135,7 +135,8 @@ class TradeScreen(menu: TradeMenu, inventory: Inventory, title: Component) :
         graphics.drawString(font, "+", plusX, MONEY_Y + 3, CasinoUi.GOLD_TEXT, true)
         val coinX = plusX + font.width("+ ")
         graphics.drawString(font, Lnbit.symbol(), coinX, MONEY_Y + 2, CasinoUi.GOLD_TEXT, true)
-        graphics.drawString(font, Amounts.format(state.theirAmount, language), coinX + font.width(Lnbit.symbol()) + font.width(" "), MONEY_Y + 3, CasinoUi.GOLD_TEXT, true)
+        val amountX = coinX + font.width(Lnbit.symbol()) + font.width(" ")
+        graphics.drawString(font, CasinoUi.fit(font, Amounts.format(state.theirAmount, language), THEIRS_X + OFFER_WIDTH - 4 - amountX), amountX, MONEY_Y + 3, CasinoUi.GOLD_TEXT, true)
 
         when (banner()) {
             Banner.COUNTDOWN -> countdown(graphics, state.countdown)

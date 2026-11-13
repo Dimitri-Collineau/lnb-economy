@@ -177,22 +177,25 @@ class ShopScreen(private var shop: OpenShopPayload) :
         graphics.renderItem(shop.item, 0, 0)
         graphics.pose().popPose()
         val textX = innerX + 46
+        // Each line stays in the item's box, right of the item.
+        val room = panelX + SECTION_LEFT + SECTION_WIDTH - 4 - textX
+        fun line(text: Component, y: Int, color: Int) = graphics.drawString(font, CasinoUi.fit(font, text.string, room), textX, y, color, true)
         val quote = quote
-        graphics.drawString(font, shop.item.hoverName, textX, itemY + 6, WHITE, true)
+        line(shop.item.hoverName, itemY + 6, WHITE)
         if (shop.buying) {
-            graphics.drawString(font, Component.translatable("gui.lnbeconomy.shop.pays", Lnbit.compact(shop.buyPrice, language), shop.lotSize), textX, itemY + 17, CasinoUi.GOLD_TEXT, true)
+            line(Component.translatable("gui.lnbeconomy.shop.pays", Lnbit.compact(shop.buyPrice, language), shop.lotSize), itemY + 17, CasinoUi.GOLD_TEXT)
             val takes = if (shop.lotSize > 0) shop.room / shop.lotSize else 0
-            graphics.drawString(font, Component.translatable("gui.lnbeconomy.shop.takes", takes, shop.room), textX, itemY + 28, CasinoUi.DIM, true)
-            graphics.drawString(font, Component.translatable("gui.lnbeconomy.shop.carried", carried), textX, itemY + 39, if (carried >= shop.lotSize) CasinoUi.DIM else RED, true)
+            line(Component.translatable("gui.lnbeconomy.shop.takes", takes, shop.room), itemY + 28, CasinoUi.DIM)
+            line(Component.translatable("gui.lnbeconomy.shop.carried", carried), itemY + 39, if (carried >= shop.lotSize) CasinoUi.DIM else RED)
         } else {
-            graphics.drawString(font, Component.translatable("gui.lnbeconomy.shop.price", Lnbit.compact(shop.sellPrice, language), shop.lotSize), textX, itemY + 17, CasinoUi.GOLD_TEXT, true)
-            graphics.drawString(font, Component.translatable("gui.lnbeconomy.shop.stock", quote.maxBuyLots, shop.stock), textX, itemY + 28, CasinoUi.DIM, true)
+            line(Component.translatable("gui.lnbeconomy.shop.price", Lnbit.compact(shop.sellPrice, language), shop.lotSize), itemY + 17, CasinoUi.GOLD_TEXT)
+            line(Component.translatable("gui.lnbeconomy.shop.stock", quote.maxBuyLots, shop.stock), itemY + 28, CasinoUi.DIM)
             val buyBack = if (quote.buysBack) {
                 Component.translatable("gui.lnbeconomy.shop.buyback", Lnbit.compact(shop.buyPrice, language), quote.maxSellLots)
             } else {
                 Component.translatable("gui.lnbeconomy.shop.no_buyback")
             }
-            graphics.drawString(font, buyBack, textX, itemY + 39, CasinoUi.DIM, true)
+            line(buyBack, itemY + 39, CasinoUi.DIM)
         }
 
         // The number of lots, and how many items that makes.

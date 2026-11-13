@@ -160,9 +160,12 @@ class AccountEditScreen(private val parent: Screen?, private val existing: Accou
         if (existing == null) {
             graphics.drawString(font, "#", x + 1, panelY + HANDLE_Y + 5, CasinoUi.DIM, true)
         } else {
-            graphics.drawString(font, "#${existing.handle}", x, panelY + HANDLE_Y + 5, CasinoUi.IVORY, true)
+            val handle = "#${existing.handle}"
+            graphics.drawString(font, handle, x, panelY + HANDLE_Y + 5, CasinoUi.IVORY, true)
             val never = Component.translatable("gui.lnbeconomy.account.handle.fixed")
-            graphics.drawString(font, never, x + INNER - font.width(never), panelY + HANDLE_Y + 5, CasinoUi.DIM, true)
+            if (font.width(handle) + 8 + font.width(never) <= INNER) {
+                graphics.drawString(font, never, x + INNER - font.width(never), panelY + HANDLE_Y + 5, CasinoUi.DIM, true)
+            }
         }
         graphics.drawString(font, Component.translatable("gui.lnbeconomy.account.type"), x, panelY + TYPE_Y - 11, CasinoUi.GOLD_TEXT, true)
         val licences = Component.translatable("gui.lnbeconomy.account.licences", ClientEconomy.snapshot.licensesFree)
@@ -174,8 +177,8 @@ class AccountEditScreen(private val parent: Screen?, private val existing: Accou
             !mayEdit -> Component.translatable("gui.lnbeconomy.account.owners_only") to CasinoUi.DIM
             else -> Component.translatable("gui.lnbeconomy.account.type.$type.hint") to CasinoUi.DIM
         }
-        val lines = font.split(line.first, INNER)
-        lines.take(2).forEachIndexed { i, text -> graphics.drawString(font, text, x, panelY + FEEDBACK_Y + i * 10, line.second, true) }
+        val lines = CasinoUi.lines(font, line.first, INNER, 2)
+        lines.forEachIndexed { i, text -> graphics.drawString(font, text, x, panelY + FEEDBACK_Y + i * 10, line.second, true) }
     }
 
     override fun onClose() {

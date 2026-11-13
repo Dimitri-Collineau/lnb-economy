@@ -21,7 +21,7 @@ class LicenseScreen(dealer: String) : Screen(Component.literal(dealer)) {
         const val INNER = PANEL_WIDTH - 2 * LEFT
         const val TEXT_Y = 30
         const val PRICE_Y = 86
-        const val ACCOUNT_Y = 112
+        const val ACCOUNT_Y = 114
         const val BUTTONS_Y = 142
         const val RED = 0xFFFF6060.toInt()
     }
@@ -97,15 +97,13 @@ class LicenseScreen(dealer: String) : Screen(Component.literal(dealer)) {
         super.render(graphics, mouseX, mouseY, partialTick)
         val x = panelX + LEFT
         CasinoUi.title(graphics, font, Component.literal(CasinoUi.fit(font, title.string, PANEL_WIDTH - 30)), width / 2, panelY + 11)
-        font.split(Component.translatable("gui.lnbeconomy.license.pitch"), INNER).take(4).forEachIndexed { i, line ->
-            graphics.drawString(font, line, x, panelY + TEXT_Y + i * 10, CasinoUi.IVORY, true)
-        }
+        CasinoUi.wrapped(graphics, font, Component.translatable("gui.lnbeconomy.license.pitch"), x, panelY + TEXT_Y, INNER, 4, CasinoUi.IVORY)
         val snapshot = ClientEconomy.snapshot
         val priceText = if (price < 0) Component.translatable("gui.lnbeconomy.license.not_sold")
         else Component.translatable("gui.lnbeconomy.license.price", Lnbit.compact(price, language))
         graphics.drawString(font, priceText, x, panelY + PRICE_Y, CasinoUi.GOLD_TEXT, true)
         val held = Component.translatable("gui.lnbeconomy.license.held", snapshot.licensesFree, snapshot.licensesTotal)
-        graphics.drawString(font, held, x + INNER - font.width(held), panelY + PRICE_Y, CasinoUi.DIM, true)
+        graphics.drawString(font, held, x, panelY + PRICE_Y + 11, CasinoUi.DIM, true)
 
         val chosen = account?.value
         val note = when {
@@ -114,9 +112,7 @@ class LicenseScreen(dealer: String) : Screen(Component.literal(dealer)) {
             confirming -> Component.translatable("gui.lnbeconomy.license.warning") to CasinoUi.GOLD_TEXT
             else -> Component.translatable("gui.lnbeconomy.license.after") to CasinoUi.DIM
         }
-        font.split(note.first, INNER).take(2).forEachIndexed { i, line ->
-            graphics.drawString(font, line, x, panelY + BUTTONS_Y + 24 + i * 10, note.second, true)
-        }
+        CasinoUi.wrapped(graphics, font, note.first, x, panelY + BUTTONS_Y + 24, INNER, 2, note.second)
     }
 
     override fun isPauseScreen(): Boolean = false
