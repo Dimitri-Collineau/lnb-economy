@@ -17,6 +17,7 @@ import fr.bde_teknantes.lnb.economy.counter.Counters
 import fr.bde_teknantes.lnb.economy.drop.MobDrops
 import fr.bde_teknantes.lnb.economy.ledger.TransferJournal
 import fr.bde_teknantes.lnb.economy.mail.ItemMailbox
+import fr.bde_teknantes.lnb.economy.poker.MineVegasPokerTable
 import fr.bde_teknantes.lnb.economy.network.EconomyNetwork
 import fr.bde_teknantes.lnb.economy.shop.ShopItemHandler
 import fr.bde_teknantes.lnb.economy.shop.Shops
@@ -91,6 +92,10 @@ class LnbEconomy(modBus: IEventBus, container: ModContainer) {
             modBus.addListener(MineVegasEvents::onCommonSetup)
             NeoForge.EVENT_BUS.addListener(MineVegasEvents::onServerStarted)
             NeoForge.EVENT_BUS.addListener(MineVegasEvents::onContainerOpen)
+            // This mod's poker table takes the place of MineVegas's.
+            modBus.addListener(MineVegasPokerTable::onBuildTabs)
+            NeoForge.EVENT_BUS.addListener(MineVegasPokerTable::onPlayerTick)
+            NeoForge.EVENT_BUS.addListener(MineVegasPokerTable::onRightClickBlock)
         }
         NeoForge.EVENT_BUS.addListener<ItemExpireEvent>(EventPriority.LOWEST, LostChips::onExpire)
         NeoForge.EVENT_BUS.addListener(LostChips::onLeaveLevel)

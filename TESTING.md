@@ -290,6 +290,10 @@ to cover the antes (102 times each ante).
 | 12.17 | Mid-round, stop the server and start it again | Same message and chips for each seated player when the table's chunk loads |
 | 12.18 | `/economy casino #test-casino` during a round | "held for rounds" shows 102 times the antes until the showdown |
 | 12.19 | `casino.holdem = false` in the config, restart, ante | "This game is switched off on this server." |
+| 12.20 | With MineVegas: craft MineVegas's poker table recipe (green wool, gold blocks, croupier badge, red wool, planks) | It gives the LNB poker table |
+| 12.21 | With MineVegas: look through the creative tabs and search "poker" | Only the LNB poker table |
+| 12.22 | `/give @s roulettecasino:poker_table` | Within a second it becomes the LNB poker table, with a message |
+| 12.23 | A MineVegas poker table placed before the update: right click it, then break it | "This old poker table is closed…"; broken, its item becomes the LNB table |
 
 ## 13. Without MineVegas
 

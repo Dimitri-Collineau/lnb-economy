@@ -417,5 +417,7 @@
   "economy.lnbeconomy.poker.result.no_qualify": "Poker : le croupier ne joue pas. Tu reçois %s pour %s misés.",
   "economy.lnbeconomy.poker.result.win": "Poker : tu gagnes ! Tu reçois %s pour %s misés.",
   "gui.lnbeconomy.poker.phase.dealing": "Le croupier distribue…",
-  "itemGroup.lnbeconomy": "LNB Economy"
+  "itemGroup.lnbeconomy": "LNB Economy",
+  "economy.lnbeconomy.poker.swapped": "La table de poker de MineVegas est devenue la table de poker LNB.",
+  "economy.lnbeconomy.poker.retired": "Cette ancienne table de poker est fermée. Casse-la : tu reçois une table de poker LNB à la place."
 }

@@ -417,5 +417,7 @@
   "economy.lnbeconomy.poker.result.no_qualify": "Poker: the dealer doesn’t play. You get %s for %s staked.",
   "economy.lnbeconomy.poker.result.win": "Poker: you win! You get %s for %s staked.",
   "gui.lnbeconomy.poker.phase.dealing": "The dealer deals…",
-  "itemGroup.lnbeconomy": "LNB Economy"
+  "itemGroup.lnbeconomy": "LNB Economy",
+  "economy.lnbeconomy.poker.swapped": "MineVegas's poker table became the LNB poker table.",
+  "economy.lnbeconomy.poker.retired": "This old poker table is closed. Break it: you get an LNB poker table in its place."
 }

@@ -39,7 +39,9 @@ the mod on a player's computer only talks to the server. The contract is `docs/e
   chips and gets two cards; once the first three board cards are out, each calls for twice the ante or folds. The
   dealer plays from a pair of fours. Everyone at the table, and anyone watching, sees the same round. A round cut
   short by a broken table or a restart gives its stakes back. It works without MineVegas, and can be switched off
-  with `casino.holdem` in the config.
+  with `casino.holdem` in the config. With MineVegas installed, it replaces MineVegas's poker table: MineVegas's recipe
+  makes this one, MineVegas's table is in no creative tab, one a player holds turns into this one, and one already
+  placed no longer opens (broken, it gives this one).
 - **Shops.** A shop block sells one item, in lots, for an account its owner or a member chooses, and may buy it back
   at a lower or equal price. Or it only **buys**: the owner picks any item from a search, a price per lot and how many
   the shop holds at most, and players bring it the item; each kind has its own screen for customers. Its owners and members fill it (hoppers can fill it too, never empty it), set it up and
