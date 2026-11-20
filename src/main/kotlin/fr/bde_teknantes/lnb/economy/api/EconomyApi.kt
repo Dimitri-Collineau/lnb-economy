@@ -2,8 +2,8 @@ package fr.bde_teknantes.lnb.economy.api
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import fr.bde_teknantes.lnb.warden.common.api.ApiClient
 import fr.bde_teknantes.lnb.warden.common.api.ApiResult
+import fr.bde_teknantes.lnb.warden.common.api.ApiClient
 import fr.bde_teknantes.lnb.warden.server.ServerConfig
 import fr.bde_teknantes.lnb.warden.server.api.ApiHealth
 import java.net.URLEncoder
@@ -115,7 +115,7 @@ object EconomyApi {
             return CompletableFuture.completedFuture(result)
         }
         // Plain HTTP is allowed: the server's admin chose api.url, and LNB Warden warns about it at startup.
-        return ApiClient.send<T>(url, method, path, token, body, requireSecure = false)
+        return ApiClient.send<T>(url, method, path, token, body, requireSecure = false, headers = EconomyHttp.HEADERS)
             .thenApply { result -> result.also { ApiHealth.record(what, it) } }
     }
 }

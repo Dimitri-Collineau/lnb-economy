@@ -3,6 +3,7 @@ package fr.bde_teknantes.lnb.economy.api
 /*
  * The bodies and answers of the `/api/economy/server` routes, as in `shared/schemas/economy.ts` on the site.
  * Decoded with Gson: optional fields are nullable, and null fields are left out of request bodies.
+ * Every money amount here (balances, prices, amounts, taxes) is a Long of cents: the mod sends `X-Economy-Units: cents`.
  */
 
 /** One of a player's accounts, as `GET /players/:uuid` lists it. */
@@ -127,7 +128,8 @@ data class TransferBody(
         const val KIND_PAYMENT = "payment"
         const val KIND_CASINO = "casino"
         const val MAX_MEMO_LENGTH = 140
-        const val MAX_AMOUNT = 1_000_000_000_000L
+        /** 10^12 LNBits, in cents. */
+        const val MAX_AMOUNT = 100_000_000_000_000L
     }
 }
 
@@ -238,7 +240,8 @@ data class ListingBody(
     val price: Long,
 ) {
     companion object {
-        const val MAX_PRICE = 1_000_000_000L
+        /** 10^9 LNBits, in cents. */
+        const val MAX_PRICE = 100_000_000_000L
     }
 }
 

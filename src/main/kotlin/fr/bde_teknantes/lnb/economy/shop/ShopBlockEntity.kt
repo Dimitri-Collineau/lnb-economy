@@ -129,6 +129,7 @@ data class ShopSettings(val lotSize: Int, val sellPrice: Long, val buyPrice: Lon
         buyPrice?.let { putLong("buyPrice", it) }
         putInt("buyCap", buyCap)
         putBoolean("buying", buying)
+        putString(UNITS, CENTS)
     }
 
     /** What is wrong with these settings for [template], or null when they are fine. */
@@ -144,15 +145,23 @@ data class ShopSettings(val lotSize: Int, val sellPrice: Long, val buyPrice: Lon
 
     companion object {
         const val MAX_LOT = 99
-        const val MAX_PRICE = 1_000_000_000_000L
+        /** 10^12 LNBits, in cents. */
+        const val MAX_PRICE = 100_000_000_000_000L
 
-        fun fromTag(tag: CompoundTag) = ShopSettings(
-            lotSize = tag.getInt("lotSize"),
-            sellPrice = tag.getLong("sellPrice"),
-            buyPrice = if (tag.contains("buyPrice")) tag.getLong("buyPrice") else null,
-            buyCap = tag.getInt("buyCap"),
-            buying = tag.getBoolean("buying"),
-        )
+        private const val UNITS = "units"
+        private const val CENTS = "cents"
+
+        /** Prices saved before 0.3.0 have no `units` tag and are whole LNBits: they become cents here, and stay so on the next save. */
+        fun fromTag(tag: CompoundTag): ShopSettings {
+            val factor = if (tag.getString(UNITS) == CENTS) 1L else 100L
+            return ShopSettings(
+                lotSize = tag.getInt("lotSize"),
+                sellPrice = tag.getLong("sellPrice") * factor,
+                buyPrice = if (tag.contains("buyPrice")) tag.getLong("buyPrice") * factor else null,
+                buyCap = tag.getInt("buyCap"),
+                buying = tag.getBoolean("buying"),
+            )
+        }
 
         /** A shop that only buys, at [price] per lot. */
         fun buying(lotSize: Int, price: Long, buyCap: Int) = ShopSettings(lotSize, price, price.takeIf { it > 0 }, buyCap, buying = true)

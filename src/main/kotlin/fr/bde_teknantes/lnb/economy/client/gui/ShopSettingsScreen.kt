@@ -1,5 +1,6 @@
 package fr.bde_teknantes.lnb.economy.client.gui
 
+import fr.bde_teknantes.lnb.economy.money.Amounts
 import fr.bde_teknantes.lnb.economy.client.ClientEconomy
 import fr.bde_teknantes.lnb.economy.network.ShopItemPayload
 import fr.bde_teknantes.lnb.economy.network.ShopMaterialPayload
@@ -112,8 +113,8 @@ class ShopSettingsScreen(menu: ShopMenu, inventory: Inventory, title: Component)
         val settings = menu.setup.settings
         if (typed[LOT] == null) {
             typed[LOT] = settings?.lotSize?.toString() ?: "1"
-            typed[SELL] = settings?.takeIf { !it.buying }?.sellPrice?.toString().orEmpty()
-            typed[BUY] = settings?.buyPrice?.toString().orEmpty()
+            typed[SELL] = settings?.takeIf { !it.buying }?.sellPrice?.let(Amounts::plain).orEmpty()
+            typed[BUY] = settings?.buyPrice?.let(Amounts::plain).orEmpty()
             typed[CAP] = (settings?.buyCap ?: DEFAULT_CAP).toString()
         }
         when (view) {
@@ -132,7 +133,7 @@ class ShopSettingsScreen(menu: ShopMenu, inventory: Inventory, title: Component)
             val maxLength = when (field) {
                 LOT -> 2
                 CAP -> 5
-                else -> 13
+                else -> 17
             }
             boxes[field] = field(row, field, maxLength)
         }
@@ -235,7 +236,7 @@ class ShopSettingsScreen(menu: ShopMenu, inventory: Inventory, title: Component)
         box.setBordered(false)
         box.setTextColor(CasinoUi.IVORY)
         box.setMaxLength(maxLength)
-        box.setFilter { text -> text.all(Char::isDigit) }
+        box.setFilter { text -> if (field == LOT || field == CAP) text.all(Char::isDigit) else Amounts.isTypable(text) }
         box.value = typed[field].orEmpty()
         box.setResponder { typed[field] = it }
         return addRenderableWidget(box)
@@ -249,10 +250,10 @@ class ShopSettingsScreen(menu: ShopMenu, inventory: Inventory, title: Component)
     /** The settings as typed, or null while a required field is empty. */
     private fun settings(): ShopSettings? {
         val lot = typed[LOT]?.toIntOrNull() ?: return null
-        val buy = typed[BUY]?.toLongOrNull()?.takeIf { it > 0 }
+        val buy = typed[BUY]?.let(Amounts::parse)?.takeIf { it > 0 }
         val cap = typed[CAP]?.toIntOrNull() ?: DEFAULT_CAP
         if (isBuying) return ShopSettings.buying(lot, buy ?: return null, cap)
-        val sell = typed[SELL]?.toLongOrNull() ?: return null
+        val sell = typed[SELL]?.let(Amounts::parse) ?: return null
         return ShopSettings(lot, sell, buy, cap)
     }
 

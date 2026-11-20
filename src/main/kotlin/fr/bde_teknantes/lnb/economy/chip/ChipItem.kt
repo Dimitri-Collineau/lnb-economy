@@ -28,7 +28,7 @@ class ChipItem(val value: Int, properties: Properties) : Item(properties) {
         if (stack.count > 1) {
             val language = if (FMLEnvironment.dist == Dist.CLIENT) Minecraft.getInstance().options.languageCode else "en_us"
             tooltip.add(
-                Component.translatable("item.lnbeconomy.chip.stack", Amounts.format(Chips.valueOf(stack), language))
+                Component.translatable("item.lnbeconomy.chip.stack", Amounts.format(Amounts.fromLnbits(Chips.valueOf(stack)), language))
                     .withStyle(ChatFormatting.GRAY),
             )
         }

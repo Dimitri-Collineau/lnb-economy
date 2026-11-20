@@ -10,6 +10,7 @@ import fr.bde_teknantes.lnb.economy.api.Problems
 import fr.bde_teknantes.lnb.economy.ledger.JournalEntry
 import fr.bde_teknantes.lnb.economy.ledger.Outcome
 import fr.bde_teknantes.lnb.economy.ledger.TransferJournal
+import fr.bde_teknantes.lnb.economy.money.Amounts
 import fr.bde_teknantes.lnb.economy.money.Texts
 import fr.bde_teknantes.lnb.economy.network.EconomyStatus
 import fr.bde_teknantes.lnb.warden.common.api.ApiResult
@@ -38,7 +39,7 @@ object MobDrops {
     private const val FROM_SPAWNER = "lnbeconomy_from_spawner"
 
     /** The site caps one mint; a larger total is sent in several. */
-    private const val MAX_PER_CALL = 100_000L
+    private val MAX_PER_CALL = Amounts.fromLnbits(100_000L)
 
     /** After the site says mob drops are off, nothing is rolled for this long. */
     private const val PAUSE_MS = 10 * 60_000L
@@ -66,7 +67,8 @@ object MobDrops {
         if (PlayerAccounts.get(player.uuid)?.status != EconomyStatus.READY) return
 
         val roll = MobDropRoll(EconomyConfig.MOB_DROPS_CHANCE.get(), EconomyConfig.MOB_DROPS_MIN.get(), EconomyConfig.MOB_DROPS_MAX.get())
-        val amount = roll.amount(player.random.nextDouble(), player.random.nextDouble())
+        // The roll is in whole LNBits; the site and the player's balance count cents.
+        val amount = Amounts.fromLnbits(roll.amount(player.random.nextDouble(), player.random.nextDouble()))
         if (amount <= 0) return
         if (EconomyConfig.MOB_DROPS_FLUSH_SECONDS.get() == 0) send(player.uuid, amount) else waiting.merge(player.uuid, amount, Long::plus)
         player.displayClientMessage(
@@ -114,7 +116,7 @@ object MobDrops {
             is Outcome.Refused -> {
                 val problem = (outcome.result as? ApiResult.Http)?.problem
                 if (problem == Problems.DISABLED) pausedUntil = System.currentTimeMillis() + PAUSE_MS
-                LnbEconomy.LOGGER.warn("The site refused {} LNBits of mob drops for {}: {}", entry.amount, entry.data["player"], outcome.result.describe())
+                LnbEconomy.LOGGER.warn("The site refused {} cents of mob drops for {}: {}", entry.amount, entry.data["player"], outcome.result.describe())
             }
         }
     }

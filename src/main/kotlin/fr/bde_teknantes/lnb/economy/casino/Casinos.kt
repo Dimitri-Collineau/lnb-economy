@@ -8,6 +8,7 @@ import fr.bde_teknantes.lnb.economy.api.EconomyApi
 import fr.bde_teknantes.lnb.economy.api.Problems
 import fr.bde_teknantes.lnb.economy.api.TransferResult
 import fr.bde_teknantes.lnb.economy.chip.ChipLedger
+import fr.bde_teknantes.lnb.economy.money.Amounts
 import fr.bde_teknantes.lnb.warden.common.api.ApiResult
 import net.minecraft.server.MinecraftServer
 import net.neoforged.neoforge.event.server.ServerStartedEvent
@@ -18,6 +19,9 @@ import java.util.concurrent.CompletableFuture
 /**
  * The accounts of the casinos linked to a machine or a counter: their balance read from the site, and their free
  * balance once the chips in circulation and the rounds in progress are kept back. Server thread only.
+ *
+ * The casino side counts in whole LNBits, like chips: the site's balances (cents) are rounded down on the way in,
+ * and [SpendLimits.available] is converted back to cents on the way out.
  */
 object Casinos {
     val book = CasinoBook(System::currentTimeMillis)
@@ -51,7 +55,7 @@ object Casinos {
                 loading.remove(handle)
                 when {
                     result is ApiResult.Ok -> {
-                        book.update(handle, result.body.balance, result.body.frozen, result.body.isCasino)
+                        book.update(handle, Amounts.toWholeLnbits(result.body.balance), result.body.frozen, result.body.isCasino)
                         names[handle] = result.body.name
                     }
                     result is ApiResult.Http && result.problem == Problems.NOT_FOUND -> book.markMissing(handle)
@@ -65,8 +69,8 @@ object Casinos {
     }
 
     fun onTransfer(result: TransferResult) {
-        result.from.handle?.let { book.updateBalance(it, result.from.balance) }
-        result.to.handle?.let { book.updateBalance(it, result.to.balance) }
+        result.from.handle?.let { book.updateBalance(it, Amounts.toWholeLnbits(result.from.balance)) }
+        result.to.handle?.let { book.updateBalance(it, Amounts.toWholeLnbits(result.to.balance)) }
     }
 
     fun onServerStarted(event: ServerStartedEvent) {
@@ -78,7 +82,7 @@ object Casinos {
             val current = this.server
             if (current == null || (handle !in linked(current) && ChipLedger.get(current).outstanding(handle) == 0L)) null
             else when (val status = status(current, handle)) {
-                is CasinoBook.Status.Open -> status.free
+                is CasinoBook.Status.Open -> Amounts.fromLnbits(status.free)
                 else -> 0
             }
         }

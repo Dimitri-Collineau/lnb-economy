@@ -18,7 +18,7 @@ class JournalStore(private val file: Path) {
         if (!Files.exists(file)) return emptyList()
         val text = Files.readString(file)
         if (text.isBlank()) return emptyList()
-        return gson.fromJson<List<JournalEntry>>(text, listType).orEmpty()
+        return gson.fromJson<List<JournalEntry>>(text, listType).orEmpty().map { it.inCents() }
     }
 
     fun save(entries: Collection<JournalEntry>) {

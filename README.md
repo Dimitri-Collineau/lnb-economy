@@ -6,12 +6,16 @@ the mod on a player's computer only talks to the server. The contract is `docs/e
 
 ## What it does
 
+- **Cents.** Amounts are exact to the cent (1 LNBit = 100 cents): the mod counts in whole cents, never in decimals,
+  and sends `X-Economy-Units: cents` on every economy call, as the site asks. Chips stay whole LNBits (1, 5, 25, 100,
+  500, 1000), and the settings in LNBits (`pay.confirmAbove`, the mob drop amounts) are still whole LNBits. Data saved
+  before 0.3.0 (shop prices, calls waiting in the journal) is converted once on load.
 - **Balances.** The inventory shows the default account's balance, with a "My accounts" button to see every account
   and choose the one that pays by default. Players without a linked LNB account have no economy.
 - **Commands.**
   - `/balance` (`/bal`): your accounts.
-  - `/pay <player|#account> <amount> [message]`: pays from your default account. Above `pay.confirmAbove`, asks to
-    confirm with a click.
+  - `/pay <player|#account> <amount> [message]`: pays from your default account. The amount is in LNBits with up to
+    two decimals (`/pay Steve 0.5`, `/pay Steve 12,34`). Above `pay.confirmAbove`, asks to confirm with a click.
   - `/payfrom <#account> <player|#account> <amount> [message]`: pays from a shared account you own or are a member of.
   - `/account` (`/compte`): shared accounts. `create <handle> <name>`, `rename <handle> <name>`,
     `type <handle> team|shop|casino`, `invite <handle> <player>`, `members <handle>`, `invitations`,
@@ -86,7 +90,7 @@ Java 21. Then put these jars in the instance's `mods/` folder. The same mods go 
 | Mod              | Version                          | Needed                                                                     |
 |------------------|----------------------------------|----------------------------------------------------------------------------|
 | LNB Economy      | this mod, from the [releases][r] | required, on the server and on the players' computers                      |
-| LNB Warden       | 0.1.0 or newer                   | required, on the server and on the players' computers                      |
+| LNB Warden       | 0.4.0 or newer                   | required, on the server and on the players' computers                      |
 | Kotlin for Forge | 5.12 or newer                    | required                                                                   |
 | GeckoLib         | 4.9 or newer (tested on 4.9.3)   | required: the counter's teller and the license dealer are animated with it |
 | MineVegas Casino | 1.1.1 up to, not including, 1.2  | optional: its machines then take only the chips of their casino            |
@@ -178,6 +182,6 @@ AGPL-3.0-or-later, like LNB Warden and the site.
 | `LNB_TEST_CASINO` | handle of a shared account that player owns or is a member of              |
 | `LNB_TEST_PARTNER` | optional: UUID of another player's linked Minecraft account, for trades     |
 
-The tests move 1 LNBit to that account and back. Without these variables, they are skipped.
+The tests move 0.01 LNBit (1 cent) to that account and back. Without these variables, they are skipped.
 
 `TESTING.md` is the manual test plan, in game.

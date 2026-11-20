@@ -124,7 +124,7 @@ object CasinoHooks {
         val total = stakes.sumOf(Chips::valueOf)
         val maxBet = link.maxBet
         if (maxBet != null && total > maxBet) {
-            return refuse(player, Component.translatable("economy.lnbeconomy.machine.max_bet", Casinos.name(link.handle), Texts.amount(maxBet, player)))
+            return refuse(player, Component.translatable("economy.lnbeconomy.machine.max_bet", Casinos.name(link.handle), Texts.chips(maxBet, player)))
         }
         val key = keyOf(machine)
         return when (val status = Casinos.status(level.server, link.handle, except = key)) {

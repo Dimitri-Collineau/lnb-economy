@@ -99,7 +99,7 @@ object EconomyEvents {
 
     private fun listen(server: MinecraftServer) {
         val (url, token) = EconomyApi.connection() ?: return
-        val request = ApiClient.request(url, PATH, token)
+        val request = EconomyHttp.request(url, PATH, token)
             .header("Accept", "text/event-stream")
             .timeout(Duration.ofSeconds(30))
             .apply { lastEventId?.let { header("Last-Event-ID", it) } }

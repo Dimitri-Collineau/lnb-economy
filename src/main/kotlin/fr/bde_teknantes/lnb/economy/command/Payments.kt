@@ -11,6 +11,7 @@ import fr.bde_teknantes.lnb.economy.api.TransferBody
 import fr.bde_teknantes.lnb.economy.ledger.JournalEntry
 import fr.bde_teknantes.lnb.economy.ledger.Outcome
 import fr.bde_teknantes.lnb.economy.ledger.TransferJournal
+import fr.bde_teknantes.lnb.economy.money.Amounts
 import fr.bde_teknantes.lnb.economy.money.Texts
 import fr.bde_teknantes.lnb.economy.network.EconomyStatus
 import fr.bde_teknantes.lnb.warden.common.api.ApiResult
@@ -50,7 +51,8 @@ object Payments {
         val request = Request(from?.let(Handles::bare), parsed.target, targetUuid, parsed.amount, parsed.memo)
         if (!mayPay(player, request)) return
 
-        val threshold = EconomyConfig.PAY_CONFIRM_ABOVE.get()
+        // The setting is in whole LNBits; amounts are cents.
+        val threshold = Amounts.fromLnbits(EconomyConfig.PAY_CONFIRM_ABOVE.get())
         if (threshold in 1 until request.amount) {
             val token = UUID.randomUUID().toString().take(8)
             confirmations[player.uuid] = Confirmation(token, request, System.currentTimeMillis() + CONFIRM_MS)

@@ -14,7 +14,10 @@ object Lnbit {
     fun symbol(): MutableComponent =
         Component.literal(Amounts.SYMBOL).withStyle { it.withFont(FONT).withColor(WHITE) }
 
-    /** The coin then `1 250`, for the inventory and block screens. A style set on the result colors the amount. */
-    fun compact(amount: Long, language: String): MutableComponent =
-        Component.empty().append(symbol()).append(" " + Amounts.format(amount, language))
+    /** Like [compact] for chip values, which are whole LNBits. */
+    fun chips(wholeLnbits: Long, language: String): MutableComponent = compact(Amounts.fromLnbits(wholeLnbits), language)
+
+    /** The coin then `1 250,5`, for the inventory and block screens. A style set on the result colors the amount. */
+    fun compact(cents: Long, language: String): MutableComponent =
+        Component.empty().append(symbol()).append(" " + Amounts.format(cents, language))
 }

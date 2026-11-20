@@ -68,7 +68,7 @@ test needs two players.
 | 1.6 | Click the personal account | Back to personal |
 | 1.7 | Join as B, open "My accounts" | `#test-casino` is greyed: B is a viewer |
 | 1.8 | Join as a username linked to nothing | No balance in the inventory; `/balance` says to link an LNB account |
-| 1.9 | Switch the game to French | Amounts read `1 250`, texts are in French |
+| 1.9 | Switch the game to French | Amounts read `1 250` and `1 250,5`, texts are in French |
 
 ## 2. Payments
 
@@ -80,10 +80,13 @@ test needs two players.
 | 2.4 | A: `/payfrom #test-casino B 10` | Paid from the casino account |
 | 2.5 | B: `/payfrom #test-casino A 10` | Refused: B can't spend from it |
 | 2.6 | A: `/pay B 99999999` | "There isn't enough money on that account." |
-| 2.7 | `/pay B 0`, `/pay B 1.5`, `/pay test-casino 5`, `/pay #A 5` | The matching usage error, nothing sent |
+| 2.7 | `/pay B 0`, `/pay B 1.555`, `/pay test-casino 5`, `/pay #A 5` | The matching usage error, nothing sent |
 | 2.8 | `/pay ` then Tab; `/pay #` then Tab; `/payfrom ` then Tab | Online players and known handles; for `/payfrom`, only accounts A can spend from |
 | 2.9 | A: `/pay Nobody 5` (a name linked to nothing) | "Nobody has no LNB account with the economy." |
 | 2.10 | `/balance` | Every account with its balance, the default marked |
+| 2.11 | A: `/pay B 0.01`, then `/pay B 12,5` | B receives "0.01 LNBits" then "12.5 LNBits" ("0,01" and "12,5" in French); A's balance goes down by exactly 12.51; the site's history shows 1 and 1250 cents |
+| 2.12 | A has 1,234.56: `/pay B 0.01` | A's balance reads 1,234.55, not 1,234.5 or 1,235 |
+| 2.13 | Watch the site's request log during any of the above | Every call from the server has `X-Economy-Units: cents`, the event stream's too |
 
 ## 3. Counter
 
@@ -302,3 +305,19 @@ to cover the antes (102 times each ante).
 
 Remove MineVegas from the server and the client: the game starts, payments, counters and the poker table work, the
 log has no mixin error.
+
+## 13. Cents (0.3.0)
+
+Upgrade a world that ran 0.2.x: a shop priced 12 LNBits, and one money call waiting in the journal (stop the site, make a `/pay B 5`, stop the server, start the site, start the server with 0.3.0).
+
+| # | Do | Expect |
+|---|----|--------|
+| 13.1 | Open the old shop | Its price reads 12, and the site's shop shows 1200 cents. Saving it again keeps 12 |
+| 13.2 | `/economy pending` before the site is back, then once it is | The waiting payment goes through for exactly 5 LNBits (500 cents), not 0.05 |
+| 13.3 | Set a shop price of `0.25`, and a buy-back of `0.1` | Accepted; customers read 0.25 and 0.10; a trade of 2 lots costs 0.50 |
+| 13.4 | A shop price of `0.255` | The field refuses the third decimal as it is typed |
+| 13.5 | List an auction for `1.5` | The tooltip reads 1.5; the buyer pays 1.5, the tax is shown with decimals |
+| 13.6 | Trade: give `2.5` LNBits | The other side sees 2.5; both balances move by 2.5 |
+| 13.7 | Kill a zombie (see 11) | "+N from the mob" with N whole; the balance rises by exactly N |
+| 13.8 | Buy 5 LNBits of chips, play, cash them | Chips value 5; the account goes down 5 and back up by the cash-out, to the cent |
+| 13.9 | `/economy casino #test-casino` | Balance, chips and free balance in whole LNBits, free = balance - chips - held |
