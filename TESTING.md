@@ -68,7 +68,7 @@ test needs two players.
 | 1.6 | Click the personal account | Back to personal |
 | 1.7 | Join as B, open "My accounts" | `#test-casino` is greyed: B is a viewer |
 | 1.8 | Join as a username linked to nothing | No balance in the inventory; `/balance` says to link an LNB account |
-| 1.9 | Switch the game to French | Amounts read `1 250`, texts are in French |
+| 1.9 | Switch the game to French | Amounts read `1 250` and `1 250,5`, texts are in French |
 
 ## 2. Payments
 
@@ -80,10 +80,13 @@ test needs two players.
 | 2.4 | A: `/payfrom #test-casino B 10` | Paid from the casino account |
 | 2.5 | B: `/payfrom #test-casino A 10` | Refused: B can't spend from it |
 | 2.6 | A: `/pay B 99999999` | "There isn't enough money on that account." |
-| 2.7 | `/pay B 0`, `/pay B 1.5`, `/pay test-casino 5`, `/pay #A 5` | The matching usage error, nothing sent |
+| 2.7 | `/pay B 0`, `/pay B 1.555`, `/pay test-casino 5`, `/pay #A 5` | The matching usage error, nothing sent |
 | 2.8 | `/pay ` then Tab; `/pay #` then Tab; `/payfrom ` then Tab | Online players and known handles; for `/payfrom`, only accounts A can spend from |
 | 2.9 | A: `/pay Nobody 5` (a name linked to nothing) | "Nobody has no LNB account with the economy." |
 | 2.10 | `/balance` | Every account with its balance, the default marked |
+| 2.11 | A: `/pay B 0.01`, then `/pay B 12,5` | B receives "0.01 LNBits" then "12.5 LNBits" ("0,01" and "12,5" in French); A's balance goes down by exactly 12.51; the site's history shows 1 and 1250 cents |
+| 2.12 | A has 1,234.56: `/pay B 0.01` | A's balance reads 1,234.55, not 1,234.5 or 1,235 |
+| 2.13 | Watch the site's request log during any of the above | Every call from the server has `X-Economy-Units: cents`, the event stream's too |
 
 ## 3. Counter
 
@@ -302,3 +305,47 @@ to cover the antes (102 times each ante).
 
 Remove MineVegas from the server and the client: the game starts, payments, counters and the poker table work, the
 log has no mixin error.
+
+## 13. Cents (0.3.0)
+
+Upgrade a world that ran 0.2.x: a shop priced 12 LNBits, and one money call waiting in the journal (stop the site, make a `/pay B 5`, stop the server, start the site, start the server with 0.3.0).
+
+| # | Do | Expect |
+|---|----|--------|
+| 13.1 | Open the old shop | Its price reads 12, and the site's shop shows 1200 cents. Saving it again keeps 12 |
+| 13.2 | `/economy pending` before the site is back, then once it is | The waiting payment goes through for exactly 5 LNBits (500 cents), not 0.05 |
+| 13.3 | Set a shop price of `0.25`, and a buy-back of `0.1` | Accepted; customers read 0.25 and 0.10; a trade of 2 lots costs 0.50 |
+| 13.4 | A shop price of `0.255` | The field refuses the third decimal as it is typed |
+| 13.5 | List an auction for `1.5` | The tooltip reads 1.5; the buyer pays 1.5, the tax is shown with decimals |
+| 13.6 | Trade: give `2.5` LNBits | The other side sees 2.5; both balances move by 2.5 |
+| 13.7 | Kill a zombie (see 11) | "+N from the mob" with N whole; the balance rises by exactly N |
+| 13.8 | Buy 5 LNBits of chips, play, cash them | Chips value 5; the account goes down 5 and back up by the cash-out, to the cent |
+| 13.9 | `/economy casino #test-casino` | Balance, chips and free balance in whole LNBits, free = balance - chips - held |
+
+## 14. Market (0.4.0)
+
+On a server against a site with the Market on, with a linked player, a second player who is only a viewer of a shared account, and one banned player. The site's `economy.market`, `economy.market.sell` and `economy.market.buy` flags are what you turn on and off.
+
+| # | Do | Expect |
+|---|----|--------|
+| 14.1 | Market off on the site, `/market` | A "closed" screen, no chat error, no "API unreachable" alert for operators |
+| 14.2 | Turn the Market on, wait up to a minute with the closed screen open | The screen turns into the Market by itself |
+| 14.3 | Sell tab, then Buy tab; search, sort by name, price and change | Tabs are told apart, the list does not shuffle while sorted by change, items held by the player are brighter on Sell |
+| 14.4 | Open an item: hover the chart, switch the period chips | A value and a date under the cursor; each period loads, a second look at the same period is instant |
+| 14.5 | Sell 1, 64, "All" and a typed quantity | The total matches the site's payout to the cent, the balance and stock move, the toast and chat read the same sale |
+| 14.6 | Sell a damaged tool, a renamed item, an enchanted book, a shulker box with items | Refused by the mod without calling the site, with a reason |
+| 14.7 | A sale across the first tier threshold | The average price shows the split; the Efficiency screen shows the player's meter moved |
+| 14.8 | Change the stock from the admin between opening an item and clicking | The new total is shown, the items are back, a second click sells at it |
+| 14.9 | Mint budget very low, then sell | A partial payout with the "capped" message, then a refusal |
+| 14.10 | Block the network for 20 s right after clicking Sell | The items stay held, "delayed" is shown once, the player is paid once when it clears |
+| 14.11 | Stop the server in the middle of a sale | After the restart the sale settles once; no item is lost or doubled |
+| 14.12 | Buy 1, 64 and 2,304 with a nearly full inventory | What fits is handed over, the rest is in `/mailbox` |
+| 14.13 | Crash the server just after a purchase was answered | After the restart the items are claimed once |
+| 14.14 | Buy from a shared account as a viewer | The account is not offered; a forged order is refused `notAllowed` |
+| 14.15 | Buy above the balance, as a banned player, with a flag off | The right message each time; nothing moves; a sale gives the items back |
+| 14.16 | An order above `pay.confirmAbove` | The first click asks, the second sends |
+| 14.17 | Change a price or turn an item off in the admin | The screen follows within seconds; a disabled item disappears |
+| 14.18 | Sell with the site's `settings.saleAccount` on, then off | The "Pay to" choice appears with it and goes without it; the sale pays the chosen account |
+| 14.19 | Close the screen, relog, open it as a second player at the same time | Each sees their own window and balance; closing stops the updates |
+| 14.20 | Switch the game to French | Every Market text and problem message is translated |
+

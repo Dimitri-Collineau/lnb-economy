@@ -28,4 +28,27 @@ class RetryPolicyTest {
         assertTrue(delays.zipWithNext().all { (a, b) -> a <= b })
         assertEquals(delays[5], delays[7])
     }
+
+    @Test
+    fun `a market order retries after 1, 2, 4, 8 then 30 seconds`() {
+        val delays = (1..7).map { RetryPolicy.delayAfter(it, RetryPolicy.MARKET_ORDERS) }
+        assertEquals(listOf(1_000L, 2_000L, 4_000L, 8_000L, 30_000L, 30_000L, 30_000L), delays)
+    }
+
+    @Test
+    fun `other routes keep the usual delays`() {
+        assertEquals(RetryPolicy.delayAfter(3), RetryPolicy.delayAfter(3, "/auctions"))
+    }
+
+    @Test
+    fun `a key reused for another market order is held, not refused or retried`() {
+        val mismatch = ApiResult.Http(409, "idempotencyMismatch")
+        assertEquals(Verdict.HOLD, RetryPolicy.verdict(mismatch, RetryPolicy.MARKET_ORDERS))
+        assertEquals(Verdict.REFUSED, RetryPolicy.verdict(mismatch, "/auctions"))
+    }
+
+    @Test
+    fun `a market order refused by the market being closed is final`() {
+        assertEquals(Verdict.REFUSED, RetryPolicy.verdict(ApiResult.Http(503, "disabled"), RetryPolicy.MARKET_ORDERS))
+    }
 }

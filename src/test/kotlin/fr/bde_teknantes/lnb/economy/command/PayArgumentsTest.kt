@@ -13,7 +13,7 @@ class PayArgumentsTest {
     fun `a player, an amount and a message`() {
         val parsed = ok("Steve 50 for the diamonds")
         assertEquals(Target.Player("Steve"), parsed.target)
-        assertEquals(50, parsed.amount)
+        assertEquals(5000, parsed.amount)
         assertEquals("for the diamonds", parsed.memo)
     }
 
@@ -24,11 +24,19 @@ class PayArgumentsTest {
     }
 
     @Test
+    fun `amounts have up to two decimals and are read in cents`() {
+        assertEquals(1, ok("Steve 0.01").amount)
+        assertEquals(1250, ok("Steve 12,5").amount)
+        assertEquals(1234, ok("Steve 12.34 hi").amount)
+        assertEquals("economy.lnbeconomy.pay.bad_amount", error("Steve 12.345"))
+        assertEquals("economy.lnbeconomy.pay.bad_amount", error("Steve 0.00"))
+    }
+
+    @Test
     fun `bad input names what is wrong`() {
         assertEquals("economy.lnbeconomy.pay.usage", error("Steve"))
         assertEquals("economy.lnbeconomy.pay.bad_amount", error("Steve 0"))
-        assertEquals("economy.lnbeconomy.pay.bad_amount", error("Steve 1.5"))
-        assertEquals("economy.lnbeconomy.pay.bad_amount", error("Steve 1000000000001"))
+                assertEquals("economy.lnbeconomy.pay.bad_amount", error("Steve 1000000000001"))
         assertEquals("economy.lnbeconomy.pay.bad_handle", error("#A 10"))
         assertEquals("economy.lnbeconomy.pay.bad_player", error("not-a-name 10"))
         assertEquals("economy.lnbeconomy.pay.memo_too_long", error("Steve 10 " + "x".repeat(141)))

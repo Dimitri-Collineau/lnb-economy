@@ -20,6 +20,15 @@ import fr.bde_teknantes.lnb.economy.network.OpenLinkPayload
 import fr.bde_teknantes.lnb.economy.network.OpenShopPayload
 import fr.bde_teknantes.lnb.economy.network.PokerStatePayload
 import fr.bde_teknantes.lnb.economy.network.TradeStatePayload
+import fr.bde_teknantes.lnb.economy.client.gui.MarketClosedScreen
+import fr.bde_teknantes.lnb.economy.client.gui.MarketEfficiencyScreen
+import fr.bde_teknantes.lnb.economy.client.gui.MarketScreen
+import fr.bde_teknantes.lnb.economy.client.gui.MarketUi
+import fr.bde_teknantes.lnb.economy.network.MarketCatalogPayload
+import fr.bde_teknantes.lnb.economy.network.MarketDeltaPayload
+import fr.bde_teknantes.lnb.economy.network.MarketHistoryPayload
+import fr.bde_teknantes.lnb.economy.network.MarketResultPayload
+import fr.bde_teknantes.lnb.economy.network.MarketWindowPayload
 import net.minecraft.client.Minecraft
 import net.neoforged.neoforge.network.handling.IPayloadContext
 
@@ -74,6 +83,39 @@ object ClientPayloadHandler {
 
     fun handleAuctionMailbox(payload: AuctionMailboxPayload, context: IPayloadContext) {
         ClientAuction.update(payload)
+    }
+
+    /** The catalog answers `/market` (it opens the screen) or refreshes a Market screen that is already open. */
+    fun handleMarketCatalog(payload: MarketCatalogPayload, context: IPayloadContext) {
+        ClientMarket.update(payload)
+        val minecraft = Minecraft.getInstance()
+        val screen = minecraft.screen
+        val onMarket = screen is MarketScreen || screen is MarketClosedScreen || screen is MarketEfficiencyScreen
+        if (!onMarket && !payload.fresh) return
+        // Moving between Market screens is not leaving the Market: the server keeps sending until the player closes it.
+        MarketUi.switching = true
+        when {
+            payload.open && screen is MarketClosedScreen -> minecraft.setScreen(MarketScreen())
+            payload.open && !onMarket -> minecraft.setScreen(MarketScreen())
+            !payload.open && screen !is MarketClosedScreen -> minecraft.setScreen(MarketClosedScreen())
+        }
+        MarketUi.switching = false
+    }
+
+    fun handleMarketDelta(payload: MarketDeltaPayload, context: IPayloadContext) {
+        ClientMarket.update(payload)
+    }
+
+    fun handleMarketWindow(payload: MarketWindowPayload, context: IPayloadContext) {
+        ClientMarket.update(payload)
+    }
+
+    fun handleMarketHistory(payload: MarketHistoryPayload, context: IPayloadContext) {
+        ClientMarket.update(payload)
+    }
+
+    fun handleMarketResult(payload: MarketResultPayload, context: IPayloadContext) {
+        ClientMarket.update(payload)
     }
 
     fun handleTradeState(payload: TradeStatePayload, context: IPayloadContext) {

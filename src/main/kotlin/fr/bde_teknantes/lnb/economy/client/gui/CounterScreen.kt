@@ -152,7 +152,7 @@ class CounterScreen(private val counter: OpenCounterPayload) :
         CasinoUi.title(graphics, font, Component.literal(CasinoUi.fit(font, title.string, PANEL_WIDTH - 30)), width / 2, panelY + 11)
         graphics.drawString(font, Component.translatable("gui.lnbeconomy.counter.buy.title"), innerX, panelY + BUY_TOP + 5, CasinoUi.GOLD_TEXT, true)
         graphics.drawString(
-            font, Component.translatable("gui.lnbeconomy.counter.cash.title", Lnbit.compact(chipsValue(), language)),
+            font, Component.translatable("gui.lnbeconomy.counter.cash.title", Lnbit.chips(chipsValue(), language)),
             innerX, panelY + CASH_TOP + 5, CasinoUi.GOLD_TEXT, true,
         )
         val end = graphics.drawString(font, Component.translatable("gui.lnbeconomy.counter.change.title"), innerX, panelY + CHANGE_TOP + 5, CasinoUi.GOLD_TEXT, true)

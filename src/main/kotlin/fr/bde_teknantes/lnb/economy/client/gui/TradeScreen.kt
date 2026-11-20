@@ -63,9 +63,9 @@ class TradeScreen(menu: TradeMenu, inventory: Inventory, title: Component) :
         amount = EditBox(font, leftPos + MINE_X + 11, topPos + MONEY_Y + 3, FIELD_WIDTH - 8, 10, Component.translatable("gui.lnbeconomy.trade.amount"))
         amount.setBordered(false)
         amount.setTextColor(CasinoUi.IVORY)
-        amount.setMaxLength(13)
-        amount.setFilter { text -> text.all(Char::isDigit) }
-        amount.value = if (state.myAmount > 0) state.myAmount.toString() else ""
+        amount.setMaxLength(17)
+        amount.setFilter(Amounts::isTypable)
+        amount.value = if (state.myAmount > 0) Amounts.plain(state.myAmount) else ""
         amount.setHint(Component.literal("0").withColor(CasinoUi.HINT))
         amount.setResponder { sendMoney() }
         addRenderableWidget(amount)
@@ -90,7 +90,7 @@ class TradeScreen(menu: TradeMenu, inventory: Inventory, title: Component) :
     }
 
     private fun sendMoney() {
-        val value = amount.value.toLongOrNull() ?: 0
+        val value = Amounts.parse(amount.value) ?: 0
         val chosen = account?.value?.id
         PacketDistributor.sendToServer(TradeMoneyPayload(value, chosen.takeIf { it != ClientEconomy.snapshot.defaultAccountId }))
     }

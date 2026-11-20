@@ -132,7 +132,7 @@ class PokerScreen(val pos: BlockPos) : Screen(Component.translatable("gui.lnbeco
         if (phase == HoldemRound.Phase.DECISION && mine != null && mine.choice == HoldemRound.Choice.NONE.ordinal) {
             val cost = mine.ante * HoldemRules.CALL_ANTES
             val call: Button = addRenderableWidget(
-                CasinoButton.primary(Component.translatable("gui.lnbeconomy.poker.call", Lnbit.compact(cost, language))) {
+                CasinoButton.primary(Component.translatable("gui.lnbeconomy.poker.call", Lnbit.chips(cost, language))) {
                     PacketDistributor.sendToServer(PokerActionPayload(pos, PokerActionPayload.CALL))
                 }.bounds(panelX + 20, controlsY, 110, 18).build(),
             )
@@ -157,7 +157,7 @@ class PokerScreen(val pos: BlockPos) : Screen(Component.translatable("gui.lnbeco
             val cost = mine.ante * HoldemRules.CALL_ANTES
             val half = (inner - 2) / 2
             val call: Button = addRenderableWidget(
-                CasinoButton.primary(Component.translatable("gui.lnbeconomy.poker.call", Lnbit.compact(cost, language))) {
+                CasinoButton.primary(Component.translatable("gui.lnbeconomy.poker.call", Lnbit.chips(cost, language))) {
                     PacketDistributor.sendToServer(PokerActionPayload(pos, PokerActionPayload.CALL))
                 }.bounds(panelX + 10, buttonsY, half, 18).build(),
             )
@@ -270,12 +270,12 @@ class PokerScreen(val pos: BlockPos) : Screen(Component.translatable("gui.lnbeco
         return when {
             result == HoldemRules.Result.FOLD -> Component.translatable("gui.lnbeconomy.poker.choice.fold") to CasinoUi.GREY
             result == HoldemRules.Result.LOSE -> Component.translatable("gui.lnbeconomy.poker.result.lose", hand(seat.hand)) to LOSS
-            result == HoldemRules.Result.PUSH -> Component.translatable("gui.lnbeconomy.poker.result.push", Lnbit.compact(seat.payout, language)) to CasinoUi.IVORY
-            result != null -> Component.translatable("gui.lnbeconomy.poker.result.win", hand(seat.hand), Lnbit.compact(seat.payout, language)) to GREEN
+            result == HoldemRules.Result.PUSH -> Component.translatable("gui.lnbeconomy.poker.result.push", Lnbit.chips(seat.payout, language)) to CasinoUi.IVORY
+            result != null -> Component.translatable("gui.lnbeconomy.poker.result.win", hand(seat.hand), Lnbit.chips(seat.payout, language)) to GREEN
             seat.choice == HoldemRound.Choice.CALL.ordinal -> Component.translatable("gui.lnbeconomy.poker.choice.call") to CasinoUi.GOLD_TEXT
             seat.choice == HoldemRound.Choice.FOLD.ordinal -> Component.translatable("gui.lnbeconomy.poker.choice.fold") to CasinoUi.GREY
             phase == HoldemRound.Phase.DECISION -> Component.translatable("gui.lnbeconomy.poker.choice.thinking") to CasinoUi.DIM
-            else -> Component.translatable("gui.lnbeconomy.poker.staked", Lnbit.compact(seat.ante, language)) to CasinoUi.DIM
+            else -> Component.translatable("gui.lnbeconomy.poker.staked", Lnbit.chips(seat.ante, language)) to CasinoUi.DIM
         }
     }
 
@@ -345,10 +345,10 @@ class PokerScreen(val pos: BlockPos) : Screen(Component.translatable("gui.lnbeco
         graphics.drawString(font, shown, panelX + PANEL_WIDTH - 20 - font.width(shown), panelY + DEALER_Y + 10, CasinoUi.GOLD_TEXT, true)
 
         if (ante != null) {
-            val carried = Component.translatable("gui.lnbeconomy.poker.chips", Lnbit.compact(chips(state), language))
+            val carried = Component.translatable("gui.lnbeconomy.poker.chips", Lnbit.chips(chips(state), language))
             graphics.drawString(font, carried, panelX + 96, panelY + CONTROLS_Y + 5, CasinoUi.DIM, true)
         }
-        val rules = Component.translatable(if (state.maxBet > 0) "gui.lnbeconomy.poker.rules.max" else "gui.lnbeconomy.poker.rules", Lnbit.compact(state.maxBet, language))
+        val rules = Component.translatable(if (state.maxBet > 0) "gui.lnbeconomy.poker.rules.max" else "gui.lnbeconomy.poker.rules", Lnbit.chips(state.maxBet, language))
         graphics.drawCenteredString(font, CasinoUi.fit(font, rules.string, PANEL_WIDTH - 24), center, panelY + CONTROLS_Y + 23, CasinoUi.DIM)
     }
 
@@ -366,15 +366,15 @@ class PokerScreen(val pos: BlockPos) : Screen(Component.translatable("gui.lnbeco
         cards(graphics, seat.cards.ifEmpty { listOf(null, null) }, middle, y + 20)
 
         val staked = if (seat.choice == HoldemRound.Choice.CALL.ordinal) seat.ante * (1 + HoldemRules.CALL_ANTES) else seat.ante
-        val stake = Component.translatable("gui.lnbeconomy.poker.staked", Lnbit.compact(staked, language))
+        val stake = Component.translatable("gui.lnbeconomy.poker.staked", Lnbit.chips(staked, language))
         graphics.drawCenteredString(font, stake, middle, y + 56, CasinoUi.DIM)
 
         val result = HoldemRules.Result.entries.getOrNull(seat.result)
         val (line, color) = when {
             result == HoldemRules.Result.FOLD -> Component.translatable("gui.lnbeconomy.poker.choice.fold") to CasinoUi.GREY
             result == HoldemRules.Result.LOSE -> Component.translatable("gui.lnbeconomy.poker.result.lose", hand(seat.hand)) to LOSS
-            result == HoldemRules.Result.PUSH -> Component.translatable("gui.lnbeconomy.poker.result.push", Lnbit.compact(seat.payout, language)) to CasinoUi.IVORY
-            result != null -> Component.translatable("gui.lnbeconomy.poker.result.win", hand(seat.hand), Lnbit.compact(seat.payout, language)) to GREEN
+            result == HoldemRules.Result.PUSH -> Component.translatable("gui.lnbeconomy.poker.result.push", Lnbit.chips(seat.payout, language)) to CasinoUi.IVORY
+            result != null -> Component.translatable("gui.lnbeconomy.poker.result.win", hand(seat.hand), Lnbit.chips(seat.payout, language)) to GREEN
             seat.choice == HoldemRound.Choice.CALL.ordinal -> Component.translatable("gui.lnbeconomy.poker.choice.call") to CasinoUi.GOLD_TEXT
             seat.choice == HoldemRound.Choice.FOLD.ordinal -> Component.translatable("gui.lnbeconomy.poker.choice.fold") to CasinoUi.GREY
             phase == HoldemRound.Phase.DECISION -> Component.translatable("gui.lnbeconomy.poker.choice.thinking") to CasinoUi.DIM

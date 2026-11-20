@@ -39,6 +39,7 @@ object ClientEconomy {
     fun onLoggingOut(event: ClientPlayerNetworkEvent.LoggingOut) {
         snapshot = EMPTY
         ClientAccounts.clear()
+        ClientMarket.clear()
         InvitationBanner.clear()
         receivedAt = 0
         revision++

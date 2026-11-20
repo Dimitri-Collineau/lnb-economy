@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.Suggestions
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
+import fr.bde_teknantes.lnb.economy.money.Amounts
 import fr.bde_teknantes.lnb.economy.account.KnownHandles
 import fr.bde_teknantes.lnb.economy.LnbEconomy
 import fr.bde_teknantes.lnb.economy.ModContent
@@ -225,7 +226,7 @@ object EconomyCommands {
         val ledger = ChipLedger.get(source.server)
         if (parts.size == 3 && parts[1] == "outstanding") {
             val value = parts[2].toLongOrNull()?.takeIf { it >= 0 } ?: run {
-                source.sendFailure(Component.translatable("economy.lnbeconomy.pay.bad_amount"))
+                source.sendFailure(Component.translatable("commands.lnbeconomy.casino.outstanding.bad"))
                 return 0
             }
             val before = ledger.outstanding(handle)
@@ -296,7 +297,7 @@ object EconomyCommands {
             val line = Component.translatable(
                 "commands.lnbeconomy.pending.line",
                 entry.purpose,
-                entry.amount?.toString() ?: "-",
+                entry.amount?.let { Amounts.format(it, "en_us") } ?: "-",
                 transfer?.from?.let { it.account?.let(Handles::display) ?: it.player } ?: entry.route,
                 transfer?.to?.let { it.account?.let(Handles::display) ?: it.player } ?: "-",
                 entry.attempts,

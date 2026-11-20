@@ -2,8 +2,15 @@ package fr.bde_teknantes.lnb.economy.api
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import fr.bde_teknantes.lnb.warden.common.api.ApiClient
 import fr.bde_teknantes.lnb.warden.common.api.ApiResult
+import fr.bde_teknantes.lnb.economy.market.MarketHistoryView
+import fr.bde_teknantes.lnb.economy.market.MarketPlayerWindow
+import fr.bde_teknantes.lnb.economy.market.MarketQuote
+import fr.bde_teknantes.lnb.economy.market.MarketQuoteBody
+import fr.bde_teknantes.lnb.economy.market.MarketRecipeBody
+import fr.bde_teknantes.lnb.economy.market.MarketRecipeResult
+import fr.bde_teknantes.lnb.economy.market.MarketStateView
+import fr.bde_teknantes.lnb.warden.common.api.ApiClient
 import fr.bde_teknantes.lnb.warden.server.ServerConfig
 import fr.bde_teknantes.lnb.warden.server.api.ApiHealth
 import java.net.URLEncoder
@@ -99,6 +106,26 @@ object EconomyApi {
     fun siteMailbox(uuid: UUID): CompletableFuture<ApiResult<SiteMailbox>> =
         call("economy mailbox", "GET", "$BASE/players/$uuid/mailbox")
 
+    /** The Market's catalog, settings, tiers and stocks. 503 `disabled` while the Market is off. */
+    fun marketState(): CompletableFuture<ApiResult<MarketStateView>> =
+        call("market state", "GET", "$BASE/market/state")
+
+    /** A player's selling windows. */
+    fun marketPlayer(uuid: UUID): CompletableFuture<ApiResult<MarketPlayerWindow>> =
+        call("market window", "GET", "$BASE/market/players/$uuid")
+
+    /** The public price history of an item. [period] is `24h`, `7d`, `30d` or `1y`. */
+    fun marketHistory(item: String, period: String): CompletableFuture<ApiResult<MarketHistoryView>> =
+        call("market history", "GET", "/api/market/items/${encode(item)}/history?period=${encode(period)}")
+
+    /** The site's own price, changing nothing. */
+    fun marketQuote(body: MarketQuoteBody): CompletableFuture<ApiResult<MarketQuote>> =
+        call("market quote", "POST", "$BASE/market/quote", body)
+
+    /** Replaces the recipe graph the site's loop validator uses. Not behind the Market flag. */
+    fun putRecipes(body: MarketRecipeBody): CompletableFuture<ApiResult<MarketRecipeResult>> =
+        call("market recipes", "PUT", "$BASE/market/recipes", body)
+
     /**
      * A POST to [route] (under `/api/economy/server`, such as `/transfers`), with an answer left as JSON. The journal
      * sends every money move through here, whatever its route.
@@ -115,7 +142,10 @@ object EconomyApi {
             return CompletableFuture.completedFuture(result)
         }
         // Plain HTTP is allowed: the server's admin chose api.url, and LNB Warden warns about it at startup.
-        return ApiClient.send<T>(url, method, path, token, body, requireSecure = false)
-            .thenApply { result -> result.also { ApiHealth.record(what, it) } }
+        return ApiClient.send<T>(url, method, path, token, body, requireSecure = false, headers = EconomyHttp.HEADERS)
+            .thenApply { result ->
+                // A feature LNB turned off (the Market, say) answers 503 `disabled`: the API itself is fine.
+                result.also { if (!it.isDisabled) ApiHealth.record(what, it) }
+            }
     }
 }

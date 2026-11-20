@@ -21,6 +21,8 @@ data class JournalEntry(
     val lastError: String? = null,
     /** Null in entries written when the journal only sent transfers. Read it through [route]. */
     val path: String? = null,
+    /** `cents` once the body's money fields are cents. Null in entries written before 0.3.0, in whole LNBits. */
+    val units: String? = null,
 ) {
     val key: String get() = body.get(KEY).asString
 
@@ -33,7 +35,27 @@ data class JournalEntry(
     /** The amount in the body, when it has one, for operators' listings. */
     val amount: Long? get() = body.get("amount")?.takeIf { it.isJsonPrimitive }?.asLong
 
+    /**
+     * This entry with its money in cents. Entries written before cents (no [units]) hold whole LNBits: their money
+     * fields are multiplied by 100, once, before anything is sent again. Sent with the units header, a body left in
+     * whole LNBits would move a hundredth of the money, or be refused as another request under the same key.
+     */
+    fun inCents(): JournalEntry {
+        if (units == CENTS) return this
+        val converted = body.deepCopy()
+        for (field in MONEY_FIELDS) {
+            val value = converted.get(field)?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isNumber } ?: continue
+            converted.addProperty(field, Math.multiplyExact(value.asLong, 100L))
+        }
+        return copy(body = converted, units = CENTS)
+    }
+
     companion object {
+        const val CENTS = "cents"
+
+        /** The body fields that hold LNBits, on every route the journal sends to. */
+        private val MONEY_FIELDS = listOf("amount", "price", "expectedLotPrice")
+
         const val KEY = "idempotencyKey"
         const val TRANSFERS = "/transfers"
 
@@ -41,7 +63,7 @@ data class JournalEntry(
         fun of(route: String, body: Any, purpose: String, data: Map<String, String> = emptyMap()): JournalEntry {
             val json = ApiClient.GSON.toJsonTree(body).asJsonObject
             require(json.has(KEY)) { "A journal entry's body needs an $KEY" }
-            return JournalEntry(json, purpose, data, path = route)
+            return JournalEntry(json, purpose, data, path = route, units = CENTS)
         }
     }
 }

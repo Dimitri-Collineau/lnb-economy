@@ -4,6 +4,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import fr.bde_teknantes.lnb.economy.LnbEconomy
 import fr.bde_teknantes.lnb.economy.account.PlayerAccounts
+import fr.bde_teknantes.lnb.economy.market.Markets
 import fr.bde_teknantes.lnb.economy.account.SharedAccounts
 import fr.bde_teknantes.lnb.warden.common.api.ApiClient
 import net.minecraft.server.MinecraftServer
@@ -23,6 +24,7 @@ import java.util.UUID
  *
  * - `accounts` `{ uuids }`: those players' accounts and invitations are read again.
  * - `invitation` `{ uuids, id, account: { handle, name }, invitedBy }`: the invited player sees it at once.
+ * - `market` `{ revision, items }` and `market-config` `{ revision }`: see [Markets.onEvent].
  */
 object EconomyEvents {
     private const val PATH = "/api/economy/server/events"
@@ -99,7 +101,7 @@ object EconomyEvents {
 
     private fun listen(server: MinecraftServer) {
         val (url, token) = EconomyApi.connection() ?: return
-        val request = ApiClient.request(url, PATH, token)
+        val request = EconomyHttp.request(url, PATH, token)
             .header("Accept", "text/event-stream")
             .timeout(Duration.ofSeconds(30))
             .apply { lastEventId?.let { header("Last-Event-ID", it) } }
@@ -115,7 +117,10 @@ object EconomyEvents {
         connected = true
         LnbEconomy.LOGGER.info("Connected to LNB's economy event stream")
         // Changes made while the stream was down are lost: read the players' accounts again.
-        server.execute { server.playerList.players.forEach { PlayerAccounts.refresh(server, it.uuid, force = false) } }
+        server.execute {
+            server.playerList.players.forEach { PlayerAccounts.refresh(server, it.uuid, force = false) }
+            Markets.onStreamConnected(server)
+        }
 
         response.body().bufferedReader().use { reader ->
             this.reader = reader
@@ -172,6 +177,7 @@ object EconomyEvents {
                     }
                 }
             }
+            "market", "market-config" -> Markets.onEvent(server, type, body)
             else -> LnbEconomy.LOGGER.debug("Ignoring LNB economy event {}", type)
         }
     }

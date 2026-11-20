@@ -187,4 +187,46 @@ class PayloadCodecTest {
         val sit = PokerActionPayload(BlockPos(4, 70, -9), PokerActionPayload.SIT, 2, 1_000_000)
         assertEquals(sit, roundTrip(PokerActionPayload.STREAM_CODEC, sit))
     }
+
+    private fun <T> registryRoundTrip(codec: StreamCodec<RegistryFriendlyByteBuf, T>, value: T): T {
+        val buf = registryBuf()
+        codec.encode(buf, value)
+        val decoded = codec.decode(buf)
+        assertEquals(0, buf.readableBytes(), "every byte is read back")
+        return decoded
+    }
+
+    @Test
+    fun `market screens`() {
+        val items = List(3) { MarketCatalogItem("minecraft:item_$it", it % 3, true, it != 1, 1.5, 0.1, 9.0, 1000.0, 50.0, 4000.0, 0.8, 0.02, 1234.5 + it) }
+        val catalog = MarketCatalogPayload(
+            true, 42, true, false, true, 0.05, 2304, 123_456_789,
+            listOf(MarketCatalogTier(1, 3_500, 9_300, 40.0, 5.0)), items,
+            listOf(MarketWindowEntry(1, 12.5, 0.5, 20.0, 35.0, 93.0, 0.1), MarketWindowEntry(2, 0.0, 1.0, null, 10.0, 20.0, null)),
+            capped = true, confirmAbove = 100_000, fresh = true,
+        )
+        assertEquals(catalog, registryRoundTrip(MarketCatalogPayload.STREAM_CODEC, catalog))
+        val closed = MarketCatalogPayload.closed(fresh = true)
+        assertEquals(closed, registryRoundTrip(MarketCatalogPayload.STREAM_CODEC, closed))
+        val delta = MarketDeltaPayload(7, 99, mapOf("minecraft:stone" to 10.5, "minecraft:dirt" to 3.0))
+        assertEquals(delta, registryRoundTrip(MarketDeltaPayload.STREAM_CODEC, delta))
+        val window = MarketWindowPayload(catalog.window, true)
+        assertEquals(window, registryRoundTrip(MarketWindowPayload.STREAM_CODEC, window))
+        val history = MarketHistoryPayload("minecraft:stone", "7d", listOf(1.0f, 1.5f, 1.25f))
+        assertEquals(history, registryRoundTrip(MarketHistoryPayload.STREAM_CODEC, history))
+        val request = MarketRequestPayload(MarketRequestPayload.HISTORY, "minecraft:stone", "24h")
+        assertEquals(request, registryRoundTrip(MarketRequestPayload.STREAM_CODEC, request))
+        for (order in listOf(MarketOrderPayload(true, "minecraft:stone", 2304, 123_456, null), MarketOrderPayload(false, "minecraft:stone", 1, 5, "acc-1"))) {
+            assertEquals(order, registryRoundTrip(MarketOrderPayload.STREAM_CODEC, order))
+        }
+    }
+
+    @Test
+    fun `a catalog of a thousand items stays far under the packet limit`() {
+        val items = List(1000) { MarketCatalogItem("minecraft:some_long_item_name_$it", 1, true, true, 1.5, 0.1, 9.0, 1000.0, 50.0, 4000.0, 0.8, 0.02, 1234.5) }
+        val catalog = MarketCatalogPayload(true, 1, true, true, false, 0.05, 2304, 0, emptyList(), items, emptyList(), false)
+        val buf = registryBuf()
+        MarketCatalogPayload.STREAM_CODEC.encode(buf, catalog)
+        assertTrue(buf.readableBytes() < 200_000, "${buf.readableBytes()} bytes")
+    }
 }

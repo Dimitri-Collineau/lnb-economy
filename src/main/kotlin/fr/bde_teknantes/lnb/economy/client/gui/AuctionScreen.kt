@@ -150,13 +150,13 @@ class AuctionScreen : Screen(Component.translatable("gui.lnbeconomy.auction.titl
         val toSell = stackToSell()
         val sideY = panelY + 10
         count = field(sideX + 10, sideY + 55, SIDE_INNER - 8, countText ?: if (toSell.isEmpty) "" else toSell.count.toString(), 2) { countText = it }
-        price = field(sideX + 10, sideY + 83, SIDE_INNER - 22, priceText, 10) { priceText = it }
+        price = field(sideX + 10, sideY + 83, SIDE_INNER - 22, priceText, 13, Amounts::isTypable) { priceText = it }
         account = accountPicker(sideX + 6, sideY + 98)
         addRenderableWidget(
             CasinoButton.primary(Component.translatable("gui.lnbeconomy.auction.sell")) {
                 // An empty field is sent as 0: the server answers with what is missing.
                 val n = count?.value?.toIntOrNull() ?: 0
-                val p = price?.value?.toLongOrNull() ?: 0
+                val p = price?.value?.let(Amounts::parse) ?: 0
                 PacketDistributor.sendToServer(AuctionSellPayload(sellSlot, n, p, chosenAccount()))
                 countText = null
                 priceText = ""
@@ -200,12 +200,12 @@ class AuctionScreen : Screen(Component.translatable("gui.lnbeconomy.auction.titl
     }
 
     /** A borderless box drawn on a sunken field sprite (see [renderBackground]). */
-    private fun field(x: Int, y: Int, w: Int, value: String, maxLength: Int, onChange: (String) -> Unit): EditBox {
+    private fun field(x: Int, y: Int, w: Int, value: String, maxLength: Int, filter: (String) -> Boolean = { it.all(Char::isDigit) }, onChange: (String) -> Unit): EditBox {
         val box = EditBox(font, x, y, w, 10, Component.empty())
         box.setBordered(false)
         box.setTextColor(CasinoUi.IVORY)
         box.setMaxLength(maxLength)
-        box.setFilter { text -> text.all(Char::isDigit) }
+        box.setFilter(filter)
         box.value = value
         box.setResponder(onChange)
         return addRenderableWidget(box)

@@ -22,11 +22,17 @@ object Problems {
     const val ALREADY_CLAIMED = "alreadyClaimed"
     const val NO_LICENSE = "noLicense"
     const val TYPE_LOCKED = "typeLocked"
+    const val ITEM_DISABLED = "itemDisabled"
+    const val NOT_SELLABLE = "notSellable"
+    const val NOT_BUYABLE = "notBuyable"
+    const val ZERO_PAYOUT = "zeroPayout"
+    const val TOO_MANY_ITEMS = "tooManyItems"
 
     /** Problems with their own message; anything else gets the generic one with its code. */
     val KNOWN = setOf(
         INSUFFICIENT_FUNDS, FROZEN, NOT_ALLOWED, NOT_LINKED, NOT_ELIGIBLE, NOT_FOUND, CLOSED, SAME_ACCOUNT, DISABLED,
         SHOP_DISABLED, PRICE_CHANGED, NO_BUY_BACK, TOO_MANY_LISTINGS, LISTING_GONE, NO_LICENSE, TYPE_LOCKED,
+        ITEM_DISABLED, NOT_SELLABLE, NOT_BUYABLE, ZERO_PAYOUT, TOO_MANY_ITEMS,
         "handleTaken", "handleReserved", "tooManyAccounts", "tooManyMembers", "alreadyMember", "alreadyInvited",
         "invitationGone", "lastOwner", "playerNotFound",
     )

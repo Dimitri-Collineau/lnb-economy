@@ -102,8 +102,8 @@ class PokerTableBlockEntity(pos: BlockPos, state: BlockState) : BlockEntity(ModC
         // A round is played in one casino's chips, whatever happens to the link meanwhile.
         if (round.seated.isNotEmpty() && roundCasino != casino) return error(player, Component.translatable("economy.lnbeconomy.poker.cant_sit"))
         if (ante < 1) return error(player, Component.translatable("economy.lnbeconomy.poker.no_ante"))
-        link.maxBet?.let { if (ante > it) return error(player, Component.translatable("economy.lnbeconomy.machine.max_bet", name, Texts.amount(it, player))) }
-        if (Chips.valueIn(player.inventory, casino) < ante) return error(player, Component.translatable("economy.lnbeconomy.poker.no_chips", Texts.amount(ante, player), name))
+        link.maxBet?.let { if (ante > it) return error(player, Component.translatable("economy.lnbeconomy.machine.max_bet", name, Texts.chips(it, player))) }
+        if (Chips.valueIn(player.inventory, casino) < ante) return error(player, Component.translatable("economy.lnbeconomy.poker.no_chips", Texts.chips(ante, player), name))
 
         val key = key(level)
         val exposure = (round.seated.sumOf { it.second.ante } + ante) * HoldemRules.MAX_NET_ANTES
@@ -129,7 +129,7 @@ class PokerTableBlockEntity(pos: BlockPos, state: BlockState) : BlockEntity(ModC
         if (!round.canDecide(player.uuid)) return
         val cost = seat.ante * HoldemRules.CALL_ANTES
         if (Chips.valueIn(player.inventory, casino) < cost) {
-            return error(player, Component.translatable("economy.lnbeconomy.poker.no_chips", Texts.amount(cost, player), Casinos.name(casino)))
+            return error(player, Component.translatable("economy.lnbeconomy.poker.no_chips", Texts.chips(cost, player), Casinos.name(casino)))
         }
         if (!take(player, casino, cost)) return
         round.call(player.uuid)
@@ -192,7 +192,7 @@ class PokerTableBlockEntity(pos: BlockPos, state: BlockState) : BlockEntity(ModC
             val result = seat.result ?: continue
             val won = seat.payout > seat.staked
             val message = Component.translatable(
-                "economy.lnbeconomy.poker.result.${result.name.lowercase()}", Texts.amount(seat.payout, player), Texts.amount(seat.staked, player),
+                "economy.lnbeconomy.poker.result.${result.name.lowercase()}", Texts.chips(seat.payout, player), Texts.chips(seat.staked, player),
             )
             player.sendSystemMessage(message.withStyle(if (won) ChatFormatting.GREEN else if (seat.payout > 0) ChatFormatting.YELLOW else ChatFormatting.GRAY))
             if (won) player.playNotifySound(SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.6f, 1.4f)
@@ -218,7 +218,7 @@ class PokerTableBlockEntity(pos: BlockPos, state: BlockState) : BlockEntity(ModC
         ChipLedger.get(level.server).add(owed.casino, owed.value)
         ItemMailbox.deliverChips(level.server, owed.player, owed.casino, owed.value)
         level.server.playerList.getPlayer(owed.player)?.sendSystemMessage(
-            Component.translatable("economy.lnbeconomy.poker.refunded", Texts.amount(owed.value, level.server.playerList.getPlayer(owed.player))),
+            Component.translatable("economy.lnbeconomy.poker.refunded", Texts.chips(owed.value, level.server.playerList.getPlayer(owed.player))),
         )
         LnbEconomy.LOGGER.info("Poker at {}: gave {} of #{} back to {}", blockPos, owed.value, owed.casino, owed.player)
     }

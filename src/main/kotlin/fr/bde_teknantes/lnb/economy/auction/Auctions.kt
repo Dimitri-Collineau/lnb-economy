@@ -233,7 +233,7 @@ object Auctions {
     }
 
     /** Claims one item, unless a claim for it is already waiting in the journal. */
-    private fun claim(player: UUID, itemId: String) {
+    fun claim(player: UUID, itemId: String) {
         if (!isId(itemId)) return
         val route = "/mailbox/$itemId/claim"
         if (TransferJournal.pending.any { it.route == route }) return
@@ -345,7 +345,21 @@ object Auctions {
                     LnbEconomy.LOGGER.error("Mailbox item {} for {} has an unreadable SNBT, kept on the site's record only: {}", item.id, uuid, item.item.snbt)
                     return
                 }
-                ItemMailbox.deliverSaved(server, uuid, listOf(tag))
+                // The row says how many were claimed: hand over exactly that many, in stacks the game accepts
+                // (a Market purchase can be 36 stacks).
+                val stack = ItemStacks.fromTag(tag, server.registryAccess())
+                if (stack == null || item.count < 1) {
+                    ItemMailbox.deliverSaved(server, uuid, listOf(tag))
+                    return
+                }
+                val stacks = ArrayList<ItemStack>()
+                var left = item.count
+                while (left > 0) {
+                    val part = minOf(left, stack.maxStackSize)
+                    stacks += stack.copyWithCount(part)
+                    left -= part
+                }
+                ItemMailbox.deliver(server, uuid, stacks)
             }
         }
     }

@@ -15,6 +15,7 @@ import fr.bde_teknantes.lnb.economy.ledger.JournalEntry
 import fr.bde_teknantes.lnb.economy.ledger.Outcome
 import fr.bde_teknantes.lnb.economy.ledger.TransferJournal
 import fr.bde_teknantes.lnb.economy.mail.ItemMailbox
+import fr.bde_teknantes.lnb.economy.money.Amounts
 import fr.bde_teknantes.lnb.economy.money.Texts
 import fr.bde_teknantes.lnb.economy.network.CounterBuyPayload
 import fr.bde_teknantes.lnb.economy.network.CounterCashPayload
@@ -63,7 +64,7 @@ object Counters {
     fun handleBuy(payload: CounterBuyPayload, context: IPayloadContext) {
         val player = context.player() as? ServerPlayer ?: return
         val handle = casinoAt(player, payload.pos) ?: return
-        if (payload.amount < 1 || payload.amount > TransferBody.MAX_AMOUNT) return
+        if (payload.amount < 1 || payload.amount > Amounts.toWholeLnbits(TransferBody.MAX_AMOUNT)) return
         if (!hasEconomy(player) || !casinoOpen(player, handle)) return
         val accounts = PlayerAccounts.accounts(player.uuid)
         if (payload.accountId != null && accounts?.accounts?.any { it.id == payload.accountId && it.canSpend } != true) {
@@ -74,7 +75,7 @@ object Counters {
         TransferJournal.submit(
             from = Party(player = player.uuid.toString(), account = payload.accountId),
             to = Party(account = handle),
-            amount = payload.amount,
+            amount = Amounts.fromLnbits(payload.amount),
             kind = TransferBody.KIND_CASINO,
             memo = MEMO_BUY,
             purpose = BUY,
@@ -97,7 +98,7 @@ object Counters {
         TransferJournal.submit(
             from = Party(account = handle),
             to = Party(player = player.uuid.toString()),
-            amount = value,
+            amount = Amounts.fromLnbits(value),
             kind = TransferBody.KIND_CASINO,
             memo = MEMO_CASH,
             purpose = CASH,
@@ -116,7 +117,7 @@ object Counters {
         }
         teller(player, payload.pos)?.count()
         ItemMailbox.deliver(player.server, player.uuid, Chips.make(handle, value, payload.largest))
-        player.sendSystemMessage(Component.translatable("economy.lnbeconomy.counter.changed", Texts.amount(value, player)))
+        player.sendSystemMessage(Component.translatable("economy.lnbeconomy.counter.changed", Texts.amount(Amounts.fromLnbits(value), player)))
     }
 
     private fun finishBuy(server: MinecraftServer, entry: JournalEntry, outcome: Outcome) {
@@ -128,8 +129,9 @@ object Counters {
             is Outcome.Refused -> player?.let { error(it, Texts.problem(outcome.result)) }
             is Outcome.Done -> {
                 PlayerAccounts.applyTransfer(server, outcome.result)
-                ChipLedger.get(server).add(handle, outcome.result.amount)
-                ItemMailbox.deliverChips(server, uuid, handle, outcome.result.amount)
+                val chips = Amounts.toWholeLnbits(outcome.result.amount)
+                ChipLedger.get(server).add(handle, chips)
+                ItemMailbox.deliverChips(server, uuid, handle, chips)
                 player?.sendSystemMessage(
                     Component.translatable("economy.lnbeconomy.counter.bought", Texts.amount(outcome.result.amount, player), Casinos.name(handle))
                         .withStyle(ChatFormatting.GREEN),
@@ -145,7 +147,7 @@ object Counters {
         when (outcome) {
             is Outcome.Delayed -> player?.sendSystemMessage(Component.translatable("economy.lnbeconomy.counter.delayed").withStyle(ChatFormatting.GRAY))
             is Outcome.Refused -> {
-                val amount = entry.amount ?: 0
+                val amount = Amounts.toWholeLnbits(entry.amount ?: 0)
                 ChipLedger.get(server).add(handle, amount)
                 ItemMailbox.deliverChips(server, uuid, handle, amount)
                 player?.let {

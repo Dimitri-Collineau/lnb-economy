@@ -2,10 +2,11 @@ package fr.bde_teknantes.lnb.economy.command
 
 import fr.bde_teknantes.lnb.economy.api.Handles
 import fr.bde_teknantes.lnb.economy.api.TransferBody
+import fr.bde_teknantes.lnb.economy.money.Amounts
 
 /**
  * Parses what follows `/pay` and `/payfrom`. Brigadier's word arguments can't hold a `#`, so the commands take the
- * rest of the line and split it here: `<target> <amount> [message]`.
+ * rest of the line and split it here: `<target> <amount> [message]`. The amount is in LNBits, with up to two decimals, and parsed to cents.
  */
 object PayArguments {
     sealed interface Target {
@@ -34,7 +35,7 @@ object PayArguments {
         val target = target(parts[0]) ?: return Result.Error(
             if (parts[0].startsWith("#")) "economy.lnbeconomy.pay.bad_handle" else "economy.lnbeconomy.pay.bad_player",
         )
-        val amount = parts[1].toLongOrNull()
+        val amount = Amounts.parse(parts[1])
         if (amount == null || amount < 1 || amount > TransferBody.MAX_AMOUNT) return Result.Error("economy.lnbeconomy.pay.bad_amount")
         val memo = parts.getOrNull(2)?.trim()?.takeIf { it.isNotEmpty() }
         if (memo != null && memo.length > TransferBody.MAX_MEMO_LENGTH) return Result.Error("economy.lnbeconomy.pay.memo_too_long")

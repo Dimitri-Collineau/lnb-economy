@@ -155,8 +155,32 @@ class JournalCoreTest {
         val entry = core.pending.single()
         assertEquals(JournalEntry.TRANSFERS, entry.route)
         assertEquals("old-key", entry.key)
-        assertEquals(250, entry.transfer?.amount)
+        assertEquals(25_000, entry.transfer?.amount) // 250 LNBits, written before cents
+        assertEquals(JournalEntry.CENTS, entry.units)
         assertEquals(mapOf("chips" to "25"), entry.data)
+    }
+
+    @Test
+    fun `an entry from before cents is converted once, whatever its route`() {
+        val file = dir.resolve("journal.json")
+        Files.writeString(
+            file,
+            """[{"body":{"idempotencyKey":"a","price":1500,"count":1},"purpose":"test","data":{},"path":"/auctions"},""" +
+                """{"body":{"idempotencyKey":"b","expectedLotPrice":7,"lots":2},"purpose":"test","data":{},"path":"/shops/x/orders"},""" +
+                """{"body":{"idempotencyKey":"c","amount":3},"purpose":"test","data":{},"path":"/mints","units":"cents"},""" +
+                """{"body":{"idempotencyKey":"d","player":"p"},"purpose":"test","data":{},"path":"/auctions/1/buy"}]""",
+        )
+        val first = JournalStore(file).load()
+        assertEquals(150_000, first[0].body.get("price").asLong)
+        assertEquals(1, first[0].body.get("count").asInt)
+        assertEquals(700, first[1].body.get("expectedLotPrice").asLong)
+        assertEquals(2, first[1].body.get("lots").asInt)
+        assertEquals(3, first[2].body.get("amount").asLong) // already cents
+        assertEquals("p", first[3].body.get("player").asString)
+
+        // Saved, then read again: not multiplied a second time.
+        JournalStore(file).save(first)
+        assertEquals(150_000, JournalStore(file).load()[0].body.get("price").asLong)
     }
 
     @Test

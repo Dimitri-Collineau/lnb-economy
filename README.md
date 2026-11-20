@@ -6,12 +6,16 @@ the mod on a player's computer only talks to the server. The contract is `docs/e
 
 ## What it does
 
+- **Cents.** Amounts are exact to the cent (1 LNBit = 100 cents): the mod counts in whole cents, never in decimals,
+  and sends `X-Economy-Units: cents` on every economy call, as the site asks. Chips stay whole LNBits (1, 5, 25, 100,
+  500, 1000), and the settings in LNBits (`pay.confirmAbove`, the mob drop amounts) are still whole LNBits. Data saved
+  before 0.3.0 (shop prices, calls waiting in the journal) is converted once on load.
 - **Balances.** The inventory shows the default account's balance, with a "My accounts" button to see every account
   and choose the one that pays by default. Players without a linked LNB account have no economy.
 - **Commands.**
   - `/balance` (`/bal`): your accounts.
-  - `/pay <player|#account> <amount> [message]`: pays from your default account. Above `pay.confirmAbove`, asks to
-    confirm with a click.
+  - `/pay <player|#account> <amount> [message]`: pays from your default account. The amount is in LNBits with up to
+    two decimals (`/pay Steve 0.5`, `/pay Steve 12,34`). Above `pay.confirmAbove`, asks to confirm with a click.
   - `/payfrom <#account> <player|#account> <amount> [message]`: pays from a shared account you own or are a member of.
   - `/account` (`/compte`): shared accounts. `create <handle> <name>`, `rename <handle> <name>`,
     `type <handle> team|shop|casino`, `invite <handle> <player>`, `members <handle>`, `invitations`,
@@ -19,6 +23,7 @@ the mod on a player's computer only talks to the server. The contract is `docs/e
   - `/trade <player>`: asks to trade, from any distance (a key, unbound by default, asks the player in front of you).
   - `/hdv` (`/ah`): opens the auction house, unless `features.auctionsCommand` is off.
   - `/mailbox` (`/courrier`): collects items that didn't fit in your inventory.
+  - `/market`: opens the Market, or a "closed" screen that opens the Market by itself when it reopens.
   - `/economy notify on|off`: messages when someone buys from or sells to your shops, and when one of your auction
     house listings sells.
   - `/economy status|pending|retry <key>|casino <#account> [outstanding <value>]`: operators.
@@ -69,6 +74,16 @@ the mod on a player's computer only talks to the server. The contract is `docs/e
   the server claims with a key and hands over; unsold items come back the same way from "To collect". The seller is
   told when a listing sells, right away or when they next join. It opens with `/hdv`, an auction house podium
   (operators only, unbreakable outside creative) or the auctioneer NPC.
+- **Market.** `/market` opens a screen to sell items to the Market and buy them from it, at the prices the site
+  computes from each item's stock. The server reads the Market's state, events and recipes from the site and relays
+  them; clients never call the site. The screen lists the items with their price for 1 and for 64 and their change
+  against the base price, with a search, a sort and the player's own efficiency tier. An order panel shows a price
+  history chart (24 h, 7 d, 30 d, 1 y), the quantity (chips, "All" or a typed number) and the exact total, priced by
+  the same formula as the site and corrected from the site's answer if it differs. Only plain items are sold (no
+  enchantment, damage, name or contents); a purchase is delivered through the mailbox. A sale is held in the journal
+  entry while the site decides, so a refusal or a crash gives the items back, and a purchase is claimed once, even
+  after a restart. Above `pay.confirmAbove` a second click confirms. When the site turns the Market off the screen
+  says so, and the "Pay to" choice on sales appears when the site supports it (`settings.saleAccount`).
 - **Mob drops.** A hostile mob killed by a player has a chance (10 %) to leave them a few LNBits (1 to 10), minted by
   the site on their personal account right away. Mobs from spawners give nothing by default.
 - **Mailbox.** Items owed to a player (bought chips or items, items handed back) go straight to the inventory; what
@@ -86,7 +101,7 @@ Java 21. Then put these jars in the instance's `mods/` folder. The same mods go 
 | Mod              | Version                          | Needed                                                                     |
 |------------------|----------------------------------|----------------------------------------------------------------------------|
 | LNB Economy      | this mod, from the [releases][r] | required, on the server and on the players' computers                      |
-| LNB Warden       | 0.1.0 or newer                   | required, on the server and on the players' computers                      |
+| LNB Warden       | 0.4.0 or newer                   | required, on the server and on the players' computers                      |
 | Kotlin for Forge | 5.12 or newer                    | required                                                                   |
 | GeckoLib         | 4.9 or newer (tested on 4.9.3)   | required: the counter's teller and the license dealer are animated with it |
 | MineVegas Casino | 1.1.1 up to, not including, 1.2  | optional: its machines then take only the chips of their casino            |
@@ -178,6 +193,6 @@ AGPL-3.0-or-later, like LNB Warden and the site.
 | `LNB_TEST_CASINO` | handle of a shared account that player owns or is a member of              |
 | `LNB_TEST_PARTNER` | optional: UUID of another player's linked Minecraft account, for trades     |
 
-The tests move 1 LNBit to that account and back. Without these variables, they are skipped.
+The tests move 0.01 LNBit (1 cent) to that account and back. Without these variables, they are skipped.
 
 `TESTING.md` is the manual test plan, in game.

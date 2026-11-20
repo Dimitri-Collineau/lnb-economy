@@ -4,6 +4,9 @@ import com.mojang.logging.LogUtils
 import fr.bde_teknantes.lnb.economy.account.PlayerAccounts
 import fr.bde_teknantes.lnb.economy.account.SharedAccounts
 import fr.bde_teknantes.lnb.economy.api.EconomyEvents
+import fr.bde_teknantes.lnb.economy.market.MarketOrders
+import fr.bde_teknantes.lnb.economy.market.MarketViews
+import fr.bde_teknantes.lnb.economy.market.Markets
 import fr.bde_teknantes.lnb.economy.auction.Auctions
 import fr.bde_teknantes.lnb.economy.casino.CasinoLinks
 import fr.bde_teknantes.lnb.economy.casino.Casinos
@@ -54,6 +57,7 @@ class LnbEconomy(modBus: IEventBus, container: ModContainer) {
         Shops.register()
         Trades.register()
         Auctions.register()
+        MarketOrders.register()
         MobDrops.register()
         Licenses.register()
         modBus.addListener(ShopItemHandler::register)
@@ -71,6 +75,10 @@ class LnbEconomy(modBus: IEventBus, container: ModContainer) {
         NeoForge.EVENT_BUS.addListener(EconomyEvents::onServerStopping)
         NeoForge.EVENT_BUS.addListener(EconomyEvents::onServerTick)
         NeoForge.EVENT_BUS.addListener(SharedAccounts::registerCommands)
+        NeoForge.EVENT_BUS.addListener(Markets::onServerStarted)
+        NeoForge.EVENT_BUS.addListener(Markets::onServerStopped)
+        NeoForge.EVENT_BUS.addListener(Markets::onServerTick)
+        NeoForge.EVENT_BUS.addListener(Markets::onTagsUpdated)
         NeoForge.EVENT_BUS.addListener(Casinos::onServerStarted)
         NeoForge.EVENT_BUS.addListener(Casinos::onServerStopped)
         NeoForge.EVENT_BUS.addListener(Casinos::onServerTick)
@@ -81,6 +89,8 @@ class LnbEconomy(modBus: IEventBus, container: ModContainer) {
         NeoForge.EVENT_BUS.addListener(Licenses::onLoggedOut)
         NeoForge.EVENT_BUS.addListener(Auctions::onLoggedIn)
         NeoForge.EVENT_BUS.addListener(Auctions::onLoggedOut)
+        NeoForge.EVENT_BUS.addListener(MarketViews::registerCommands)
+        NeoForge.EVENT_BUS.addListener(MarketViews::onLoggedOut)
         NeoForge.EVENT_BUS.addListener(Trades::onServerTick)
         NeoForge.EVENT_BUS.addListener(Trades::onLoggedOut)
         NeoForge.EVENT_BUS.addListener(Trades::onServerStopped)

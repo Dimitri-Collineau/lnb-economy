@@ -6,6 +6,7 @@ import fr.bde_teknantes.lnb.economy.casino.Licenses
 import fr.bde_teknantes.lnb.economy.casino.Links
 import fr.bde_teknantes.lnb.economy.client.ClientPayloadHandler
 import fr.bde_teknantes.lnb.economy.counter.Counters
+import fr.bde_teknantes.lnb.economy.market.MarketViews
 import fr.bde_teknantes.lnb.economy.poker.PokerTables
 import fr.bde_teknantes.lnb.economy.shop.Shops
 import fr.bde_teknantes.lnb.economy.trade.Trades
@@ -16,7 +17,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent
  * Bump [PROTOCOL_VERSION] whenever a payload changes, so mismatched client and server versions refuse to connect.
  */
 object EconomyNetwork {
-    private const val PROTOCOL_VERSION = "9"
+    private const val PROTOCOL_VERSION = "10"
 
     fun register(event: RegisterPayloadHandlersEvent) {
         val registrar = event.registrar(PROTOCOL_VERSION)
@@ -88,6 +89,23 @@ object EconomyNetwork {
         registrar.playToServer(AuctionBuyPayload.TYPE, AuctionBuyPayload.STREAM_CODEC, Auctions::handleBuy)
         registrar.playToServer(AuctionCancelPayload.TYPE, AuctionCancelPayload.STREAM_CODEC, Auctions::handleCancel)
         registrar.playToServer(AuctionCollectPayload.TYPE, AuctionCollectPayload.STREAM_CODEC, Auctions::handleCollect)
+        registrar.playToClient(MarketCatalogPayload.TYPE, MarketCatalogPayload.STREAM_CODEC) { payload, context ->
+            ClientPayloadHandler.handleMarketCatalog(payload, context)
+        }
+        registrar.playToClient(MarketDeltaPayload.TYPE, MarketDeltaPayload.STREAM_CODEC) { payload, context ->
+            ClientPayloadHandler.handleMarketDelta(payload, context)
+        }
+        registrar.playToClient(MarketWindowPayload.TYPE, MarketWindowPayload.STREAM_CODEC) { payload, context ->
+            ClientPayloadHandler.handleMarketWindow(payload, context)
+        }
+        registrar.playToClient(MarketHistoryPayload.TYPE, MarketHistoryPayload.STREAM_CODEC) { payload, context ->
+            ClientPayloadHandler.handleMarketHistory(payload, context)
+        }
+        registrar.playToClient(MarketResultPayload.TYPE, MarketResultPayload.STREAM_CODEC) { payload, context ->
+            ClientPayloadHandler.handleMarketResult(payload, context)
+        }
+        registrar.playToServer(MarketRequestPayload.TYPE, MarketRequestPayload.STREAM_CODEC, MarketViews::handleRequest)
+        registrar.playToServer(MarketOrderPayload.TYPE, MarketOrderPayload.STREAM_CODEC, MarketViews::handleOrder)
         registrar.playToServer(LinkPayload.TYPE, LinkPayload.STREAM_CODEC, Links::handleLink)
         registrar.playToServer(CounterWoodPayload.TYPE, CounterWoodPayload.STREAM_CODEC, Links::handleWood)
         registrar.playToServer(RefreshAccountsPayload.TYPE, RefreshAccountsPayload.STREAM_CODEC, ServerPayloadHandler::handleRefresh)

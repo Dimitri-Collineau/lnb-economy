@@ -81,7 +81,7 @@ class JournalCore(
     private fun answered(key: String, result: ApiResult<JsonElement>) {
         inFlight.remove(key)
         val entry = entries[key] ?: return
-        when (RetryPolicy.verdict(result)) {
+        when (RetryPolicy.verdict(result, entry.route)) {
             Verdict.DONE -> {
                 entries.remove(key)
                 store.save(entries.values)
@@ -92,11 +92,20 @@ class JournalCore(
                 store.save(entries.values)
                 onOutcome(entry, Outcome.Refused(result))
             }
+            Verdict.HOLD -> {
+                // Never sent again by itself: the first time, the handler hears of it as a delay, and finds the
+                // reason in the result.
+                val first = entry.nextAttemptAt != Long.MAX_VALUE
+                val updated = entry.copy(attempts = entry.attempts + 1, nextAttemptAt = Long.MAX_VALUE, lastError = result.describe())
+                entries[key] = updated
+                store.save(entries.values)
+                if (first) onOutcome(updated, Outcome.Delayed(result))
+            }
             Verdict.RETRY -> {
                 val attempts = entry.attempts + 1
                 val updated = entry.copy(
                     attempts = attempts,
-                    nextAttemptAt = clock() + RetryPolicy.delayAfter(attempts),
+                    nextAttemptAt = clock() + RetryPolicy.delayAfter(attempts, entry.route),
                     lastError = result.describe(),
                 )
                 entries[key] = updated
